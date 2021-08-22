@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "game_manager",
+    "dijkstra_map"
+]

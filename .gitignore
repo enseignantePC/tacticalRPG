@@ -1,1 +1,2 @@
-djikstra
+**/target/
+**Cargo.lock
