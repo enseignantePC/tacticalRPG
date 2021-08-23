@@ -1,78 +1,22 @@
-/// Represents the options an entity can chose from for deciding what to do in the game
-///
-/// generated at with
-///     entity intern state
-///     external context
-
-/// contains exhaustive info about a movement
-#[derive(Clone)]
-pub struct MoveInfo {}
-/// contains exhaustive info about an attack  
-#[derive(Clone)]
-pub struct AttackInfo {}
-/// contains exhaustive info about an object use
-#[derive(Clone)]
-pub struct ObjectInfo {}
-/// contains exhaustive info about a spell use
-#[derive(Clone)]
-pub struct SpellInfo {}
-
-impl MoveInfo {
-    fn next_step(&self) {
-        todo!()
-    }
+use super::*;
+/// represent the intent of doing something in the world
+pub struct Intent {
+    action: Action,
+    priority: f64,
 }
 
 pub enum PlayOptions {
     Pass,
-    Move(Vec<MoveInfo>),
-    Attack(Vec<AttackInfo>),
-    Object(Vec<ObjectInfo>),
-    Spell(Vec<SpellInfo>),
-}
-
-/// representation of what an entity will achieve
-
-#[derive(Clone)]
-pub enum Action {
-    Move(MoveInfo),
-    Attack(AttackInfo),
-    Object(ObjectInfo),
-    Spell(SpellInfo),
-}
-impl Action {
-    fn minimal_action(&self) -> Self {
-        use Action::*;
-        match self {
-            Move(move_info) => {
-                // one step on map
-                todo!()
-            }
-            // Action if feature combo implemented
-            x => x.clone(),
-        }
-    }
+    ActionKind,
 }
 
 /// representation of what an entity wants to do
-pub struct Intent {
-    priority: f64,
-    action: Action,
-}
-
-impl Intent {
-    fn minimal_intent(&self) -> Self {
-        Intent {
-            priority: self.priority,
-            action: self.action.minimal_action(),
-        }
-    }
-}
 
 impl Intent {
     /// splits the intent into the more little Action and the rest of the intented action as an intent remainder
     pub fn poll_minimal_action(&self) -> (Intent, Action) {
-        let minimal_action: Action = self.action.minimal_action();
+        let minimal_action: Action = todo!(); 
+        //self.action.minimal_action();
         let intent_remainder: Intent = todo!();
         (intent_remainder, minimal_action)
     }
@@ -106,18 +50,8 @@ impl IntentSubmitter {
         let top_intent: Intent = todo!(); //pop the head of the queue
                                           // is top intent still faisable?
 
-        // declare to IntentWatcher top intent
-
-        // still is top intent?
-        let top_intent_unchanged: bool = todo!();
-
-        if top_intent_unchanged {
-            let (intent, minimal_action) = top_intent.poll_minimal_action();
-            // submit new intent at TOP of queue
-            todo!();
-            Ok(minimal_action)
-        } else {
-            Err(())
-        }
+        let (intent, minimal_action) = top_intent.poll_minimal_action();
+        /// submit minimal action
+        todo!()
     }
 }

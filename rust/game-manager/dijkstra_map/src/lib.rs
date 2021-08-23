@@ -2,6 +2,7 @@
 //!
 //! This is intended for use in Godot, via the **dijkstra-map-gd** crate.
 
+pub use euclid::Vector2D;
 use fnv::FnvHashMap;
 use fnv::FnvHashSet;
 

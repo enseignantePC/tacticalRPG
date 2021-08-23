@@ -1,5 +1,4 @@
-use super::{DijkstraMap, FnvHashMap, PointId, TerrainType, Weight};
-use euclid::Vector2D;
+use super::{DijkstraMap, FnvHashMap, PointId, TerrainType, Vector2D, Weight};
 
 impl DijkstraMap {
     /// Function for common processing input of add_*grid methods.

@@ -1,22 +1,25 @@
 #![allow(dead_code, unused_imports)]
+use std::collections::HashMap;
+
 use dijkstra_map::DijkstraMap;
 use gdnative::prelude::*;
+use on_the_map::Entity;
 
+/// everuthing doable in the world
+pub mod action;
+use action::*;
+/// module that deals with transforming an attack into a consequence on the world
+pub mod attack_solver;
 /// responsible for representing the world on a 2D grid
 pub mod map;
-
-/// holds method for turn_logic
-pub mod turn_logic;
-
 /// everything that is on the map
 pub mod on_the_map;
 
-/*
-/// everything that is on the map has this trait
-///
-/// means you can generate PlayOptions by interacting with this
-pub trait Interactable {}*/
+pub mod game_manager;
+pub use game_manager::*;
 
+/// holds method for turn_logic
+pub mod turn_logic;
 /// represents teams in the game for the game manager
 pub enum TeamID {
     /// maps a i32 to a team
@@ -26,60 +29,45 @@ pub enum TeamID {
 }
 /// represents an action that happenned in the world
 pub enum Consequences {}
-///
-pub struct GameManager {}
-pub struct UninitialisedGameManager {}
-
-impl UninitialisedGameManager {
-    fn initialise() -> GameManager {
-        todo!()
-    }
+/// this is the current state of the game manager
+pub enum Status {
+    FightNotStarted,
+    EntityWaitingForInput,
+    FightEnded,
 }
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+/// allows reference to this entity for the game manager
+pub struct EntityId(pub i64);
 
-impl GameManager {
-    fn new() -> UninitialisedGameManager {
-        todo!()
-    }
-    /// adds a new entity on the map
-    /// fails if the place is occupied
-    fn register_entity(entity: on_the_map::Entity, map_position: map::Pos2D) -> Result<(), ()> {
-        todo!()
-    }
-    ///
-    fn play_turn() {
-        todo!()
-    }
-    /// if a player p is playing its turn, give the intent for that player
-    fn give_intent() -> Vec<Consequences> {
-        todo!()
-    }
-    /// ask who is playing and what are his options, is the game finished? etc
-    fn ask_status() {
-        todo!()
-    }
-}
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::on_the_map::Entity;
+
     fn basic_initialise_map() -> map::Map {
-        todo!()
+        let m = map::Map::new();
+        m.initialise(20, 20)
     }
-    fn basic_initialise_game_manager() {
+    fn basic_initialise_game_manager() -> GameManager {
         let manager = GameManager::new();
-        todo!()
+        manager.initialise()
     }
     #[test]
     fn basic_test() {
-        panic!()
         // initialize the game manager
-        //  give it a map
+        let mut gm = basic_initialise_game_manager();
         //  one player
+        let result = gm.register_entity(Entity::example_entity(), map::Pos2D(0, 0));
+        result.unwrap();
+        panic!()
     }
     #[test]
     fn _move() {
         // initialize the game manager
         // on player turn make it move somewhere
+        // assert the player did move
         todo!()
     }
     #[test]
@@ -87,6 +75,7 @@ mod tests {
         // initialize the game manager
         // add a second player
         // on player turn make it attack somewhere
+        // assert the second player was damaged
         todo!()
     }
     /// player A attack player B, player B counterAttacks
@@ -103,5 +92,38 @@ mod tests {
     #[test]
     fn no_double_attack_if_not_deadly() {
         todo!()
+    }
+    #[cfg(test)]
+    mod can_attack_if {
+        use super::*;
+
+        #[test]
+        fn in_range() {
+            todo!()
+        }
+        #[test]
+        fn not_if_not_in_range() {
+            todo!()
+        }
+        #[test]
+        fn loner_vs_loner() {
+            todo!()
+        }
+        #[test]
+        fn loner_vs_any_team() {
+            todo!()
+        }
+        #[test]
+        fn any_team_vs_loner() {
+            todo!()
+        }
+        #[test]
+        fn cant_if_same_team() {
+            todo!()
+        }
+        #[test]
+        fn different_teams() {
+            todo!()
+        }
     }
 }
