@@ -20,6 +20,7 @@ pub use game_manager::*;
 
 /// holds method for turn_logic
 pub mod turn_logic;
+use turn_logic::*;
 /// represents teams in the game for the game manager
 pub enum TeamID {
     /// maps a i32 to a team
@@ -32,14 +33,12 @@ pub enum Consequences {}
 /// this is the current state of the game manager
 pub enum Status {
     FightNotStarted,
-    EntityWaitingForInput,
+    EntityWaitingForInput(EntityId),
     FightEnded,
 }
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
 /// allows reference to this entity for the game manager
 pub struct EntityId(pub i64);
-
-
 
 #[cfg(test)]
 mod tests {
@@ -47,8 +46,7 @@ mod tests {
     use crate::on_the_map::Entity;
 
     fn basic_initialise_map() -> map::Map {
-        let m = map::Map::new();
-        m.initialise(20, 20)
+        map::Map::new(20, 20)
     }
     fn basic_initialise_game_manager() -> GameManager {
         let manager = GameManager::new();
@@ -62,6 +60,10 @@ mod tests {
         let result = gm.register_entity(Entity::example_entity(), map::Pos2D(0, 0));
         result.unwrap();
         panic!()
+    }
+    #[test]
+    fn can_retrieve_choices_from_gamemanager() {
+        todo!()
     }
     #[test]
     fn _move() {

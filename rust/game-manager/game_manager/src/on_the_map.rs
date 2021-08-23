@@ -1,6 +1,8 @@
-/// "live" thing interacting in the world
+/// everything that is on the map
+///
 use super::TeamID;
 
+/// An entity is the only thing on the map that requires input to decide what to do
 pub struct Entity {
     team: TeamID,
 }
