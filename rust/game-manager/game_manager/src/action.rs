@@ -1,4 +1,5 @@
 use crate::map::Pos2D;
+pub use crate::map::Vector2D;
 
 /// Represents the options an entity can chose from for deciding what to do in the game
 ///
@@ -10,9 +11,9 @@ use crate::map::Pos2D;
 #[derive(Clone, Debug)]
 pub struct Move {
     /// every position the entity will cross to get to their final point,
-    ///     starting with where they are now
+    ///     excluing where they are now
     ///     ending where they will end
-    path: Vec<Pos2D>,
+    pub path: Vec<Pos2D>,
 }
 /// contains exhaustive info about an attack  
 #[derive(PartialEq, PartialOrd, Clone, Copy, Debug)]
@@ -52,7 +53,7 @@ impl Action {
     /// return an action devoid of sense most of the time for testing purposes
     pub fn void_action() -> Action {
         Action::Move(Move {
-            path: vec![Pos2D(0, 0)],
+            path: vec![Pos2D::new(0, 0)],
         })
     }
 }

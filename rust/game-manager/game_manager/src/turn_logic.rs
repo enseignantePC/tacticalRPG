@@ -15,10 +15,25 @@ pub enum PlayOptions {
 
 impl Intent {
     /// splits the intent into the more little Action and the rest of the intented action as an intent remainder
-    pub fn extract_minimal_intent(&self) -> (Intent, Intent) {
-        let minimal_intent: Intent = todo!();
-        //self.action.minimal_action();
-        let remainder_intent: Intent = todo!();
+    pub fn extract_minimal_intent(self) -> (Intent, Intent) {
+        let (minimal_intent, remainder_intent) = match self.action {
+            Action::Attack(a) => todo!(),
+            Action::Move(mut m) => {
+                let next_path = vec![m.path.remove(0)];
+                (
+                    Intent {
+                        action: Action::Move(Move { path: next_path }),
+                        priority: self.priority,
+                    },
+                    Intent {
+                        action: Action::Move(Move { path: m.path }),
+                        priority: self.priority,
+                    },
+                )
+            }
+            Action::Object(o) => todo!(),
+            Action::Spell(s) => todo!(),
+        };
         (minimal_intent, remainder_intent)
     }
     pub fn void_intent() -> Intent {
@@ -102,5 +117,65 @@ mod tests {
     #[test]
     fn remainder_intents_gets_treated_first() {
         todo!()
+    }
+    #[cfg(test)]
+    mod extract_minimal_intent {
+        use crate::map::Pos2D;
+
+        use super::*;
+
+        #[test]
+        fn one() {
+            let intent = Intent {
+                action: Action::Move(Move {
+                    path: vec![Pos2D::new(1, 2)],
+                }),
+                priority: 0,
+            };
+            let (a, b) = intent.extract_minimal_intent();
+            if let Action::Move(x) = a.action {
+                assert_eq!(x.path, vec![Pos2D::new(1, 2)]);
+            } else {
+                assert!(false);
+            };
+            if let Action::Move(x) = b.action {
+                assert_eq!(x.path, vec![]);
+            } else {
+                assert!(false);
+            };
+        }
+        #[test]
+        fn two() {
+            let intent = Intent {
+                action: Action::Move(Move {
+                    path: vec![Pos2D::new(1, 2), Pos2D::new(3, 4), Pos2D::new(5, 6)],
+                }),
+                priority: 0,
+            };
+            let (a, b) = intent.extract_minimal_intent();
+            if let Action::Move(x) = a.action {
+                assert_eq!(x.path, vec![Pos2D::new(1, 2)]);
+            } else {
+                assert!(false);
+            };
+            if let Action::Move(x) = b.action {
+                assert_eq!(x.path, vec![Pos2D::new(3, 4), Pos2D::new(5, 6)]);
+            } else {
+                assert!(false);
+            };
+        }
+        #[test]
+        fn priority_kept() {
+            let intent = Intent {
+                action: Action::Move(Move {
+                    path: vec![Pos2D::new(1, 2), Pos2D::new(3, 4), Pos2D::new(5, 6)],
+                }),
+                priority: 4,
+            };
+            let (a, b) = intent.extract_minimal_intent();
+            assert_eq!(a.priority, 4);
+            assert_eq!(b.priority, 4);
+            dbg!(a);
+        }
     }
 }

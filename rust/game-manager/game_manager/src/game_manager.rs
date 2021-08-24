@@ -47,6 +47,17 @@ impl GameManager {
         }
         Err(())
     }
+    /// generate valid inputs for entity
+    /// what movements are okay
+    /// what attacks are okay
+    /// etc
+    pub fn get_valid_inputs(&self, entity_id: EntityId) {
+        self.map.get_valid_movement_for_entity_at_pos(
+            self.entity_id_to_entity.get(&entity_id).unwrap(),
+            todo!(),
+        );
+        todo!()
+    }
     /// if a player p is playing its turn, give the intent for that player
     pub fn give_inputs(&mut self, intent: Intent) {
         // submit a new input

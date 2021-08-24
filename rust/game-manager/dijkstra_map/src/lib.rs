@@ -155,6 +155,7 @@ impl DijkstraMap {
     /// # Parameters
     ///
     /// - `origins` : slice of IDs for origin points.
+    /// TODO : not clear
     /// - `read` (default : [`InputIsDestination`](Read::InputIsDestination)):
     /// Wether or not the origin points are seen as destination.
     /// - `max_cost` (default : [`INFINITY`](Cost::infinity)) : Specifies
@@ -169,6 +170,7 @@ impl DijkstraMap {
     /// - `terrain_weights` : Specifies weights for terrain types. Keys are
     /// terrain type IDs and values are [weights](Weight).
     ///
+    /// TODO throw a warning
     ///   Unspecified values are assumed to be [`INFINITY`](Weight::infinity)
     /// by default.
     ///

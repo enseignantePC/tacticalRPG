@@ -57,7 +57,7 @@ mod tests {
         // initialize the game manager
         let mut gm = basic_initialise_game_manager();
         //  one player
-        let result = gm.register_entity(Entity::example_entity(), map::Pos2D(0, 0));
+        let result = gm.register_entity(Entity::example_entity(), map::Pos2D::new(0, 0));
         result.unwrap();
         panic!()
     }

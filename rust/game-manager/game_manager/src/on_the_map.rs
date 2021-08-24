@@ -19,6 +19,14 @@ impl Entity {
             team: TeamID::Loner,
         }
     }
+
+    pub fn get_move_force(&self) -> f32 {
+        todo!()
+    }
+    pub fn terrain_weights(&self) {
+        todo!()
+    }
+
     // TODO : properly implement this
     #[deprecated = "prout"]
     pub fn damage_reduction_factor(&self) -> f64 {

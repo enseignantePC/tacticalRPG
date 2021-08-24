@@ -1,10 +1,12 @@
 use std::collections::HashMap;
 
 use crate::{on_the_map::*, DijkstraMap, EntityId};
-use fnv::FnvHashMap;
+use dijkstra_map::Cost;
+use fnv::{FnvHashMap, FnvHashSet};
 // pub mod djikstra;
-#[derive(Eq, Hash, PartialEq, Debug, Clone, Copy)]
-pub struct Pos2D(pub i64, pub i64);
+pub use dijkstra_map::Vector2D;
+pub type Pos2D = Vector2D<i32, i32>;
+
 /// spatial representation of the world
 ///
 /// holds the information of :
@@ -34,7 +36,7 @@ pub struct Map {
     /// intern dijkstramap
     dijkstra_map: DijkstraMap,
     /// pos to dijkstraPointId
-    pos_to_dijkstra_point_id: FnvHashMap<dijkstra_map::Vector2D<i32, i32>, dijkstra_map::PointId>,
+    pos_to_dijkstra_point_id: FnvHashMap<Pos2D, dijkstra_map::PointId>,
     //  position -> TerrainType
     // interactable_map: FnvHashMap<Pos2D, TerrainType>,
     // position -> who or what is there
@@ -65,6 +67,28 @@ impl Map {
     pub fn register_entity_at_pos(&mut self, entity_id: EntityId, position: Pos2D) {
         todo!()
     }
+    /// return a
+    /// ? list of path to get to reachable position excluding the first position where the entity is standing
+    /// ? list of path to get to reachable position
+    /// ? list of reachable position
+    pub fn get_valid_movement_for_entity_at_pos(&self, entity: &Entity, position: Pos2D) {
+        self.dijkstra_map.recalculate(
+            &[*self.pos_to_dijkstra_point_id.get(&position).unwrap()],
+            None,
+            Some(Cost(entity.get_move_force())),
+            Vec::new(),
+            entity.terrain_weights(),
+            FnvHashSet::default(),
+        );
+        // ? TODO : implement a get all points available from the djikstra_map side
+        // ? (all point excluding the infinitly costing ones)
+        // currently,
+        let points_available = self
+            .dijkstra_map
+            .get_all_points_with_cost_between(Cost(0f32), Cost(entity.get_move_force()))
+            .iter()
+            .map(|x| self.dijkstra_map.get_shortest_path_from_point(*x).collect());
+    }
     // pub fn print_terrain(&self) {
     //     // Je vais parcourir les positions,
     //     // chaque position en x est display à la suite
@@ -82,7 +106,7 @@ impl Map {
     //         let mut l2 = String::new();
 
     //         for x in 0..size.height {
-    //             let pos = Vector2D::new(x as i32, y as i32);
+    //             let pos = Pos2D::new(x as i32, y as i32);
     //             let terrain = self
     //                 .dijkstra_map
     //                 .get_terrain_for_point(*self.pos_to_id.get(&pos).unwrap())
