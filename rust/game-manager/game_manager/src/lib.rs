@@ -21,6 +21,7 @@ pub use game_manager::*;
 /// holds method for turn_logic
 pub mod turn_logic;
 use turn_logic::*;
+
 /// represents teams in the game for the game manager
 pub enum TeamID {
     /// maps a i32 to a team

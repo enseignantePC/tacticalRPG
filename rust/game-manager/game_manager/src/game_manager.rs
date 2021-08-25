@@ -51,11 +51,12 @@ impl GameManager {
     /// what movements are okay
     /// what attacks are okay
     /// etc
-    pub fn get_valid_inputs(&self, entity_id: EntityId) {
+    pub fn get_valid_inputs(&mut self, entity_id: EntityId) {
         self.map.get_valid_movement_for_entity_at_pos(
             self.entity_id_to_entity.get(&entity_id).unwrap(),
             todo!(),
         );
+
         todo!()
     }
     /// if a player p is playing its turn, give the intent for that player
@@ -97,6 +98,7 @@ impl GameManager {
     pub fn start_fight() {
         todo!()
     }
+
     ///
     fn make_available_entity_id(&self) -> EntityId {
         let mut i = 0;

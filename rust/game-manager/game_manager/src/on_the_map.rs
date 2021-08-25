@@ -1,10 +1,15 @@
+use std::collections::HashMap;
+
+use crate::map;
+
 /// everything that is on the map
 ///
 use super::TeamID;
 
 /// An entity is the only thing on the map that requires input to decide what to do
 pub struct Entity {
-    team: TeamID,
+    pub team: TeamID,
+    pub terrain_weights: HashMap<map::terrains::TerrainType, i32>,
 }
 
 /// interactive object present on the map (interruptor, usable etc)
@@ -15,16 +20,18 @@ pub struct Obstacle {}
 impl Entity {
     /// creates a entity for test purposes
     pub fn example_entity() -> Entity {
+        let mut h: HashMap<map::terrains::TerrainType, i32> = HashMap::new();
+        h.insert(map::terrains::TerrainType::Ground, 1);
+        h.insert(map::terrains::TerrainType::Forest, 4);
         Entity {
             team: TeamID::Loner,
+            terrain_weights: h,
         }
     }
 
+    // TODO : properly implement this
     pub fn get_move_force(&self) -> f32 {
-        todo!()
-    }
-    pub fn terrain_weights(&self) {
-        todo!()
+        10.0
     }
 
     // TODO : properly implement this

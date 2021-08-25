@@ -1,12 +1,3 @@
-use std::collections::HashMap;
-
-use crate::{on_the_map::*, DijkstraMap, EntityId};
-use dijkstra_map::Cost;
-use fnv::{FnvHashMap, FnvHashSet};
-// pub mod djikstra;
-pub use dijkstra_map::Vector2D;
-pub type Pos2D = Vector2D<i32, i32>;
-
 /// spatial representation of the world
 ///
 /// holds the information of :
@@ -14,16 +5,18 @@ pub type Pos2D = Vector2D<i32, i32>;
 ///     what is it made of
 ///     who is where
 /// what each case of the world is made of
-#[derive(Eq, Hash, PartialEq, Debug, Clone, Copy)]
-pub enum TerrainType {
-    Forest,
-    Ground,
-    Wall,
-    Void,
-    Water,
-    Sky,
-    ByDefault,
-}
+use std::collections::HashMap;
+
+use crate::{on_the_map::*, DijkstraMap, EntityId};
+use dijkstra_map::{Cost, PointId};
+use fnv::{FnvHashMap, FnvHashSet};
+// pub mod djikstra;
+pub use dijkstra_map::Vector2D;
+pub type Pos2D = Vector2D<i32, i32>;
+
+pub mod terrains;
+use terrains::*;
+
 /// everything interactable that can be in the world
 pub enum Occupant {
     Vacant,
@@ -37,6 +30,7 @@ pub struct Map {
     dijkstra_map: DijkstraMap,
     /// pos to dijkstraPointId
     pos_to_dijkstra_point_id: FnvHashMap<Pos2D, dijkstra_map::PointId>,
+    dijkstra_point_id_to_pos: FnvHashMap<dijkstra_map::PointId, Pos2D>,
     //  position -> TerrainType
     // interactable_map: FnvHashMap<Pos2D, TerrainType>,
     // position -> who or what is there
@@ -54,9 +48,16 @@ impl Map {
             None,
             None,
         );
+        let mut dijkstra_point_id_to_pos: FnvHashMap<dijkstra_map::PointId, Pos2D> =
+            FnvHashMap::default();
+        for ele in &pos_to_dijkstra_point_id {
+            let (x, y) = ele.clone();
+            dijkstra_point_id_to_pos.insert(*y, *x);
+        }
         Map {
             dijkstra_map,
             pos_to_dijkstra_point_id,
+            dijkstra_point_id_to_pos,
         }
     }
     /// returns a bool according to wether adding an entity at pos is possible
@@ -64,6 +65,7 @@ impl Map {
         todo!()
     }
     /// adds an entity on the map
+    /// TODO : add a force option to put the entity on the map (by destroying whats there? by finding the closest place where the entity can go?)
     pub fn register_entity_at_pos(&mut self, entity_id: EntityId, position: Pos2D) {
         todo!()
     }
@@ -71,23 +73,50 @@ impl Map {
     /// ? list of path to get to reachable position excluding the first position where the entity is standing
     /// ? list of path to get to reachable position
     /// ? list of reachable position
-    pub fn get_valid_movement_for_entity_at_pos(&self, entity: &Entity, position: Pos2D) {
+    pub fn get_valid_movement_for_entity_at_pos(
+        &mut self,
+        entity: &Entity,
+        position: Pos2D,
+    ) -> Vec<Vec<Pos2D>> {
         self.dijkstra_map.recalculate(
             &[*self.pos_to_dijkstra_point_id.get(&position).unwrap()],
             None,
             Some(Cost(entity.get_move_force())),
             Vec::new(),
-            entity.terrain_weights(),
+            terrains::terrain_weights_to_dijkstra_terrain_weigth(&entity.terrain_weights),
             FnvHashSet::default(),
         );
         // ? TODO : implement a get all points available from the djikstra_map side
         // ? (all point excluding the infinitly costing ones)
-        // currently,
-        let points_available = self
+        let end_points_available = self
             .dijkstra_map
-            .get_all_points_with_cost_between(Cost(0f32), Cost(entity.get_move_force()))
-            .iter()
-            .map(|x| self.dijkstra_map.get_shortest_path_from_point(*x).collect());
+            // all points you can get to
+            .get_all_points_with_cost_between(Cost(0f32), Cost(entity.get_move_force()));
+        self.end_points_ids_to_paths_to_end_points(end_points_available)
+
+        // .iter()
+        // .map(|x| self.dijkstra_map.get_shortest_path_from_point(*x))
+        // // .map(|x|x.collect::<>());
+        // .collect();
+    }
+
+    fn end_points_ids_to_paths_to_end_points(
+        &self,
+        end_points_available: &[PointId],
+    ) -> Vec<Vec<Pos2D>> {
+        let mut paths: Vec<Vec<Pos2D>> = Vec::new();
+        for ele in end_points_available {
+            let i = self.dijkstra_map.get_shortest_path_from_point(*ele);
+            let mut v: Vec<Pos2D> = Vec::new();
+            for yele in i {
+                // turn pointiD to pos
+                let pos = self.dijkstra_point_id_to_pos.get(&yele).unwrap();
+                // push pos
+                v.push(*pos)
+            }
+            paths.push(v);
+        }
+        paths
     }
     // pub fn print_terrain(&self) {
     //     // Je vais parcourir les positions,
