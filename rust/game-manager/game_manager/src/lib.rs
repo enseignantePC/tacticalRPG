@@ -1,4 +1,8 @@
 #![allow(dead_code, unused_imports)]
+/// TODO : Documentation
+/// how to get valid inputs from the lib
+/// how to select them out of the lib and then inform the lib
+///
 use std::collections::HashMap;
 
 use dijkstra_map::DijkstraMap;
@@ -29,8 +33,6 @@ pub enum TeamID {
     /// the entity has no team
     Loner,
 }
-/// represents an action that happenned in the world
-pub enum Consequences {}
 /// this is the current state of the game manager
 pub enum Status {
     FightNotStarted,
@@ -40,6 +42,16 @@ pub enum Status {
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
 /// allows reference to this entity for the game manager
 pub struct EntityId(pub i64);
+
+/// this is how the game_manager will communicate what choices are available for currently playing entity
+/// it will be cloned and cached by the game_manager so we can use the id to declare the choice
+/// spec : an id that will be used to reference the
+#[derive(PartialEq, Clone)]
+pub struct InputOption {
+    unique_id: i32,
+    action: Action,
+    priority: i32,
+}
 
 #[cfg(test)]
 mod tests {
@@ -58,7 +70,7 @@ mod tests {
         // initialize the game manager
         let mut gm = basic_initialise_game_manager();
         //  one player
-        let result = gm.register_entity(Entity::example_entity(), map::Pos2D::new(0, 0));
+        let result = gm.register_entity(Entity::example_entity(), &map::Pos2D::new(0, 0));
         result.unwrap();
         panic!()
     }

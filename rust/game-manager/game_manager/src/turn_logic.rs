@@ -3,7 +3,7 @@ use super::*;
 #[derive(Debug, Clone)]
 pub struct Intent {
     pub action: Action,
-    priority: i64,
+    pub priority: i32,
 }
 
 pub enum PlayOptions {

@@ -8,7 +8,7 @@ pub use crate::map::Vector2D;
 ///     external context
 
 /// contains exhaustive info about a movement
-#[derive(Clone, Debug)]
+#[derive(PartialEq, Clone, Debug)]
 pub struct Move {
     /// every position the entity will cross to get to their final point,
     ///     excluing where they are now
@@ -33,7 +33,7 @@ pub struct Object {}
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Debug)]
 pub struct Spell {}
 /// represents every kind of action an entity can do
-#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Debug)]
 pub enum ActionKind {
     Attack,
     Move,
@@ -41,7 +41,7 @@ pub enum ActionKind {
     Spell,
 }
 /// represents everything doable by entities
-#[derive(Debug, Clone)]
+#[derive(PartialEq, Clone, Debug)]
 pub enum Action {
     Attack(Attack),
     Move(Move),

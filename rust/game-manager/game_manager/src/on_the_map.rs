@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::map;
+use crate::{map, EntityId};
 
 /// everything that is on the map
 ///
@@ -9,6 +9,7 @@ use super::TeamID;
 /// An entity is the only thing on the map that requires input to decide what to do
 pub struct Entity {
     pub team: TeamID,
+    pub unique_id: EntityId,
     pub terrain_weights: HashMap<map::terrains::TerrainType, i32>,
 }
 
@@ -26,6 +27,7 @@ impl Entity {
         Entity {
             team: TeamID::Loner,
             terrain_weights: h,
+            unique_id: EntityId(0),
         }
     }
 
@@ -38,5 +40,9 @@ impl Entity {
     #[deprecated = "prout"]
     pub fn damage_reduction_factor(&self) -> f64 {
         1f64
+    }
+
+    pub(crate) fn get_attack_ranges(&self) -> &[f32] {
+        todo!()
     }
 }
