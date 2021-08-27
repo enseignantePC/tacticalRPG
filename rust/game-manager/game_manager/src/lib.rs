@@ -1,56 +1,51 @@
 #![allow(dead_code, unused_imports)]
+/// computes map calculations
+use dijkstra_map::DijkstraMap;
+use gdnative::prelude::*;
+use on_the_map::Entity;
 /// TODO : Documentation
 /// how to get valid inputs from the lib
 /// how to select them out of the lib and then inform the lib
 ///
 use std::collections::HashMap;
 
-use dijkstra_map::DijkstraMap;
-use gdnative::prelude::*;
-use on_the_map::Entity;
-
-/// everuthing doable in the world
+/// See in-module documentation [Action]
 pub mod action;
 use action::*;
 /// module that deals with transforming an attack into a consequence on the world
 pub mod attack_solver;
-/// responsible for representing the world on a 2D grid
+/// responsible for representing the world as 2D grid
 pub mod map;
-/// everything that is on the map
+/// everything that exist on the map
 pub mod on_the_map;
-
-pub mod game_manager;
-pub use game_manager::*;
 
 /// holds method for turn_logic
 pub mod turn_logic;
 use turn_logic::*;
 
-/// represents teams in the game for the game manager
-pub enum TeamID {
-    /// maps a i32 to a team
-    Team(i32),
-    /// the entity has no team
-    Loner,
-}
-/// this is the current state of the game manager
+/// manages the states of the world, accept [WorldChange]s and
+/// - A : stores them
+/// - B : update the global state accordingly
+pub mod world_manager;
+use world_manager::*;
+
+/// expose a [Watcher] structure, responsible of analysing incoming intents or [WorldChange]s and
+/// yields [Intent]s as a response
+pub mod watcher;
+use watcher::*;
+
+/// expose a structure responsible for communicating with an external sources that will provide inputs
+pub mod input_manager;
+use input_manager::*;
+
+/// main interfaces that glue modules together
+pub mod game_manager;
+pub use game_manager::*;
+
 pub enum Status {
     FightNotStarted,
     EntityWaitingForInput(EntityId),
     FightEnded,
-}
-#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
-/// allows reference to this entity for the game manager
-pub struct EntityId(pub i64);
-
-/// this is how the game_manager will communicate what choices are available for currently playing entity
-/// it will be cloned and cached by the game_manager so we can use the id to declare the choice
-/// spec : an id that will be used to reference the
-#[derive(PartialEq, Clone)]
-pub struct InputOption {
-    unique_id: i32,
-    action: Action,
-    priority: i32,
 }
 
 #[cfg(test)]

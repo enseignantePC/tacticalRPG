@@ -6,7 +6,9 @@ use crate::{map, EntityId};
 ///
 use super::TeamID;
 
-/// An entity is the only thing on the map that requires input to decide what to do
+/// An entity is the type of thing on the map that requires input to decide what to do.
+/// You should think of entities as the only "alive" thing on the map
+#[derive(Debug)]
 pub struct Entity {
     pub team: TeamID,
     pub unique_id: EntityId,

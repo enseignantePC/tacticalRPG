@@ -1,12 +1,32 @@
+use std::rc::Rc;
+
 use gdnative::api::remote_transform;
 
 use super::*;
+
+/// This is an identifier that a [GameManager] can use to get a reference to an entity
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Debug)]
+
+pub struct EntityId(pub i64);
+
+/// The team of an entity,
+/// TODO : entity of the same team shouldnt be able to attack each other
+/// TODO : except undirectly? via a `friendly fire` option for the game manager
+/// TODO : entities in the Loner team can attack anyone
+#[derive(Debug)]
+pub enum TeamID {
+    /// a unique identifier for each team
+    Team(i32),
+    /// the entity has no team and can attack anyone
+    Loner,
+}
+
 /// handles and connect everything
 pub struct GameManager {
     /// represents the world (2D grid) and everything that is on it
     map: map::Map,
     /// how the game manager stores and references entity that are on the map
-    entity_id_to_entity: HashMap<EntityId, Entity>,
+    entity_id_to_entity: HashMap<EntityId, Rc<Entity>>,
     /// Manages the intents (aka inputs) that declares how the entities want to act on the world
     intent_manager: IntentManager,
     /// resolve what effectively happens on the world and has an event system to trigger new intents to be sent according to what happened
@@ -18,6 +38,9 @@ pub struct GameManager {
     entity_currently_awaiting_input: Option<EntityId>,
     ///
     input_cache: Option<InputCache>,
+    world_manager: WorldManager,
+    intent_watcher: Watcher,
+    action_watcher: Watcher,
 }
 /// this is stored by the gamemanager after you chose which Entity was going to play and i gave you a choice in the form
 /// of a Vec<InputOption>
@@ -50,7 +73,7 @@ impl GameManager {
         // check if the place on the map can accept the entity
         let entity_id = self.make_available_entity_id();
         if self.map.can_entity_be_accepted_at_pos(map_position) {
-            self.entity_id_to_entity.insert(entity_id, entity);
+            self.entity_id_to_entity.insert(entity_id, Rc::new(entity));
             self.map.register_entity_at_pos(entity_id, map_position);
             return Ok(entity_id);
         }
@@ -60,7 +83,7 @@ impl GameManager {
     /// what movements are okay
     /// what attacks are okay
     /// etc
-    pub fn get_valid_inputs(&mut self, entity_id: &EntityId) -> Vec<InputOption> {
+    pub fn get_valid_inputs_for_entity(&mut self, entity_id: &EntityId) -> Vec<InputOption> {
         let mut result: Vec<InputOption> = Vec::new();
         let mut to_cache: HashMap<i32, InputOption> = HashMap::new();
         // used to generate id of
@@ -76,9 +99,15 @@ impl GameManager {
             let unique_id = option_id_generator();
             let io = InputOption {
                 unique_id,
-                action: Action::Move(Move { path }),
-                // TODO : priority system for move intents
-                priority: 0i32,
+
+                // action: Action::Move(Move { path }),
+                // // TODO : priority system for move intents
+                // priority: 0i32,
+                intent: Intent {
+                    action: Action::Move(Move { path }),
+                    priority: 0132,
+                    entity: entity.clone(),
+                },
             };
             result.push(io.clone());
             to_cache.insert(unique_id, io);
@@ -92,11 +121,15 @@ impl GameManager {
         result
     }
     /// if a player p is playing its turn, give the intent for that player
-    /// it consumes the cache
-    pub fn give_inputs(&mut self, id_of_valid_input_cache: i32) -> Result<(), ()> {
+    /// it consumes the cache if the input is valid
+    pub fn give_inputs_according_to_cache(
+        &mut self,
+        id_of_valid_input_cache: i32,
+    ) -> Result<(), ()> {
         if self.input_cache.is_none() {
             return Err(());
         } else {
+            // get the content of the cache
             let cloned_cache = self.input_cache.take().unwrap();
             let InputCache {
                 entity_chosen_to_play,
@@ -104,72 +137,38 @@ impl GameManager {
             } = cloned_cache;
 
             let InputOption {
-                unique_id: _,
-                action,
-                priority,
-            } = input_options.remove(&id_of_valid_input_cache).unwrap();
-
-            let intent = Intent {
-                action,
-                // TODO : priority system
-                priority,
-            };
-            ///
-            self.entity_declare_intent(
-                self.entity_id_to_entity
-                    .get(&entity_chosen_to_play)
-                    .unwrap(),
+                unique_id: x,
                 intent,
-            );
-            // self.intent_manager.submit(Intent {
-            //     action: action,
-            //     priority: 0i32,
-            todo!()
-        }
-    }
-
-    /// resolve intents one by one, alerting the event system
-    /// until it needs an input to continue
-    /// when over
-    ///     map has been modified (spell or movement or object dissapearance, death)
-    ///     or entities states have been altered (attacks, death)
-    ///
-    ///     information needed :
-    ///         what_happenned
-    ///         status
-    ///         if continue currently playing entity needing input
-    /// TODO
-    pub fn poll(&mut self) {
-        let intent = self.intent_manager.resolve_one_intent();
-        match intent {
-            Ok(intent) => self.action_manager.resolve(intent.action),
-            Err(_) => todo!(),
-        }
-    }
-    /// ask who is playing and what are his options, is the game finished? etc
-    pub fn ask_status(&self) -> Status {
-        if !self.fight_started {
-            Status::FightNotStarted
-        } else if self.fight_ended {
-            Status::FightEnded
-        } else {
-            Status::EntityWaitingForInput(self.entity_currently_awaiting_input.expect("If the fight is still going, there always should be an entity waiting for input at this point"))
-        }
-    }
-    /// declares the setup over and the fight started! this can fail if the setup was not sufficient! (nobody on the map)
-    /// ? TODO : move this to UnititiliasedGameManager
-    pub fn start_fight() {
+            } = input_options.remove(&id_of_valid_input_cache).unwrap();
+            self.resolve_all_intents(intent);
+        };
         todo!()
     }
 
-    /// this makes an entity submit an intent,
-    /// that is to say?????
-    /// does it do the action : no
-    /// does it triggers event watchers : no
-    /// i guess it just submits it to intentsubmitter
+    /// make an entity declare an [Intent][super::turn_logic::Intent]
+    fn resolve_all_intents(&mut self, intent: Intent) -> () {
+        self.submit_intent_and_responses(intent);
 
-    fn entity_declare_intent(&self, entity: &Entity, intent: Intent) -> () {
-        todo!()
+        while !self.intent_manager.is_queue_empty() {
+            let next_intent = self.intent_manager.resolve_one_intent();
+            if next_intent.is_err() {
+                return;
+            }
+            let next_intent = next_intent.unwrap();
+            self.world_manager.resolve(next_intent.clone());
+            let response: Vec<Intent> = self.action_watcher.watch(next_intent);
+            for k in response {
+                self.submit_intent_and_responses(k)
+            }
+        }
+    }
+
+    fn submit_intent_and_responses(&mut self, next_intent: Intent) {
+        self.intent_manager.submit(next_intent.clone());
+        let response: Vec<Intent> = self.intent_watcher.watch(next_intent);
+        for k in response {
+            self.submit_intent_and_responses(k)
+        }
     }
 
     fn make_available_entity_id(&self) -> EntityId {

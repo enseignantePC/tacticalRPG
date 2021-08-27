@@ -72,7 +72,7 @@ impl Map {
     }
     /// adds an entity on the map
     /// TODO : add a force option to put the entity on the map (by destroying whats there? by finding the closest place where the entity can go?)
-    pub fn register_entity_at_pos(&mut self, entity_id: EntityId, position: &   Pos2D) {
+    pub fn register_entity_at_pos(&mut self, entity_id: EntityId, position: &Pos2D) {
         todo!()
     }
     /// return a
