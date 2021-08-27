@@ -10,3 +10,14 @@ pub struct InputOption {
     /// the [Intent] corresponding
     pub intent: Intent,
 }
+
+/// A builder for GameManager
+pub struct UninitialisedGameManager {}
+
+impl UninitialisedGameManager {
+    pub fn initialise(self) -> GameManager {
+        todo!()
+    }
+}
+
+pub struct InputManager {}

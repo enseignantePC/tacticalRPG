@@ -1,8 +1,5 @@
-use std::rc::Rc;
-
-use gdnative::api::remote_transform;
-
 use super::*;
+use std::rc::Rc;
 
 /// This is an identifier that a [GameManager] can use to get a reference to an entity
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Debug)]
@@ -38,9 +35,10 @@ pub struct GameManager {
     entity_currently_awaiting_input: Option<EntityId>,
     ///
     input_cache: Option<InputCache>,
-    world_manager: WorldManager,
     intent_watcher: Watcher,
     action_watcher: Watcher,
+    world_manager: WorldManager,
+    world_changes: Vec<WorldChange>,
 }
 /// this is stored by the gamemanager after you chose which Entity was going to play and i gave you a choice in the form
 /// of a Vec<InputOption>
@@ -49,18 +47,11 @@ pub struct InputCache {
     input_options: HashMap<i32, InputOption>,
 }
 
-pub struct UninitialisedGameManager {}
-
-impl UninitialisedGameManager {
-    pub fn initialise(self) -> GameManager {
-        todo!()
-    }
-}
-
 impl GameManager {
-    pub fn new() -> UninitialisedGameManager {
-        UninitialisedGameManager {}
-    }
+    // pub fn new() -> UninitialisedGameManager {
+    //     UninitialisedGameManager {}
+    // }
+
     /// adds a new entity on the map
     /// fails if the place is occupied
     /// On success, returns a entity_id that allows reference to this entity for the game manager
@@ -83,6 +74,11 @@ impl GameManager {
     /// what movements are okay
     /// what attacks are okay
     /// etc
+    /// stores and return a hashmap of the form :
+    ///         unique id -> valid_intent
+    ///
+    /// input can then be submitted in the form of that unique id
+    /// via the method [GameManager.give_inputs_according_to_cache]
     pub fn get_valid_inputs_for_entity(&mut self, entity_id: &EntityId) -> Vec<InputOption> {
         let mut result: Vec<InputOption> = Vec::new();
         let mut to_cache: HashMap<i32, InputOption> = HashMap::new();
@@ -99,21 +95,19 @@ impl GameManager {
             let unique_id = option_id_generator();
             let io = InputOption {
                 unique_id,
-
-                // action: Action::Move(Move { path }),
-                // // TODO : priority system for move intents
-                // priority: 0i32,
                 intent: Intent {
                     action: Action::Move(Move { path }),
-                    priority: 0132,
+                    // TODO : priority system
+                    priority: 0i32,
                     entity: entity.clone(),
                 },
             };
             result.push(io.clone());
             to_cache.insert(unique_id, io);
         }
-
-        // TODO : attacks, objects, spell
+        // TODO : attacks
+        // TODO : objects
+        // TODO : spell
         self.input_cache = Some(InputCache {
             entity_chosen_to_play: *entity_id,
             input_options: to_cache,
@@ -122,55 +116,77 @@ impl GameManager {
     }
     /// if a player p is playing its turn, give the intent for that player
     /// it consumes the cache if the input is valid
+    ///
+    /// returns a vector of the [WorldChange]s that happened in the world
+    /// fails if the input is invalid (aka, its unique id doesnt exist in the [InputCache])
     pub fn give_inputs_according_to_cache(
         &mut self,
         id_of_valid_input_cache: i32,
-    ) -> Result<(), ()> {
+    ) -> Result<Vec<WorldChange>, ()> {
         if self.input_cache.is_none() {
-            return Err(());
+            Err(())
         } else {
             // get the content of the cache
             let cloned_cache = self.input_cache.take().unwrap();
             let InputCache {
-                entity_chosen_to_play,
+                entity_chosen_to_play: _,
                 mut input_options,
             } = cloned_cache;
 
             let InputOption {
-                unique_id: x,
+                unique_id: _,
                 intent,
             } = input_options.remove(&id_of_valid_input_cache).unwrap();
-            self.resolve_all_intents(intent);
-        };
-        todo!()
-    }
-
-    /// make an entity declare an [Intent][super::turn_logic::Intent]
-    fn resolve_all_intents(&mut self, intent: Intent) -> () {
-        self.submit_intent_and_responses(intent);
-
-        while !self.intent_manager.is_queue_empty() {
-            let next_intent = self.intent_manager.resolve_one_intent();
-            if next_intent.is_err() {
-                return;
-            }
-            let next_intent = next_intent.unwrap();
-            self.world_manager.resolve(next_intent.clone());
-            let response: Vec<Intent> = self.action_watcher.watch(next_intent);
-            for k in response {
-                self.submit_intent_and_responses(k)
-            }
+            Ok(self.resolve_all_intents(intent))
         }
     }
 
+    /// make an entity declare an [Intent][super::turn_logic::Intent]
+    /// the intent will be `watched` (see [Watcher]) when it is emitted and when it is realised
+    fn resolve_all_intents(&mut self, intent: Intent) -> Vec<WorldChange> {
+        // stores what happens and returns it to external source
+        let result: Vec<WorldChange> = Vec::new();
+
+        self.submit_intent_and_responses(intent);
+
+        while !self.intent_manager.is_queue_empty() {
+            let next_intent = self.intent_manager.extract_top_intent();
+            if next_intent.is_err() {
+                return result;
+            } else {
+                let next_intent = next_intent.unwrap();
+                let world_change = self.realise_intent(&next_intent);
+                // stores the change for historic purposes
+                self.world_changes.push(world_change.clone());
+                // watch the change
+                let response: Vec<Intent> = self.action_watcher.watch(&next_intent);
+                for k in response {
+                    self.submit_intent_and_responses(k)
+                }
+            }
+        }
+        result
+    }
+    /// this method transform an intent into a worldchange and stores it in [GameManager.world_changes]
+    /// this is where something that was wanted by an entity finally becomes reality
+    fn realise_intent(&mut self, next_intent: &Intent) -> WorldChange {
+        let world_change = self
+            .world_manager
+            .intent_to_world_change(next_intent.clone());
+        self.world_manager
+            .apply_change_to_world(&world_change, &mut self.map);
+        world_change
+    }
+    /// submit an intent, call the intent watchers on that intent
+    /// and does the same for every intention yielded by the intent[Watcher], recursively
     fn submit_intent_and_responses(&mut self, next_intent: Intent) {
         self.intent_manager.submit(next_intent.clone());
-        let response: Vec<Intent> = self.intent_watcher.watch(next_intent);
+        let response: Vec<Intent> = self.intent_watcher.watch(&next_intent);
         for k in response {
             self.submit_intent_and_responses(k)
         }
     }
-
+    /// generates a unique, unused EntityId
     fn make_available_entity_id(&self) -> EntityId {
         let mut i = 0;
         while self.entity_id_to_entity.contains_key(&EntityId(i)) {

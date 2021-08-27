@@ -1,10 +1,12 @@
-/// spatial representation of the world
-///
-/// holds the information of :
-///     how is the world
-///     what is it made of
-///     who is where
-/// what each case of the world is made of
+//! # Module map
+//!
+//! This module is responsible for representing the world as a 2D grid
+//! and computing/keeping track of everything that happens, grid wise
+//!
+//! - the form of the world
+//! - what is it made of (TerrainType)
+//! - who is where
+//! - what each case of the world is made of
 use std::collections::HashMap;
 
 use crate::{on_the_map::*, DijkstraMap, EntityId};
@@ -119,7 +121,7 @@ impl Map {
             FnvHashSet::default(),
         );
     }
-    // ! if the dji map hasnt been precalculated, this returns empty array
+    /// ! if the dji map hasnt been precalculated, this returns empty array
     /// the paths returned doesnt include the point at which the entity is
     fn end_points_ids_to_paths_to_end_points(
         &self,

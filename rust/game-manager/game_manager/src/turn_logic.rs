@@ -81,16 +81,16 @@ impl IntentManager {
         self.queue.sort_by(|a, b| (&a).priority.cmp(&b.priority));
     }
 
-    /// Treat precisely one smallest step of the next intent in queue
-    /// declares your intent bit by bit transforming it into an action
-    /// until the intent is epuised
+    /// Extract precisely one smallest step of the next intent in queue
+    /// used to realise your intent bit by bit transforming it into an action
+    /// until the intent is exhausted
     /// or a higher priority takes its place
     /// when that happens,
     ///     puts back the rest of intent in the queue
     ///     return the small intent
     /// fails if queue empty but this should be unreachable
     /// ! TESTME an intent partially treated should not start at the beginning at the queue again
-    pub fn resolve_one_intent(&mut self) -> Result<Intent, ()> {
+    pub fn extract_top_intent(&mut self) -> Result<Intent, ()> {
         let max_priority_intent = self.queue.pop().ok_or(())?;
         let (minimal_intent, remainder_intent) = max_priority_intent.extract_minimal_intent();
         if remainder_intent.is_some() {

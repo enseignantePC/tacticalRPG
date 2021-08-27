@@ -12,7 +12,7 @@ use super::TeamID;
 pub struct Entity {
     pub team: TeamID,
     pub unique_id: EntityId,
-    pub terrain_weights: HashMap<map::terrains::TerrainType, i32>,
+    pub terrain_weights: HashMap<map::terrains::TerrainType, f32>,
 }
 
 /// interactive object present on the map (interruptor, usable etc)
@@ -23,9 +23,9 @@ pub struct Obstacle {}
 impl Entity {
     /// creates a entity for test purposes
     pub fn example_entity() -> Entity {
-        let mut h: HashMap<map::terrains::TerrainType, i32> = HashMap::new();
-        h.insert(map::terrains::TerrainType::Ground, 1);
-        h.insert(map::terrains::TerrainType::Forest, 4);
+        let mut h: HashMap<map::terrains::TerrainType, f32> = HashMap::new();
+        h.insert(map::terrains::TerrainType::Ground, 1f32);
+        h.insert(map::terrains::TerrainType::Forest, 4f32);
         Entity {
             team: TeamID::Loner,
             terrain_weights: h,

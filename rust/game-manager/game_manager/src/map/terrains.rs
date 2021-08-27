@@ -9,7 +9,7 @@ pub enum TerrainType {
     Sky,
 }
 
-impl Into<i32> for TerrainType {
+impl Into<i32> for &TerrainType {
     fn into(self) -> i32 {
         match self {
             TerrainType::Ground => 0,
@@ -36,7 +36,15 @@ impl Into<String> for TerrainType {
 }
 
 pub fn terrain_weights_to_dijkstra_terrain_weigth(
-    x: &HashMap<terrains::TerrainType, i32>,
+    x: &HashMap<terrains::TerrainType, f32>,
 ) -> FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> {
+    let mut result: FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> =
+        FnvHashMap::default();
+    for (terrain, weight) in x {
+        let dji_terrain_type = dijkstra_map::TerrainType::Terrain(terrain.into());
+        let dji_weigth = dijkstra_map::Weight(*weight);
+        result.insert(dji_terrain_type, dji_weigth);
+    }
+
     todo!()
 }
