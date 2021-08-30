@@ -6,8 +6,15 @@ pub use crate::map::Vector2D;
 /// generated at with
 ///     entity intern state
 ///     external context
+#[derive(PartialEq, Clone, Debug)]
+pub enum Action {
+    Attack(Attack),
+    Move(Move),
+    Object(Object),
+    Spell(Spell),
+}
 
-/// contains exhaustive info about a movement
+/// contains exhaustive info about the movement of an entity, excluing the initial pos of the entity
 #[derive(PartialEq, Clone, Debug)]
 pub struct Move {
     /// every position the entity will cross to get to their final point,
@@ -21,6 +28,14 @@ pub struct Attack {
     pub _type: AttackType,
     pub strength: f64,
 }
+
+/// This describes the type of attacks that exist in the game, 
+/// the logic beeing handled by the [super::attack_solver]
+/// 
+/// Possible ideas are
+/// spear /axe / sword
+/// elemental
+/// 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Debug)]
 pub enum AttackType {
     Base,
@@ -39,14 +54,6 @@ pub enum ActionKind {
     Move,
     Object,
     Spell,
-}
-/// represents everything doable by entities
-#[derive(PartialEq, Clone, Debug)]
-pub enum Action {
-    Attack(Attack),
-    Move(Move),
-    Object(Object),
-    Spell(Spell),
 }
 
 impl Action {

@@ -1,3 +1,5 @@
+//! The most interesting structure here is the [GameManager]
+//! 
 use super::*;
 use std::rc::Rc;
 

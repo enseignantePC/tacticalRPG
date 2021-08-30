@@ -9,23 +9,17 @@ use on_the_map::Entity;
 ///
 use std::collections::HashMap;
 
-/// See in-module documentation [Action]
 pub mod action;
 use action::*;
-/// module that deals with transforming an attack into a consequence on the world
+
 pub mod attack_solver;
-/// responsible for representing the world as 2D grid
 pub mod map;
-/// everything that exist on the map
+
 pub mod on_the_map;
 
-/// holds method for turn_logic
 pub mod turn_logic;
 use turn_logic::*;
 
-/// manages the states of the world, accept [WorldChange]s and
-/// - A : stores them
-/// - B : update the global state accordingly
 pub mod world_manager;
 use world_manager::*;
 
