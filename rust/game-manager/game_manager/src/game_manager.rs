@@ -11,7 +11,7 @@ pub struct EntityId(pub i64);
 /// TODO : entity of the same team shouldnt be able to attack each other
 /// TODO : except undirectly? via a `friendly fire` option for the game manager
 /// TODO : entities in the Loner team can attack anyone
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy)]
 pub enum TeamID {
     /// a unique identifier for each team
     Team(i32),
@@ -64,9 +64,11 @@ impl GameManager {
         // generate an id for the entity
         // check if the place on the map can accept the entity
         let entity_id = self.make_available_entity_id();
+        let entity = Rc::new(entity);
         if self.map.can_entity_be_accepted_at_pos(map_position) {
-            self.entity_id_to_entity.insert(entity_id, Rc::new(entity));
-            self.map.register_entity_at_pos(entity_id, map_position);
+            self.entity_id_to_entity.insert(entity_id, entity.clone());
+            self.map
+                .register_entity_at_pos(entity.clone(), map_position);
             return Ok(entity_id);
         }
         Err(())

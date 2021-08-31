@@ -10,7 +10,10 @@
 //!
 //! It uses a [DijkstraMap] to do the calculation and abstracts it so it can communicate
 //! with a [GameManager].
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    rc::Rc,
+};
 
 use crate::{on_the_map::*, DijkstraMap, EntityId, TeamID};
 use dijkstra_map::{Cost, PointId};
@@ -41,7 +44,7 @@ pub struct Map {
     entity_id_to_pos: FnvHashMap<EntityId, Pos2D>,
     pos_to_occupant: FnvHashMap<Pos2D, Occupant>,
     /// for each team, the set of position taken by the team
-    team_id_to_set_of_position_taken: FnvHashMap<TeamID, HashSet<Pos2D>>,
+    team_id_to_set_of_position_taken: FnvHashMap<TeamID, FnvHashSet<Pos2D>>,
 }
 
 impl Map {
@@ -81,13 +84,23 @@ impl Map {
 
     /// adds an entity on the map
     /// TODO : add a force option to put the entity on the map (by destroying whats there? by finding the closest place where the entity can go?)
-    pub fn register_entity_at_pos(&mut self, entity_id: EntityId, position: &Pos2D) {
-        self.entity_id_to_pos.insert(entity_id, position.clone());
+    pub fn register_entity_at_pos(&mut self, entity: Rc<Entity>, position: &Pos2D) {
+        let team = entity.team.clone();
+        let id = entity.unique_id.clone();
+        self.entity_id_to_pos.insert(id, position.clone());
         self.pos_to_occupant
-            .insert(position.clone(), Occupant::Entity(entity_id));
+            .insert(position.clone(), Occupant::Entity(id));
 
-        todo!();
-        self.dijkstra_map;
+        if !self.team_id_to_set_of_position_taken.contains_key(&team) {
+            self.team_id_to_set_of_position_taken
+                .insert(team, FnvHashSet::default());
+        }
+
+        self.team_id_to_set_of_position_taken
+            .get_mut(&team)
+            .unwrap()
+            .insert(position.clone());
+
         todo!()
     }
     /// Computes where an entity might go by what path and return the path in the form of
