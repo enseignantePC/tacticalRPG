@@ -25,7 +25,7 @@ impl WorldManager {
     pub fn intent_to_world_change(&self, intent: Intent) -> WorldChange {
         todo!()
     }
-    pub fn apply_change_to_world(&self, change: &WorldChange, gm: &mut GameManager) {
+    pub fn apply_change_to_world(&self, change: &WorldChange, gm: &mut map::Map) {
         todo!()
     }
 }

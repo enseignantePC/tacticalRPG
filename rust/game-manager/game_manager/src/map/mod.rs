@@ -10,9 +10,9 @@
 //!
 //! It uses a [DijkstraMap] to do the calculation and abstracts it so it can communicate
 //! with a [GameManager].
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-use crate::{on_the_map::*, DijkstraMap, EntityId};
+use crate::{on_the_map::*, DijkstraMap, EntityId, TeamID};
 use dijkstra_map::{Cost, PointId};
 use fnv::{FnvHashMap, FnvHashSet};
 // pub mod djikstra;
@@ -40,10 +40,8 @@ pub struct Map {
     /// TODO : wire this up
     entity_id_to_pos: FnvHashMap<EntityId, Pos2D>,
     pos_to_occupant: FnvHashMap<Pos2D, Occupant>,
-    //  position -> TerrainType
-    // interactable_map: FnvHashMap<Pos2D, TerrainType>,
-    // position -> who or what is there
-    // used to complement djikstramap result for coherent result with entities present on the map
+    /// for each team, the set of position taken by the team
+    team_id_to_set_of_position_taken: FnvHashMap<TeamID, HashSet<Pos2D>>,
 }
 
 impl Map {
@@ -69,16 +67,20 @@ impl Map {
             dijkstra_point_id_to_pos,
             entity_id_to_pos: FnvHashMap::default(),
             pos_to_occupant: FnvHashMap::default(),
+            team_id_to_set_of_position_taken: FnvHashMap::default(),
         }
     }
     /// returns a bool according to wether adding an entity at pos is possible
     pub fn can_entity_be_accepted_at_pos(&self, position: &Pos2D) -> bool {
         self.pos_to_occupant.contains_key(position)
     }
+
+    pub fn get_pos_for_entity(&self, id: EntityId) -> Option<Pos2D> {
+        self.entity_id_to_pos.get(&id).map(|x| x.clone())
+    }
+
     /// adds an entity on the map
     /// TODO : add a force option to put the entity on the map (by destroying whats there? by finding the closest place where the entity can go?)
-    /// - as end points if entities are on the same team
-    /// - as end points and travel points, if [Occupant] cannot be crossed
     pub fn register_entity_at_pos(&mut self, entity_id: EntityId, position: &Pos2D) {
         self.entity_id_to_pos.insert(entity_id, position.clone());
         self.pos_to_occupant
@@ -91,30 +93,60 @@ impl Map {
     /// Computes where an entity might go by what path and return the path in the form of
     /// a list of path to get to reachable position excluding the first position where the entity is standing.
     ///
-    /// TODO : TESTME
+    /// TODO : TESTME - disable points are the right ones?
+    ///
     ///
     /// TODO : the map has to keep track of who's where and who's and who's team
     /// TODO : as a list of position easily updatable so it can forbid these position in the movement either
+    /// - as end points if entities are on the same team
+    /// - as end points and travel points, if [Occupant] cannot be crossed
+
     pub fn get_valid_movements_for_entity(&mut self, entity: &Entity) -> Vec<Vec<Pos2D>> {
+        //store all points belonging to other teams
+        // if loner, adds all point belonging to team except pos of entity
+
+        let points_that_cannot_be_crossed = self.get_uncrossable_points_for_entity(entity);
+        self.enable_all_djikstra_points();
+
+        for k in &points_that_cannot_be_crossed {
+            self.dijkstra_map.disable_point(*k).unwrap();
+        }
+
         self.recalculates_dijkstra_map_for_entity_with_force(
             entity,
             entity.get_move_force(),
             entity.terrain_weights.clone(),
         );
-        // ? TODO : implement a get all points available from the djikstra_map side
-        // ? (all point excluding the infinitly costing ones)
-        // all points you can get to
-        let end_points_available = self
-            .dijkstra_map
-            .get_all_points_with_cost_between(Cost(0f32), Cost(entity.get_move_force()));
 
-        todo!(); // see above
-        self.end_points_ids_to_paths_to_end_points(end_points_available)
+        let end_points_available = self.points_available_filters_end_position(entity);
+
+        self.end_points_ids_to_paths_to_end_points(end_points_available.as_slice())
     }
+
+    /// all points you can get to
+    /// minus where ur teamates are
+    /// TODO : test me
+    fn points_available_filters_end_position(&mut self, entity: &Entity) -> Vec<PointId> {
+        let end_points_available: Vec<PointId> = self
+            .dijkstra_map
+            .get_all_points_with_cost_between(Cost(0f32), Cost(entity.get_move_force()))
+            .iter()
+            .filter(|&x| {
+                let x = self.dijkstra_point_id_to_pos.get(x).unwrap();
+                self.team_id_to_set_of_position_taken
+                    .get(&entity.team)
+                    .unwrap()
+                    .contains(x)
+            })
+            .map(|x| x.clone())
+            .collect();
+        end_points_available
+    }
+
     /// this methods is used to determine what occupant might be attacked by a specified [Entity]
-    ///
-    /// currently this is broken and only returns what [Entity]s can be attacked
+    /// TODO : currently this is broken and only returns what [Entity]s can be attacked
     pub fn get_attackable_entities_by_entity(&mut self, entity: &Entity) -> Vec<EntityId> {
+        // all entities in range that are not on the same team
         let result: Vec<EntityId> = Vec::new();
         for this_range in entity.get_attack_ranges() {
             self.recalculates_dijkstra_map_for_entity_with_force(
@@ -129,7 +161,28 @@ impl Map {
         todo!()
     }
 
-    /// given a force, rebakes the [DijkstraMap]
+    fn enable_all_djikstra_points(&mut self) {
+        for k in self.pos_to_dijkstra_point_id.values() {
+            self.dijkstra_map.enable_point(*k).unwrap();
+        }
+    }
+
+    /// the entity cannot :
+    /// - cross a pos where an ennemy entity is
+    /// this function shoud return a vector containing these innaccessible positions
+    fn get_uncrossable_points_for_entity(&mut self, entity: &Entity) -> Vec<PointId> {
+        let mut uncrossable_points: Vec<PointId> = Vec::new();
+
+        for (team, set) in &self.team_id_to_set_of_position_taken {
+            if (&entity.team != team) || (&entity.team == &TeamID::Loner) {
+                for pos in set {
+                    uncrossable_points.push(*self.pos_to_dijkstra_point_id.get(pos).unwrap())
+                }
+            }
+        }
+        uncrossable_points
+    }
+    /// given a `force`, rebakes the [DijkstraMap] for an entity
     ///
     fn recalculates_dijkstra_map_for_entity_with_force(
         &mut self,
@@ -168,10 +221,6 @@ impl Map {
             paths.push(v);
         }
         paths
-    }
-
-    pub fn get_pos_for_entity(&self, id: EntityId) -> Option<Pos2D> {
-        self.entity_id_to_pos.get(&id).map(|x| x.clone())
     }
     // pub fn print_terrain(&self) {
     //     // Je vais parcourir les positions,

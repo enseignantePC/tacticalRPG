@@ -1,18 +1,17 @@
 //! The most interesting structure here is the [GameManager]
-//! 
+//!
 use super::*;
 use std::rc::Rc;
 
 /// This is an identifier that a [GameManager] can use to get a reference to an entity
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Debug)]
-
 pub struct EntityId(pub i64);
 
 /// The team of an entity,
 /// TODO : entity of the same team shouldnt be able to attack each other
 /// TODO : except undirectly? via a `friendly fire` option for the game manager
 /// TODO : entities in the Loner team can attack anyone
-#[derive(Debug)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub enum TeamID {
     /// a unique identifier for each team
     Team(i32),
