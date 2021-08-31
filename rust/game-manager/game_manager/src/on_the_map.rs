@@ -9,6 +9,7 @@ use std::collections::HashMap;
 ///
 use super::{map, EntityId, TeamID};
 
+// TODO branch note: this should be the game_manager_wrapper_of a entity_intern that is a trait
 /// An entity is the type of thing on the map that requires input to decide what to do.
 /// You should think of entities as the only "alive" thing on the map
 ///
