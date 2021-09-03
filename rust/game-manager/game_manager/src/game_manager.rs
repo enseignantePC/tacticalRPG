@@ -43,9 +43,11 @@ pub struct GameManager {
     fight_started: bool,
     fight_ended: bool,
     entity_currently_awaiting_input: Option<EntityId>,
-    ///
+    /// stores what input are available after a query via [GameManager::get_valid_inputs_for_entity]
     input_cache: Option<InputCache>,
+    /// watch and react to intent emitted
     intent_watcher: Watcher,
+    /// watch and react to action done
     action_watcher: Watcher,
     /// A simple history field, storing chronologically what happens
     world_changes: Vec<WorldChange>,
