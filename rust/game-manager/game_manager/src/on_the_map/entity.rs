@@ -14,7 +14,7 @@ use super::*;
 /// As i am too much of a newbie at rust, this frigthens me however
 #[derive(Debug)]
 pub struct Entity {
-    pub team: TeamID,
+    pub team: TeamId,
     pub unique_id: EntityId,
     pub entity_intern: Box<dyn EntityIntern>,
 }

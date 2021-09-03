@@ -15,7 +15,7 @@ use std::{
     rc::Rc,
 };
 
-use crate::{on_the_map::*, DijkstraMap, EntityId, TeamID};
+use crate::{on_the_map::*, DijkstraMap, EntityId, TeamId};
 use dijkstra_map::{Cost, PointId};
 use fnv::{FnvHashMap, FnvHashSet};
 // pub mod djikstra;
@@ -44,7 +44,7 @@ pub struct Map {
     entity_id_to_pos: FnvHashMap<EntityId, Pos2D>,
     pos_to_occupant: FnvHashMap<Pos2D, Occupant>,
     /// for each team, the set of position taken by the team
-    team_id_to_set_of_position_taken: FnvHashMap<TeamID, FnvHashSet<Pos2D>>,
+    team_id_to_set_of_position_taken: FnvHashMap<TeamId, FnvHashSet<Pos2D>>,
 }
 
 impl Map {
