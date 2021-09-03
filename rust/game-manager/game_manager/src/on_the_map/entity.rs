@@ -51,5 +51,6 @@ pub trait EntityIntern: Debug {
     /// - the weapon
     /// - the entity
     /// - ? a plethora of other stuff, should the logic be handled by the external source?
+    // TODO : make this a more complex Range struct that can deal with some different logic
     fn get_attack_ranges(&self) -> &[i32];
 }
