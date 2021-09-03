@@ -19,6 +19,19 @@ pub enum TeamID {
     Loner,
 }
 
+impl TeamId {
+    /// can entities of the suplied teams fight?
+    pub fn can_fight(&self, other_team: &Self) -> bool {
+        // if they are on different teams, yes
+        if let (TeamId::Team(x), TeamId::Team(y)) = (self, other_team) {
+            x != y
+        } else {
+            // if any of them are a Loner, yes
+            true
+        }
+    }
+}
+
 /// handles and connect everything
 pub struct GameManager {
     /// represents the world (2D grid) and everything that is on it

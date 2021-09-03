@@ -268,7 +268,7 @@ impl Map {
         let mut uncrossable_points: Vec<PointId> = Vec::new();
 
         for (team, set) in &self.team_id_to_set_of_position_taken {
-            if (&entity.team != team) || (&entity.team == &TeamID::Loner) {
+            if (&entity.team != team) || (&entity.team == &TeamId::Loner) {
                 for pos in set {
                     uncrossable_points.push(*self.pos_to_dijkstra_point_id.get(pos).unwrap())
                 }
