@@ -27,7 +27,7 @@ impl ToVariant for Entity {
 }
 impl Entity {
     pub fn can_attack(&self, other_entity: &Entity) -> bool {
-        if self.team == TeamID::Loner || other_entity.team == TeamID::Loner {
+        if self.team == TeamId::Loner || other_entity.team == TeamId::Loner {
             true
         } else {
             self.team != other_entity.team
