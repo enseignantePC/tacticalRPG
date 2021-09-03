@@ -78,9 +78,10 @@ impl GameManager {
         Err(())
     }
     /// generate valid inputs for entity
-    /// what movements are okay
-    /// what attacks are okay
-    /// etc
+    /// - what movements are okay
+    /// - what attacks are okay
+    /// - etc
+    ///
     /// stores and return a hashmap of the form :
     ///         unique id -> valid_intent
     ///
