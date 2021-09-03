@@ -96,7 +96,7 @@ impl GameManager {
             x += 1;
             x
         };
-
+        // TODO EXTRACT THERE ---------------------
         let entity = self.entity_id_to_entity.get(entity_id).unwrap();
         let _move = self.map.get_valid_movements_for_entity(entity);
         for path in _move {
@@ -113,9 +113,12 @@ impl GameManager {
             result.push(io.clone());
             to_cache.insert(unique_id, io);
         }
+        // TODO ------------------- TO THERE in a function (once you know the type of a closure)
+
         // TODO : attacks
         // TODO : objects
         // TODO : spell
+        todo!();
         self.input_cache = Some(InputCache {
             entity_chosen_to_play: *entity_id,
             input_options: to_cache,
