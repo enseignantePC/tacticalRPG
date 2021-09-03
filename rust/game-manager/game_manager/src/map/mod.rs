@@ -100,8 +100,6 @@ impl Map {
             .get_mut(&team)
             .unwrap()
             .insert(position.clone());
-
-        todo!()
     }
 
     /// moves an entity to a new position, updating the maps internal accordingly
