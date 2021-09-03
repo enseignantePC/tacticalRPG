@@ -60,13 +60,6 @@ pub struct InputCache {
 }
 
 impl GameManager {
-    // pub fn new() -> UninitialisedGameManager {
-    //     UninitialisedGameManager {}
-    // }
-
-    /// adds a new entity on the map
-    /// fails if the place is occupied
-    /// On success, returns a entity_id that allows reference to this entity for the game manager
     pub fn register_entity(
         &mut self,
         entity: on_the_map::Entity,
