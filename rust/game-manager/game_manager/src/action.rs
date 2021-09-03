@@ -65,11 +65,3 @@ impl Action {
         })
     }
 }
-#[derive(Debug)]
-pub struct ActionManager {}
-
-impl ActionManager {
-    pub fn resolve(&self, action: Action) {
-        todo!()
-    }
-}

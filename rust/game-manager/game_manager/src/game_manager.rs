@@ -40,10 +40,6 @@ pub struct GameManager {
     entity_id_to_entity: HashMap<EntityId, Rc<Entity>>,
     /// Manages the intents (aka inputs) that declares how the entities want to act on the world
     intent_manager: IntentManager,
-    /// resolve what effectively happens on the world and has an event system to trigger new intents to be sent according to what happened
-    ///     a simple example would be: if someone attacks player A, player A always counter attacks
-    ///     somehow more complex : if someone attacks player A and player A is in range of attacking, player A counter attacks
-    action_manager: ActionManager,
     fight_started: bool,
     fight_ended: bool,
     entity_currently_awaiting_input: Option<EntityId>,
