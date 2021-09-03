@@ -282,7 +282,6 @@ impl Map {
         uncrossable_points
     }
     /// given a `force`, rebakes the [DijkstraMap] for an entity
-    ///
     fn recalculates_dijkstra_map_for_entity_with_force(
         &mut self,
         entity: &Entity,
