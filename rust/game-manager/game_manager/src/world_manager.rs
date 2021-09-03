@@ -2,13 +2,25 @@
 //! - Storing them
 //! - updating the global state accordingly
 
+use std::rc::Rc;
+
+use crate::{
+    attack_solver::AttackResult,
+    map::{terrains::TerrainType, Pos2D},
+};
+
 use super::*;
 
 /// this represents a changement in the global state, it will be
 /// - stored (for historic features)
 /// - send to an exterior source (that will handle animation etc)
-#[derive(Debug, Clone)]
-pub struct WorldChange {}
+#[derive(Debug, Clone, ToVariant)]
+pub enum WorldChange {
+    Attack(AttackResult),
+    Death(Rc<Entity>),
+    TerrainChange((Pos2D, TerrainType)),
+    EntityMoved,
+}
 
 /// the structure responsible for generating [WorldChange]s and appling them to the world
 // TODO : what entities (by id) are affected and how, are they dead/out of the map? how they moved

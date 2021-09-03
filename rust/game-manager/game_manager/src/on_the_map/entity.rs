@@ -19,6 +19,12 @@ pub struct Entity {
     pub entity_intern: Box<dyn EntityIntern>,
 }
 
+impl ToVariant for Entity {
+    fn to_variant(&self) -> gdnative::core_types::Variant {
+        let dict = gdnative::core_types::Dictionary::new();
+        gdnative::core_types::Variant::from_dictionary(&dict)
+    }
+}
 impl Entity {
     pub fn can_attack(&self, other_entity: &Entity) -> bool {
         if self.team == TeamID::Loner || other_entity.team == TeamID::Loner {
