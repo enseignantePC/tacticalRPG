@@ -40,11 +40,12 @@ impl TryFrom<i32> for TerrainType {
     type Error = ();
     fn try_from(value: i32) -> Result<Self, ()> {
         match value {
-            1 => Ok(TerrainType::Ground),
-            2 => Ok(TerrainType::Forest),
-            3 => Ok(TerrainType::Wall),
-            4 => Ok(TerrainType::Void),
-            5 => Ok(TerrainType::Water),
+            0 => Ok(TerrainType::Ground),
+            1 => Ok(TerrainType::Forest),
+            2 => Ok(TerrainType::Wall),
+            3 => Ok(TerrainType::Void),
+            4 => Ok(TerrainType::Water),
+            5 => Ok(TerrainType::Sky),
             _ => Err(()),
         }
     }
