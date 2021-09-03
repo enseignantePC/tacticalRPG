@@ -54,14 +54,14 @@ impl Intent {
             Action::Spell(s) => todo!(),
         }
     }
-    /// for test purposes
-    pub fn void_intent() -> Intent {
-        Intent {
-            action: Action::void_action(),
-            priority: 0,
-            entity: Rc::new(super::on_the_map::Entity::example_entity()),
-        }
-    }
+    // for test purposes
+    // pub fn void_intent() -> Intent {
+    //     Intent {
+    //         action: Action::void_action(),
+    //         priority: 0,
+    //         entity: Rc::new(super::on_the_map::Entity::example_entity()),
+    //     }
+    // }
 }
 
 #[derive(Debug)]
@@ -104,101 +104,101 @@ impl IntentManager {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use std::vec;
+// #[cfg(test)]
+// mod tests {
+//     use std::vec;
 
-    use super::*;
+//     use super::*;
 
-    #[test]
-    fn sort_intents_correctly() {
-        let a = ActionManager {};
-        let mut im = IntentManager { queue: vec![] };
+//     #[test]
+//     fn sort_intents_correctly() {
+//         let a = ActionManager {};
+//         let mut im = IntentManager { queue: vec![] };
 
-        let mut i = Intent::void_intent();
-        i.priority = 1;
-        im.submit(i.clone());
+//         let mut i = Intent::void_intent();
+//         i.priority = 1;
+//         im.submit(i.clone());
 
-        i.priority = 7;
-        im.submit(i.clone());
+//         i.priority = 7;
+//         im.submit(i.clone());
 
-        i.priority = 4;
-        im.submit(i.clone());
+//         i.priority = 4;
+//         im.submit(i.clone());
 
-        dbg!(im.queue.pop());
-        todo!()
-    }
-    #[test]
-    fn new_intents_gets_treated_last() {
-        todo!()
-    }
-    #[test]
-    fn remainder_intents_gets_treated_first() {
-        todo!()
-    }
-    #[cfg(test)]
-    mod extract_minimal_intent {
-        use crate::map::Pos2D;
+//         dbg!(im.queue.pop());
+//         todo!()
+//     }
+//     #[test]
+//     fn new_intents_gets_treated_last() {
+//         todo!()
+//     }
+//     #[test]
+//     fn remainder_intents_gets_treated_first() {
+//         todo!()
+//     }
+//     #[cfg(test)]
+//     mod extract_minimal_intent {
+//         use crate::map::Pos2D;
 
-        use super::*;
+//         use super::*;
 
-        #[test]
-        fn one() {
-            let intent = Intent {
-                action: Action::Move(Move {
-                    path: vec![Pos2D::new(1, 2)],
-                }),
-                priority: 0,
-                entity: Rc::new(super::Entity::example_entity()),
-            };
-            let (a, b) = intent.extract_minimal_intent();
-            if let Action::Move(x) = a.action {
-                assert_eq!(x.path, vec![Pos2D::new(1, 2)]);
-            } else {
-                assert!(false);
-            };
-            assert!(b.is_none());
-        }
-        #[test]
-        fn two() {
-            let intent = Intent {
-                action: Action::Move(Move {
-                    path: vec![Pos2D::new(1, 2), Pos2D::new(3, 4), Pos2D::new(5, 6)],
-                }),
-                priority: 0,
-                entity: Rc::new(super::Entity::example_entity()),
-            };
-            let (a, b) = intent.extract_minimal_intent();
-            if let Action::Move(x) = a.action {
-                assert_eq!(x.path, vec![Pos2D::new(1, 2)]);
-            } else {
-                assert!(false);
-            };
-            assert!(b.is_some());
-            let b = b.unwrap();
-            if let Action::Move(x) = b.action {
-                assert_eq!(x.path, vec![Pos2D::new(3, 4), Pos2D::new(5, 6)]);
-            } else {
-                assert!(false);
-            };
-        }
-        #[test]
-        fn priority_kept() {
-            let intent = Intent {
-                action: Action::Move(Move {
-                    path: vec![Pos2D::new(1, 2), Pos2D::new(3, 4), Pos2D::new(5, 6)],
-                }),
-                priority: 4,
-                entity: Rc::new(super::Entity::example_entity()),
-            };
-            let (a, b) = intent.extract_minimal_intent();
-            assert_eq!(a.priority, 4);
-            assert_eq!(
-                b.expect("remainder intent not expected to be none")
-                    .priority,
-                4
-            );
-            dbg!(a);
-        }
-    }
-}
+//         #[test]
+//         fn one() {
+//             let intent = Intent {
+//                 action: Action::Move(Move {
+//                     path: vec![Pos2D::new(1, 2)],
+//                 }),
+//                 priority: 0,
+//                 entity: Rc::new(super::Entity::example_entity()),
+//             };
+//             let (a, b) = intent.extract_minimal_intent();
+//             if let Action::Move(x) = a.action {
+//                 assert_eq!(x.path, vec![Pos2D::new(1, 2)]);
+//             } else {
+//                 assert!(false);
+//             };
+//             assert!(b.is_none());
+//         }
+//         #[test]
+//         fn two() {
+//             let intent = Intent {
+//                 action: Action::Move(Move {
+//                     path: vec![Pos2D::new(1, 2), Pos2D::new(3, 4), Pos2D::new(5, 6)],
+//                 }),
+//                 priority: 0,
+//                 entity: Rc::new(super::Entity::example_entity()),
+//             };
+//             let (a, b) = intent.extract_minimal_intent();
+//             if let Action::Move(x) = a.action {
+//                 assert_eq!(x.path, vec![Pos2D::new(1, 2)]);
+//             } else {
+//                 assert!(false);
+//             };
+//             assert!(b.is_some());
+//             let b = b.unwrap();
+//             if let Action::Move(x) = b.action {
+//                 assert_eq!(x.path, vec![Pos2D::new(3, 4), Pos2D::new(5, 6)]);
+//             } else {
+//                 assert!(false);
+//             };
+//         }
+//         #[test]
+//         fn priority_kept() {
+//             let intent = Intent {
+//                 action: Action::Move(Move {
+//                     path: vec![Pos2D::new(1, 2), Pos2D::new(3, 4), Pos2D::new(5, 6)],
+//                 }),
+//                 priority: 4,
+//                 entity: Rc::new(super::Entity::example_entity()),
+//             };
+//             let (a, b) = intent.extract_minimal_intent();
+//             assert_eq!(a.priority, 4);
+//             assert_eq!(
+//                 b.expect("remainder intent not expected to be none")
+//                     .priority,
+//                 4
+//             );
+//             dbg!(a);
+//         }
+//     }
+// }

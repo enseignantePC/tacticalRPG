@@ -27,15 +27,16 @@ pub struct Move {
 pub struct Attack {
     pub _type: AttackType,
     pub strength: f64,
+    pub crit_chance: f32,
 }
 
-/// This describes the type of attacks that exist in the game, 
+/// This describes the type of attacks that exist in the game,
 /// the logic beeing handled by the [super::attack_solver]
-/// 
+///
 /// Possible ideas are
 /// spear /axe / sword
 /// elemental
-/// 
+///
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Debug)]
 pub enum AttackType {
     Base,

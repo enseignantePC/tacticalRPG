@@ -103,6 +103,60 @@ impl Map {
 
         todo!()
     }
+
+    /// moves an entity to a new position, updating the maps internal accordingly
+    pub fn move_entity_from_current_position_to_next_position(
+        &mut self,
+        entity: &Entity,
+        next_position: Pos2D,
+    ) {
+        let id = &entity.unique_id;
+        let current_position = self
+            .get_pos_for_entity(*id)
+            .expect("no position found for entity_id");
+
+        self.entity_id_to_pos.remove_entry(id);
+        let res = self.entity_id_to_pos.insert(*id, next_position);
+        if res.is_some() {
+            panic!("erased old entry when it should have been empty")
+        }
+
+        let (_, occupant) = self
+            .pos_to_occupant
+            .remove_entry(&current_position)
+            .expect("No occupant found at pos");
+        let res = self.pos_to_occupant.insert(next_position, occupant);
+        if res.is_some() {
+            panic!("erased old entry when it should have been empty")
+        }
+
+        let set = self
+            .team_id_to_set_of_position_taken
+            .get_mut(&entity.team)
+            .expect("no set found for team when it should have had");
+        set.remove(&current_position);
+        set.insert(next_position);
+    }
+
+    pub fn remove_entity_from_the_map(&mut self, entity: &Entity) {
+        let id = &entity.unique_id;
+        let current_position = self
+            .get_pos_for_entity(*id)
+            .expect("no position found for entity_id");
+
+        self.entity_id_to_pos.remove_entry(id);
+
+        self.pos_to_occupant
+            .remove_entry(&current_position)
+            .expect("No occupant found at pos");
+
+        let set = self
+            .team_id_to_set_of_position_taken
+            .get_mut(&entity.team)
+            .expect("no set found for team when it should have had");
+        set.remove(&current_position);
+    }
+
     /// Computes where an entity might go by what path and return the path in the form of
     /// a list of path to get to reachable position excluding the first position where the entity is standing.
     ///
@@ -127,8 +181,8 @@ impl Map {
 
         self.recalculates_dijkstra_map_for_entity_with_force(
             entity,
-            entity.get_move_force(),
-            entity.terrain_weights.clone(),
+            entity.entity_intern.get_move_force(),
+            entity.entity_intern.terrain_weights(),
         );
 
         let end_points_available = self.points_available_filters_end_position(entity);
@@ -142,7 +196,10 @@ impl Map {
     fn points_available_filters_end_position(&mut self, entity: &Entity) -> Vec<PointId> {
         let end_points_available: Vec<PointId> = self
             .dijkstra_map
-            .get_all_points_with_cost_between(Cost(0f32), Cost(entity.get_move_force()))
+            .get_all_points_with_cost_between(
+                Cost(0f32),
+                Cost(entity.entity_intern.get_move_force()),
+            )
             .iter()
             .filter(|&x| {
                 let x = self.dijkstra_point_id_to_pos.get(x).unwrap();
@@ -158,18 +215,42 @@ impl Map {
 
     /// this methods is used to determine what occupant might be attacked by a specified [Entity]
     /// TODO : currently this is broken and only returns what [Entity]s can be attacked
-    pub fn get_attackable_entities_by_entity(&mut self, entity: &Entity) -> Vec<EntityId> {
+    pub fn get_attackable_entities_by_entity(&mut self, entity: &Entity) -> &[(Pos2D, EntityId)] {
         // all entities in range that are not on the same team
         let result: Vec<EntityId> = Vec::new();
-        for this_range in entity.get_attack_ranges() {
+        for this_range in entity.entity_intern.get_attack_ranges() {
+            // see what is in range
             self.recalculates_dijkstra_map_for_entity_with_force(
                 entity,
                 *this_range as f32,
+                // this should be a map where every terrain has a weigth of one, so the attacks flings no matter the terrain
+                // OR, we could forbid walls, or other terrain, anyway, needs thinking
                 todo!(),
             );
-            let end_points_available = self
-                .dijkstra_map
-                .get_all_points_with_cost_between(Cost(0f32), Cost(entity.get_move_force()));
+            let end_points_available = self.dijkstra_map.get_all_points_with_cost_between(
+                Cost(0f32),
+                Cost(entity.entity_intern.get_move_force()),
+            );
+            todo!();
+            let result: Vec<(Pos2D, EntityId)> = Vec::new();
+            for k in end_points_available {
+                // pour chaque position
+                let k = *self.dijkstra_point_id_to_pos.get(k).unwrap();
+                // si il y a personne, continue
+                if self.pos_to_occupant.get(&k).is_none() {
+                    continue;
+                }
+                // si il y a un loner, on garde toutes les positions
+                // si
+                if let Some(Occupant::Entity(x)) = self.pos_to_occupant.get(&k) {
+                    /// get all set except the one of entity.team
+                    if &entity.team == &TeamID::Loner {
+                        todo!()
+                    } else {
+                        result.insert(index, element)
+                    }
+                }
+            }
         }
         todo!()
     }

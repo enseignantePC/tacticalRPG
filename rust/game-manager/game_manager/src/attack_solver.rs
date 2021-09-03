@@ -1,6 +1,6 @@
 use super::*;
 pub fn solve(attack: Attack, entity_assailant: &Entity, entity_attacked: &Entity) -> AttackResult {
-    let damage: f64 = attack.strength * entity_attacked.damage_reduction_factor();
+    let damage: f64 = attack.strength * entity_attacked.entity_intern.damage_reduction_factor();
     AttackResult {
         damage_dealed: damage,
     }
