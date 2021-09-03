@@ -67,11 +67,12 @@ impl Into<String> for TerrainType {
 /// This is glue code for mapping the terrain_weights member of an [Entity] to the terrain_weights arg
 /// expected by the [DijkstraMap].
 pub fn terrain_weights_to_dijkstra_terrain_weigth(
-    x: &HashMap<terrains::TerrainType, f32>,
+    terrain_weigth: &HashMap<terrains::TerrainType, f32>,
 ) -> FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> {
     let mut result: FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> =
         FnvHashMap::default();
-    for (terrain, weight) in x {
+
+    for (terrain, weight) in terrain_weigth {
         let dji_terrain_type = dijkstra_map::TerrainType::Terrain(terrain.into());
         let dji_weigth = dijkstra_map::Weight(*weight);
         result.insert(dji_terrain_type, dji_weigth);
