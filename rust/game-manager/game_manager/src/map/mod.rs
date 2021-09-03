@@ -215,10 +215,14 @@ impl Map {
     }
 
     /// this methods is used to determine what occupant might be attacked by a specified [Entity]
-    /// TODO : currently this is broken and only returns what [Entity]s can be attacked
-    pub fn get_attackable_entities_by_entity(&mut self, entity: &Entity) -> &[(Pos2D, EntityId)] {
+    /// this returns a tuple of (a position where there is an entity, an EntityId that can be attacked)
+    ///
+    /// note : this gets which targets are available to the entity and should be presented to the entity as a list of choice BUT
+    /// the entity internal state might have to filter this
+    pub fn get_attackable_entities_by_entity(&mut self, entity: &Entity) -> Vec<(Pos2D, EntityId)> {
         // all entities in range that are not on the same team
-        let result: Vec<EntityId> = Vec::new();
+        // TODO : make this a more complex Range struct that can deal with some different logic
+        let mut result: Vec<(Pos2D, EntityId)> = Vec::new();
         for this_range in entity.entity_intern.get_attack_ranges() {
             // see what is in range
             self.recalculates_dijkstra_map_for_entity_with_force(
@@ -233,27 +237,27 @@ impl Map {
                 Cost(entity.entity_intern.get_move_force()),
             );
             todo!();
-            let result: Vec<(Pos2D, EntityId)> = Vec::new();
-            for k in end_points_available {
+            for end_point in end_points_available {
                 // pour chaque position
-                let k = *self.dijkstra_point_id_to_pos.get(k).unwrap();
+                let end_point = *self.dijkstra_point_id_to_pos.get(end_point).unwrap();
                 // si il y a personne, continue
-                if self.pos_to_occupant.get(&k).is_none() {
+                if self.pos_to_occupant.get(&end_point).is_none() {
                     continue;
                 }
+                let occupant = self.pos_to_occupant.get(&end_point).unwrap();
                 // si il y a un loner, on garde toutes les positions
-                // si
-                if let Some(Occupant::Entity(x)) = self.pos_to_occupant.get(&k) {
+
+                if let Occupant::Entity(e) = occupant {
                     /// get all set except the one of entity.team
-                    if &entity.team == &TeamID::Loner {
-                        todo!()
+                    if entity.team.can_fight(&e.team) {
+                        result.push((end_point, e.unique_id))
                     } else {
-                        result.insert(index, element)
+                        continue;
                     }
                 }
             }
         }
-        todo!()
+        result
     }
 
     fn enable_all_djikstra_points(&mut self) {
