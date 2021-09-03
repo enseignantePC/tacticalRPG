@@ -43,22 +43,23 @@ impl ToVariant for WorldChange {
     }
 }
 
-/// the structure responsible for generating [WorldChange]s and appling them to the world
 // TODO : what entities (by id) are affected and how, are they dead/out of the map? how they moved
 // TODO : how the terrain is affected
 // TODO : what object is used, what spell is launched etc
-#[derive(Debug, Clone)]
-pub struct WorldManager {}
 
-impl WorldManager {
-    /// given an intent, it generates a WorldChange :
-    /// description of a change applied to the world
-    /// while the treatment of the intent can be randomise i.e. (chance of critics etc)
-    /// the WorldChange is not i.e. (it asserts there was a critic blow or not)
-    pub fn intent_to_world_change(&self, intent: Intent) -> WorldChange {
-        todo!()
-    }
-    pub fn apply_change_to_world(&self, change: &WorldChange, gm: &mut map::Map) {
-        todo!()
-    }
+/// the function responsible for generating [WorldChange]s and appling them to the world
+///
+/// while the treatment of the intent can be randomise i.e. (chance of critics etc)
+/// the WorldChange is not i.e. (it asserts there was a critic blow or not)
+///
+/// given an intent, it generates a WorldChange : the description of a change applied to the world
+pub fn intent_to_world_change(intent: Intent) -> Vec<WorldChange> {
+    todo!()
+}
+
+/// resolve what effectively happens on the world and has an event system to trigger new intents to be sent according to what happened
+///     a simple example would be: if someone attacks player A, player A always counter attacks
+///     somehow more complex : if someone attacks player A and player A is in range of attacking, player A counter attacks
+pub fn apply_change_to_world(change: &WorldChange, gm: &mut map::Map) {
+    todo!()
 }

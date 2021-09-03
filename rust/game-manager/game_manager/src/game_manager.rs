@@ -47,7 +47,7 @@ pub struct GameManager {
     input_cache: Option<InputCache>,
     intent_watcher: Watcher,
     action_watcher: Watcher,
-    world_manager: WorldManager,
+    /// A simple history field, storing chronologically what happens
     world_changes: Vec<WorldChange>,
 }
 /// this is stored by the gamemanager after you chose which Entity was going to play and i gave you a choice in the form
@@ -181,13 +181,12 @@ impl GameManager {
     }
     /// this method transform an intent into a worldchange and stores it in [GameManager.world_changes]
     /// this is where something that was wanted by an entity finally becomes reality
-    fn realise_intent(&mut self, next_intent: &Intent) -> WorldChange {
-        let world_change = self
-            .world_manager
-            .intent_to_world_change(next_intent.clone());
-        self.world_manager
-            .apply_change_to_world(&world_change, &mut self.map);
-        world_change
+    fn realise_intent(&mut self, next_intent: &Intent) -> Vec<WorldChange> {
+        let world_changes = world_manager::intent_to_world_change(next_intent.clone());
+        for world_change in &world_changes {
+            world_manager::apply_change_to_world(world_change, &mut self.map);
+        }
+        world_changes
     }
     /// submit an intent, call the intent watchers on that intent
     /// and does the same for every intention yielded by the intent[Watcher], recursively
