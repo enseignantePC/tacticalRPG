@@ -26,10 +26,10 @@ pub type Pos2D = Vector2D<i32, i32>;
 pub mod terrains;
 use terrains::*;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug)]
 /// everything interactable that can be in the world and will be stored by the map
 pub enum Occupant {
-    Entity(EntityId),
+    Entity(Rc<Entity>),
     Obstacle(Obstacle),
     Object(Object),
 }
@@ -89,7 +89,7 @@ impl Map {
         let id = entity.unique_id.clone();
         self.entity_id_to_pos.insert(id, position.clone());
         self.pos_to_occupant
-            .insert(position.clone(), Occupant::Entity(id));
+            .insert(position.clone(), Occupant::Entity(entity.clone()));
 
         if !self.team_id_to_set_of_position_taken.contains_key(&team) {
             self.team_id_to_set_of_position_taken
@@ -159,6 +159,7 @@ impl Map {
 
     /// Computes where an entity might go by what path and return the path in the form of
     /// a list of path to get to reachable position excluding the first position where the entity is standing.
+    ///
     ///
     /// TODO : TESTME - disable points are the right ones?
     ///
