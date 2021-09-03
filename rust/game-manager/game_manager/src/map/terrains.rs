@@ -77,3 +77,27 @@ pub fn terrain_weights_to_dijkstra_terrain_weigth(
     }
     result
 }
+
+/// This maps is used to determine where and through what type of terrain can attack go
+/// it is currently hardcoded that they go through anything except walls,
+///
+/// this could be the default while the entity concerned optionaly provide correction to it
+pub fn terrain_weigth_for_attacks() -> HashMap<TerrainType, f32> {
+    let mut result: HashMap<TerrainType, f32> = HashMap::new();
+
+    for terrain_type in [
+        TerrainType::Ground,
+        TerrainType::Forest,
+        TerrainType::Void,
+        TerrainType::Water,
+        TerrainType::Sky,
+    ] {
+        let weigth = 1.0;
+        result.insert(terrain_type, weigth);
+    }
+    let terrain_type = TerrainType::Wall;
+    let weigth = f32::INFINITY;
+    result.insert(terrain_type, weigth);
+
+    result
+}

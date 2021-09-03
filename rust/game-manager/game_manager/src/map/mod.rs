@@ -230,13 +230,13 @@ impl Map {
                 *this_range as f32,
                 // this should be a map where every terrain has a weigth of one, so the attacks flings no matter the terrain
                 // OR, we could forbid walls, or other terrain, anyway, needs thinking
-                todo!(),
+                terrain_weigth_for_attacks(),
             );
             let end_points_available = self.dijkstra_map.get_all_points_with_cost_between(
                 Cost(0f32),
                 Cost(entity.entity_intern.get_move_force()),
             );
-            todo!();
+
             for end_point in end_points_available {
                 // pour chaque position
                 let end_point = *self.dijkstra_point_id_to_pos.get(end_point).unwrap();
