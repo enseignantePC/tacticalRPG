@@ -12,7 +12,7 @@ pub struct EntityId(pub i64);
 /// TODO : except undirectly? via a `friendly fire` option for the game manager
 /// TODO : entities in the Loner team can attack anyone
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy)]
-pub enum TeamID {
+pub enum TeamId {
     /// a unique identifier for each team
     Team(i32),
     /// the entity has no team and can attack anyone
