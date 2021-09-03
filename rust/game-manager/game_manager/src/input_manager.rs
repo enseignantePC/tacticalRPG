@@ -11,13 +11,9 @@ pub struct InputOption {
     pub intent: Intent,
 }
 
-/// A builder for GameManager
-pub struct UninitialisedGameManager {}
-
-impl UninitialisedGameManager {
-    pub fn initialise(self) -> GameManager {
-        todo!()
-    }
-}
-
+/// The inputmanager keeps track of the state of the game to always permit to be asked what
+/// - inputs must be submitted
+/// - what is the context etc
+///
+/// currently not used, it will be the interface with exterior sources/ godot side?
 pub struct InputManager {}
