@@ -12,6 +12,7 @@
 //! with a [GameManager].
 use std::{
     collections::{HashMap, HashSet},
+    ops::Deref,
     rc::Rc,
 };
 
@@ -21,7 +22,23 @@ use fnv::{FnvHashMap, FnvHashSet};
 // pub mod djikstra;
 
 pub use dijkstra_map::Vector2D;
-pub type Pos2D = Vector2D<i32, i32>;
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
+pub struct Pos2D(Vector2D<i32, i32>);
+impl Pos2D {
+    pub fn new(x: i32, y: i32) -> Self {
+        let x = Vector2D::<i32, i32>::new(x, y);
+        Pos2D { 0: x }
+    }
+}
+
+impl Deref for Pos2D {
+    type Target = Vector2D<i32, i32>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 pub mod terrains;
 use terrains::*;
@@ -58,11 +75,16 @@ impl Map {
             None,
             None,
         );
+        let mut intermed: FnvHashMap<Pos2D, PointId> = FnvHashMap::default();
+        for (k, v) in pos_to_dijkstra_point_id {
+            intermed.insert(Pos2D(k), v);
+        }
+        let pos_to_dijkstra_point_id = intermed;
         let mut dijkstra_point_id_to_pos: FnvHashMap<dijkstra_map::PointId, Pos2D> =
             FnvHashMap::default();
         for ele in &pos_to_dijkstra_point_id {
-            let (x, y) = ele.clone();
-            dijkstra_point_id_to_pos.insert(*y, *x);
+            let (pos, dji_id) = ele.clone();
+            dijkstra_point_id_to_pos.insert(*dji_id, pos.clone());
         }
         Map {
             dijkstra_map,
