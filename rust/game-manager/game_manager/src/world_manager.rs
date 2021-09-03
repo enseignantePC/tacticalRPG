@@ -14,33 +14,12 @@ use super::*;
 /// this represents a changement in the global state, it will be
 /// - stored (for historic features)
 /// - send to an exterior source (that will handle animation etc)
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, ToVariant)]
 pub enum WorldChange {
     Attack(AttackResult),
     Death(EntityId),
     TerrainChange(Pos2D, TerrainType),
     EntityMoved(EntityId, Pos2D),
-}
-
-impl ToVariant for WorldChange {
-    fn to_variant(&self) -> Variant {
-        let mut dict = Dictionary::new();
-        match self {
-            WorldChange::Attack(x) => dict.insert("attack", x),
-            WorldChange::Death(x) => dict.insert("death", x),
-            WorldChange::TerrainChange(x, y) => {
-                dict.insert("terrain_change_to", y);
-                dict.insert("terrain_change_at_x", x.x);
-                dict.insert("terrain_change_at_y", x.y);
-            }
-            WorldChange::EntityMoved(x, y) => {
-                dict.insert("entity_moved", x);
-                dict.insert("moved_at_x", y.x);
-                dict.insert("moved_at_y", y.y);
-            }
-        };
-        Variant::from_dictionary(&dict.into_shared())
-    }
 }
 
 // TODO : what entities (by id) are affected and how, are they dead/out of the map? how they moved
