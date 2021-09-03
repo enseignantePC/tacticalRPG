@@ -24,7 +24,9 @@ pub struct Entity {
 impl ToVariant for Entity {
     fn to_variant(&self) -> gdnative::core_types::Variant {
         let dict = gdnative::core_types::Dictionary::new();
-        gdnative::core_types::Variant::from_dictionary(&dict)
+        dict.insert("team", self.team);
+        dict.insert("unique_id", self.unique_id);
+        gdnative::core_types::Variant::from_dictionary(&dict.into_shared())
     }
 }
 

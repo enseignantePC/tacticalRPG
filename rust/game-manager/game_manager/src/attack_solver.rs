@@ -12,7 +12,7 @@ pub fn solve(attack: Attack, entity_assailant: &Entity, entity_attacked: &Entity
     }
 }
 
-// #[derive(PartialEq, PartialOrd, Clone, Copy, Debug, ToVariant)]
+#[derive(PartialEq, PartialOrd, Clone, Copy, Debug, ToVariant)]
 pub struct AttackResult {
     damage_dealed: f64,
     critical_hit: bool,

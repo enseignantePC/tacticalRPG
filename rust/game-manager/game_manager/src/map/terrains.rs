@@ -9,7 +9,8 @@
 use std::convert::TryFrom;
 
 use super::*;
-#[derive(Eq, Hash, PartialEq, Debug, Clone, Copy)]
+use gdnative::prelude::ToVariant;
+#[derive(Eq, Hash, PartialEq, Debug, Clone, Copy, ToVariant)]
 /// representation of the type of terrain from the side of the game_manager
 /// it will alter the movement of an entity sitting on it
 ///
