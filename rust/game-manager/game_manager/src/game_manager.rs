@@ -168,7 +168,7 @@ impl GameManager {
                 let next_intent = next_intent.unwrap();
                 let world_change = self.realise_intent(&next_intent);
                 // stores the change for historic purposes
-                self.world_changes.push(world_change.clone());
+                self.world_changes.extend(world_change.clone());
                 // watch the change
                 let response: Vec<Intent> = self.action_watcher.watch(&next_intent);
                 for k in response {
