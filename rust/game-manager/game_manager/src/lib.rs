@@ -7,6 +7,10 @@ use on_the_map::Entity;
 /// how to get valid inputs from the lib
 /// how to select them out of the lib and then inform the lib
 ///
+/// TODO : feature
+/// design an entity that leaves a trail of something
+/// - entity ally go faster in the trail?
+/// - entity does more damage if in own trail?
 use std::collections::HashMap;
 
 pub mod action;
