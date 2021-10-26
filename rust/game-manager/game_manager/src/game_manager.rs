@@ -8,8 +8,8 @@ use std::rc::Rc;
 pub struct EntityId(pub i64);
 
 /// The team of an entity,
-/// TODO : entity of the same team shouldnt be able to attack each other
-/// TODO : except undirectly? via a `friendly fire` option for the game manager
+/// TODO : entity of the same team shouldn't be able to attack each other
+/// TODO : except indirectly? via a `friendly fire` option for the game manager
 /// TODO : entities in the Loner team can attack anyone
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy, ToVariant)]
 pub enum TeamId {
