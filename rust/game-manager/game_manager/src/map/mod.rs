@@ -252,7 +252,7 @@ impl Map {
                 // si il y a un loner, on garde toutes les positions
 
                 if let Occupant::Entity(e) = occupant {
-                    /// get all set except the one of entity.team
+                    // get all set except the one of entity.team
                     if entity.team.can_fight(&e.team) {
                         result.push((end_point, e.unique_id))
                     } else {
