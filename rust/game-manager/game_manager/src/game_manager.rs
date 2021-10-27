@@ -1,5 +1,6 @@
-//! The most interesting structure here is the [GameManager]
-//!
+//! The most interesting structure here is the [GameManager].
+//! It is responsible of handling all the other module and making them work together
+//! to offer a good interface for dealing with the intern state of the game.
 use super::*;
 use std::rc::Rc;
 

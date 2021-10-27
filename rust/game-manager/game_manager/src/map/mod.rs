@@ -1,7 +1,7 @@
 //! # Module map
 //!
 //! This module is responsible for representing the world as a 2D grid
-//! and computing/keeping track of everything that happens, grid wise
+//! and computing/keeping track of everything that happens grid wise
 //! holding information about :
 //! - the form of the world
 //! - what is it made of (TerrainType)
@@ -9,7 +9,8 @@
 //! - what each case of the world is made of
 //!
 //! It uses a [DijkstraMap] to do the calculation and abstracts it so it can communicate
-//! with a [GameManager].
+//! with a [GameManager][crate::game_manager::GameManager].
+
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,

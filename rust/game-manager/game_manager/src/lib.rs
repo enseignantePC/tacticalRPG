@@ -1,8 +1,8 @@
 #![allow(dead_code, unused_imports)]
-/// computes map calculations
+/// computes map pathfinding calculations
 use dijkstra_map::DijkstraMap;
+/// godot side wrappers
 use gdnative::prelude::*;
-use on_the_map::Entity;
 /// TODO : Documentation
 /// how to get valid inputs from the lib
 /// how to select them out of the lib and then inform the lib
@@ -11,28 +11,50 @@ use on_the_map::Entity;
 /// design an entity that leaves a trail of something
 /// - entity ally go faster in the trail?
 /// - entity does more damage if in own trail?
+///
+/// a system of optional tags on the map that are used by entity to determine stuff
 use std::collections::HashMap;
-
+/// This module is responsible for offering a description of things
+/// that entity can do while the game is playing
+/// such things are called actions and represented by an [Action] structure.
 pub mod action;
 use action::*;
-
+/// This module is responsible for Turning an [Attack]
+/// (a description of an attack with an uncertain result) into
+/// an [ResolvedAttack] (a result without any randomness involved).
 pub mod attack_solver;
+/// This module is responsible for representing the world
+/// as a 2D grid and computing/keeping track of everything that happens,
+/// grid wise.
+/// Computation are made using an intern [DijkstraMap].
 pub mod map;
 
+/// This module is responsible for everything that is interactive
+/// and on the map, entities, object, destructible terrains.
 pub mod on_the_map;
-
+use on_the_map::Entity;
+/// Exposes an [Intent] struct that means what an Entity would like to do if possible.
+/// Intents can be emitted and subscribed to the game manager at some points of the execution.
+/// They must be analysed and judged still possible to be transformed into a [WorldChange]
+/// and be used to update the world state.
 pub mod turn_logic;
 use turn_logic::*;
 
 pub mod world_manager;
 use world_manager::*;
 
-/// expose a [Watcher] structure, responsible of analysing incoming intents or [WorldChange]s and
-/// yields [Intent]s as a response
+/// expose a [Watcher] structure, which is used to implement how an entity will react to something
+/// (by wanting to counter attack for instance).
+///
+/// It will analyse incoming [Intents][Intent] and
+/// emit [Intent]s as a response.
+///
+/// WARNING : side effect here
 pub mod watcher;
 use watcher::*;
 
-/// expose a structure responsible for communicating with an external sources that will provide inputs
+/// expose a structure responsible for communicating
+/// with an external sources that will provide inputs
 pub mod input_manager;
 use input_manager::*;
 

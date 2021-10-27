@@ -1,3 +1,8 @@
+//! This module is responsible of offering a clean interface to an external source.
+//! The [InputManager] will be the access point from which you can:
+//! - query what is possible to do for currently playing [Entity] via [InputOption]
+//! - answer what the entity will do via ~ dont know yet, an _answer method or smt
+
 use super::*;
 /// this is how a [GameManager] will communicate what choices are available for currently playing entity
 /// it will be cloned and cached by the game_manager so we can use the id to declare the choice
@@ -11,9 +16,9 @@ pub struct InputOption {
     pub intent: Intent,
 }
 
-/// The inputmanager keeps track of the state of the game to always permit to be asked what
+/// The InputManager keeps track of the state of the game to always permit to be asked what
 /// - inputs must be submitted
 /// - what is the context etc
 ///
-/// currently not used, it will be the interface with exterior sources/ godot side?
+/// currently not implemented, it will be the interface with exterior sources/ godot side
 pub struct InputManager {}

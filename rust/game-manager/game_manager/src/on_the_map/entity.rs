@@ -1,19 +1,21 @@
+//! An entity is the type of thing on the map that requires input to decide what to do.
+//! You should think of entities as the only "alive" thing on the map
+// TODO branch note: this should be the game_manager_wrapper_of a entity_intern that is a trait
+
 use gdnative::core_types::ToVariant;
 
-// TODO branch note: this should be the game_manager_wrapper_of a entity_intern that is a trait
-/// An entity is the type of thing on the map that requires input to decide what to do.
-/// You should think of entities as the only "alive" thing on the map
 use super::*;
 
 /// As entities are the most important thing on the map
 /// they should be the most flexible thing possible
 ///
-/// It makes more and more sense that it should be a trait
-/// and maybe the entity should be handled entirerly by the external source,
-/// possibly in the form of a Godot Node, capable of calling some gdscript code to satisfy the trait
+/// It makes more and more sense that it should be a trait.
+/// possibly in the form of a Godot Node, capable of calling some
+/// gdscript code to satisfy the trait
 /// (which would probably make it unsafe)?
 ///
-/// As i am too much of a newbie at rust, this frigthens me however
+/// or maybe the entity should be handled entirely by the external source
+/// As i am too much of a newbie at rust, this is a source of worry.
 #[derive(Debug)]
 pub struct Entity {
     pub team: TeamId,

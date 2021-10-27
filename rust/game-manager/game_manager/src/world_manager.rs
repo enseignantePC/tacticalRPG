@@ -1,6 +1,8 @@
-//! manages the states of the world, accept [WorldChange]s and
-//! - Storing them
-//! - updating the global state accordingly
+//! This module is responsible for accepting [WorldChange]s
+//! (a representation of what happened to the world) and
+//! - Updating the state of the game accordingly
+//! (for instance moving an entity around on the map) after it was decided the entity should move.
+//! - Storing them for history purposes
 
 use std::rc::Rc;
 
