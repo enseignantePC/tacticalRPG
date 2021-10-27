@@ -59,8 +59,8 @@ pub mod input_manager;
 use input_manager::*;
 
 /// main interfaces that glue modules together
-pub mod game_manager;
-pub use game_manager::*;
+pub mod game_manager_mod;
+pub use game_manager_mod::*;
 
 pub enum GameStatus {
     FightNotStarted,
