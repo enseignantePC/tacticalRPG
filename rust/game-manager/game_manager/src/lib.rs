@@ -18,7 +18,7 @@ use std::collections::HashMap;
 /// that entity can do while the game is playing
 /// such things are called actions and represented by an [Action] structure.
 pub mod action;
-use action::*;
+pub use action::*;
 /// This module is responsible for Turning an [Attack]
 /// (a description of an attack with an uncertain result) into
 /// an [ResolvedAttack] (a result without any randomness involved).
@@ -32,16 +32,17 @@ pub mod map;
 /// This module is responsible for everything that is interactive
 /// and on the map, entities, object, destructible terrains.
 pub mod on_the_map;
-use on_the_map::Entity;
+pub use on_the_map::Entity;
 /// Exposes an [Intent] struct that means what an Entity would like to do if possible.
 /// Intents can be emitted and subscribed to the game manager at some points of the execution.
 /// They must be analysed and judged still possible to be transformed into a [WorldChange]
 /// and be used to update the world state.
 pub mod turn_logic;
-use turn_logic::*;
+pub use turn_logic::Intent;
+pub use turn_logic::*;
 
 pub mod world_manager;
-use world_manager::*;
+pub use world_manager::*;
 
 /// expose a [Watcher] structure, which is used to implement how an entity will react to something
 /// (by wanting to counter attack for instance).
@@ -52,11 +53,6 @@ use world_manager::*;
 /// WARNING : side effect here
 pub mod watcher;
 use watcher::*;
-
-/// expose a structure responsible for communicating
-/// with an external sources that will provide inputs
-pub mod input_manager;
-use input_manager::*;
 
 /// main interfaces that glue modules together
 pub mod game_manager_mod;

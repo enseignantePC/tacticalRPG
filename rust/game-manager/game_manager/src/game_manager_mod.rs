@@ -38,26 +38,18 @@ pub struct GameManager {
     /// represents the world (2D grid) and everything that is on it
     map: map::Map,
     /// how the game manager stores and references entity that are on the map
-    entity_id_to_entity: HashMap<EntityId, Rc<Entity>>,
+    pub entity_id_to_entity: HashMap<EntityId, Rc<Entity>>,
     /// Manages the intents (aka inputs) that declares how the entities want to act on the world
     intent_manager: IntentManager,
     fight_started: bool,
     fight_ended: bool,
     entity_currently_awaiting_input: Option<EntityId>,
-    /// stores what input are available after a query via [GameManager::get_valid_inputs_for_entity]
-    input_cache: Option<InputCache>,
     /// watch and react to intent emitted
     intent_watcher: Watcher,
     /// watch and react to action done
     action_watcher: Watcher,
     /// A simple history field, storing chronologically what happens
     world_changes: Vec<WorldChange>,
-}
-/// this is stored by the gamemanager after you chose which Entity was going to play and i gave you a choice in the form
-/// of a Vec<InputOption>
-pub struct InputCache {
-    entity_chosen_to_play: EntityId,
-    input_options: HashMap<i32, InputOption>,
 }
 
 impl GameManager {
@@ -78,6 +70,7 @@ impl GameManager {
         }
         Err(())
     }
+    /// TODO FIXDOC
     /// generate valid inputs for entity
     /// - what movements are okay
     /// - what attacks are okay
@@ -88,31 +81,19 @@ impl GameManager {
     ///
     /// input can then be submitted in the form of that unique id
     /// via the method [GameManager.give_inputs_according_to_cache]
-    pub fn get_valid_inputs_for_entity(&mut self, entity_id: &EntityId) -> Vec<InputOption> {
-        let mut result: Vec<InputOption> = Vec::new();
-        let mut to_cache: HashMap<i32, InputOption> = HashMap::new();
-        // used to generate id of
-        let mut x = -1;
-        let mut option_id_generator = move || {
-            x += 1;
-            x
-        };
+    pub fn get_valid_intents_for_entity(&mut self, entity_id: &EntityId) -> Vec<Intent> {
+        let mut result: Vec<Intent> = Vec::new();
         // TODO EXTRACT THERE ---------------------
         let entity = self.entity_id_to_entity.get(entity_id).unwrap();
         let _move = self.map.get_valid_movements_for_entity(entity);
         for path in _move {
-            let unique_id = option_id_generator();
-            let io = InputOption {
-                unique_id,
-                intent: Intent {
-                    action: Action::Move(Move { path }),
-                    // TODO : priority system
-                    priority: 0i32,
-                    entity: entity.clone(),
-                },
+            let intent = Intent {
+                action: Action::Move(Move { path }),
+                // TODO : priority system
+                priority: 0i32,
+                entity: entity.clone(),
             };
-            result.push(io.clone());
-            to_cache.insert(unique_id, io);
+            result.push(intent);
         }
         // TODO ------------------- TO THERE in a function (once you know the type of a closure)
 
@@ -120,42 +101,11 @@ impl GameManager {
         // TODO : objects
         // TODO : spell
         todo!();
-        self.input_cache = Some(InputCache {
-            entity_chosen_to_play: *entity_id,
-            input_options: to_cache,
-        });
         result
     }
-    /// if a player p is playing its turn, give the intent for that player
-    /// it consumes the cache if the input is valid
-    ///
-    /// returns a vector of the [WorldChange]s that happened in the world
-    /// fails if the input is invalid (aka, its unique id doesnt exist in the [InputCache])
-    pub fn give_inputs_according_to_cache(
-        &mut self,
-        id_of_valid_input_cache: i32,
-    ) -> Result<Vec<WorldChange>, ()> {
-        if self.input_cache.is_none() {
-            Err(())
-        } else {
-            // get the content of the cache
-            let cloned_cache = self.input_cache.take().unwrap();
-            let InputCache {
-                entity_chosen_to_play: _,
-                mut input_options,
-            } = cloned_cache;
-
-            let InputOption {
-                unique_id: _,
-                intent,
-            } = input_options.remove(&id_of_valid_input_cache).unwrap();
-            Ok(self.resolve_all_intents(intent))
-        }
-    }
-
     /// make an entity declare an [Intent][super::turn_logic::Intent]
     /// the intent will be `watched` (see [Watcher]) when it is emitted and when it is realised
-    fn resolve_all_intents(&mut self, intent: Intent) -> Vec<WorldChange> {
+    pub fn resolve_all_intents(&mut self, intent: Intent) -> Vec<WorldChange> {
         // stores what happens and returns it to external source
         let result: Vec<WorldChange> = Vec::new();
 
