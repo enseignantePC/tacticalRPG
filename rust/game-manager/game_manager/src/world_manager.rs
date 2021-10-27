@@ -7,7 +7,7 @@
 use std::rc::Rc;
 
 use crate::{
-    attack_solver::AttackResult,
+    attack_solver::ResolvedAttack,
     map::{terrains::TerrainType, Pos2D},
 };
 
@@ -18,7 +18,7 @@ use super::*;
 /// - send to an exterior source (that will handle animation etc)
 #[derive(Debug, Clone, ToVariant)]
 pub enum WorldChange {
-    Attack(AttackResult),
+    Attack(ResolvedAttack),
     Death(EntityId),
     TerrainChange(Pos2D, TerrainType),
     EntityMoved(EntityId, Pos2D),

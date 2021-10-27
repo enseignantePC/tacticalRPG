@@ -62,7 +62,7 @@ use input_manager::*;
 pub mod game_manager;
 pub use game_manager::*;
 
-pub enum Status {
+pub enum GameStatus {
     FightNotStarted,
     EntityWaitingForInput(EntityId),
     FightEnded,
