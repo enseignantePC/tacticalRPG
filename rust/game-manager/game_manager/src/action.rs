@@ -2,8 +2,10 @@
 //! that entity can do while the game is playing
 //! such things are called actions and represented by an [Action] structure.
 
-use crate::map::Pos2D;
+use std::rc::Rc;
+
 pub use crate::map::Vector2D;
+use crate::{map::Pos2D, Entity, EntityId};
 
 /// Represents the options an entity can chose from for deciding what to do in the game
 ///
@@ -22,7 +24,7 @@ pub enum Action {
 #[derive(PartialEq, Clone, Debug)]
 pub struct Move {
     /// every position the entity will cross to get to their final point,
-    ///     excluing where they are now
+    ///     excluding where they are now
     ///     ending where they will end
     pub path: Vec<Pos2D>,
 }
@@ -32,6 +34,7 @@ pub struct Attack {
     pub _type: AttackType,
     pub strength: f64,
     pub crit_chance: f32,
+    pub target: EntityId,
 }
 
 /// This describes the type of attacks that exist in the game,
