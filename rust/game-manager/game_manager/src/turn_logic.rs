@@ -17,15 +17,17 @@ pub struct Intent {
 
 impl Intent {
     /// split the intent in two :
-    /// - the smallest part possible of the intent that should be use to immediatly change the world
+    /// - the smallest part possible of the intent that should be use to immediately change the world
     /// - the remainder of the intent, that should be put back on the intent queue, and treated before
     /// newer intent are submitted to the [IntentManager]
     ///
+    /// Currently this correspond to
+    /// - only walking on step when moving
     /// TESTME : if the remainder path becomes empty, the remainder intent returned is None
     /// TESTME : the remainder intent is always smaller that the original intent
     pub fn extract_minimal_intent(self) -> (Intent, Option<Intent>) {
         match self.action {
-            Action::Attack(a) => todo!(),
+            Action::Attack(a) => (self, None),
 
             Action::Move(mut m) => {
                 let next_path = vec![m.path.remove(0)];
@@ -50,8 +52,8 @@ impl Intent {
                 (minimal_intent, remainder_intent)
             }
 
-            Action::Object(o) => todo!(),
-            Action::Spell(s) => todo!(),
+            Action::Object(o) => (self, None),
+            Action::Spell(s) => (self, None),
         }
     }
     // for test purposes
