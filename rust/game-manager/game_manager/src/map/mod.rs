@@ -17,7 +17,7 @@ use std::{
     rc::Rc,
 };
 
-use crate::{on_the_map::*, DijkstraMap, EntityId, TeamId};
+use crate::{on_the_map::*, Action, DijkstraMap, EntityId, Intent, Move, TeamId};
 use dijkstra_map::{Cost, PointId};
 use fnv::{FnvHashMap, FnvHashSet};
 
@@ -111,7 +111,7 @@ impl Map {
     /// moves an entity to a new position, updating the maps internal accordingly
     pub fn move_entity_from_current_position_to_next_position(
         &mut self,
-        entity: &Entity,
+        entity: Rc<Entity>,
         next_position: Pos2D,
     ) {
         let id = &entity.unique_id;
@@ -142,7 +142,7 @@ impl Map {
         set.insert(next_position);
     }
 
-    pub fn remove_entity_from_the_map(&mut self, entity: &Entity) {
+    pub fn remove_entity_from_the_map(&mut self, entity: Rc<Entity>) {
         let id = &entity.unique_id;
         let current_position = self
             .get_pos_for_entity(*id)
@@ -161,6 +161,33 @@ impl Map {
         set.remove(&current_position);
     }
 
+    // TESTME
+    pub fn get_valid_movements_for_entity(&mut self, entity: Rc<Entity>) -> Vec<Intent> {
+        let mut result = Vec::new();
+        for path in self.get_valid_paths_for_entity(entity.clone()) {
+            let intent = Intent {
+                action: Action::Move(Move { path }),
+                // TODO : priority system
+                priority: 0i32,
+                entity: entity.clone(),
+            };
+            result.push(intent);
+        }
+        result
+    }
+
+    pub fn get_valid_attacks_for_entity(&self, entity: Rc<Entity>) -> Vec<Intent> {
+        todo!()
+    }
+
+    pub fn get_valid_object_for_entity(&self, entity: Rc<Entity>) -> Vec<Intent> {
+        todo!()
+    }
+
+    pub fn get_valid_spells_for_entity(&self, entity: Rc<Entity>) -> Vec<Intent> {
+        todo!()
+    }
+
     /// Computes where an entity might go by what path and return the path in the form of
     /// a list of path to get to reachable position excluding the first position where the entity is standing.
     ///
@@ -173,19 +200,19 @@ impl Map {
     /// - as end points if entities are on the same team
     /// - as end points and travel points, if [Occupant] cannot be crossed
 
-    pub fn get_valid_movements_for_entity(&mut self, entity: &Entity) -> Vec<Vec<Pos2D>> {
+    fn get_valid_paths_for_entity(&mut self, entity: Rc<Entity>) -> Vec<Vec<Pos2D>> {
         //store all points belonging to other teams
         // if loner, adds all point belonging to team except pos of entity
 
-        let points_that_cannot_be_crossed = self.get_uncrossable_points_for_entity(entity);
-        self.enable_all_djikstra_points();
+        let points_that_cannot_be_crossed = self.get_uncrossable_points_for_entity(entity.clone());
+        self.enable_all_dijkstra_points();
 
         for k in &points_that_cannot_be_crossed {
             self.dijkstra_map.disable_point(*k).unwrap();
         }
 
         self.recalculates_dijkstra_map_for_entity_with_force(
-            entity,
+            entity.clone(),
             entity.entity_intern.get_move_force(),
             entity.entity_intern.terrain_weights(),
         );
@@ -196,9 +223,9 @@ impl Map {
     }
 
     /// all points you can get to
-    /// minus where ur teamates are
+    /// minus where ur teammates are
     /// TODO : test me
-    fn points_available_filters_end_position(&mut self, entity: &Entity) -> Vec<PointId> {
+    fn points_available_filters_end_position(&mut self, entity: Rc<Entity>) -> Vec<PointId> {
         let end_points_available: Vec<PointId> = self
             .dijkstra_map
             .get_all_points_with_cost_between(
@@ -223,18 +250,18 @@ impl Map {
     ///
     /// note : this gets which targets are available to the entity and should be presented to the entity as a list of choice BUT
     /// the entity internal state might have to filter this
-    pub fn get_attackable_entities_by_entity(&mut self, entity: &Entity) -> Vec<(Pos2D, EntityId)> {
+    fn get_attackable_entities_by_entity(&mut self, entity: Rc<Entity>) -> Vec<(Pos2D, EntityId)> {
         // all entities in range that are not on the same team
         // TODO : make this a more complex Range struct that can deal with some different logic
         let mut result: Vec<(Pos2D, EntityId)> = Vec::new();
         for this_range in entity.entity_intern.get_attack_ranges() {
             // see what is in range
             self.recalculates_dijkstra_map_for_entity_with_force(
-                entity,
+                entity.clone(),
                 *this_range as f32,
-                // this should be a map where every terrain has a weigth of one, so the attacks flings no matter the terrain
+                // this should be a map where every terrain has a weisght of one, so the attacks flings no matter the terrain
                 // OR, we could forbid walls, or other terrain, anyway, needs thinking
-                terrain_weigth_for_attacks(),
+                terrain_weight_for_attacks(),
             );
             let end_points_available = self.dijkstra_map.get_all_points_with_cost_between(
                 Cost(0f32),
@@ -287,7 +314,7 @@ impl Map {
     /// given a `force`, rebakes the [DijkstraMap] for an entity
     fn recalculates_dijkstra_map_for_entity_with_force(
         &mut self,
-        entity: &Entity,
+        entity: Rc<Entity>,
         force: f32,
         terrain_weights: HashMap<TerrainType, f32>,
     ) {

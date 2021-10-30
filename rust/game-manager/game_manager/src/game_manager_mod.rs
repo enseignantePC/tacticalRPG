@@ -85,22 +85,13 @@ impl GameManager {
         let mut result: Vec<Intent> = Vec::new();
         // TODO EXTRACT THERE ---------------------
         let entity = self.entity_id_to_entity.get(entity_id).unwrap();
-        let _move = self.map.get_valid_movements_for_entity(entity);
-        for path in _move {
-            let intent = Intent {
-                action: Action::Move(Move { path }),
-                // TODO : priority system
-                priority: 0i32,
-                entity: entity.clone(),
-            };
-            result.push(intent);
-        }
-        // TODO ------------------- TO THERE in a function (once you know the type of a closure)
-
-        // TODO : attacks
-        // TODO : objects
-        // TODO : spell
-        todo!();
+        let _move: Vec<Intent> = self.map.get_valid_movements_for_entity(entity.clone());
+        let _attacks: Vec<Intent> = self.map.get_valid_attacks_for_entity(entity.clone());
+        let _objects: Vec<Intent> = self.map.get_valid_object_for_entity(entity.clone());
+        let _spells: Vec<Intent> = self.map.get_valid_spells_for_entity(entity.clone());
+        result.extend(_attacks);
+        result.extend(_objects);
+        result.extend(_spells);
         result
     }
     /// make an entity declare an [Intent][super::turn_logic::Intent]
