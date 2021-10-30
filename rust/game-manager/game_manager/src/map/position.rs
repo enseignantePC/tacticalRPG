@@ -2,7 +2,7 @@ use super::*;
 use gdnative::prelude::*;
 // pub mod djikstra;
 
-pub use dijkstra_map::Vector2D;
+pub use dijkstra_map::grids::Vector2D;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Pos2D(pub Vector2D<i32, i32>);
