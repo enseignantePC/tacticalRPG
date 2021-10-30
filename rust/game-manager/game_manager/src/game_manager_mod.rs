@@ -43,6 +43,7 @@ pub struct GameManager {
     intent_manager: IntentManager,
     fight_started: bool,
     fight_ended: bool,
+    // TODO MOVE TO OTHER CRATE
     entity_currently_awaiting_input: Option<EntityId>,
     /// watch and react to intent emitted
     intent_watcher: Watcher,
