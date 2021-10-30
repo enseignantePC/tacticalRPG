@@ -16,6 +16,8 @@ pub fn solve(
     );
     let damage: f64 = attack.strength * entity_attacked.entity_intern.damage_reduction_factor();
     ResolvedAttack {
+        from: entity_attacking.unique_id,
+        to: entity_attacked.unique_id,
         damage_dealt: damage,
         critical_hit: false,
     }
@@ -23,6 +25,8 @@ pub fn solve(
 
 #[derive(PartialEq, PartialOrd, Clone, Copy, Debug, ToVariant)]
 pub struct ResolvedAttack {
+    from: EntityId,
+    to: EntityId,
     damage_dealt: f64,
     critical_hit: bool,
 }
