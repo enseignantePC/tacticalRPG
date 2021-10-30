@@ -34,13 +34,40 @@ pub enum WorldChange {
 /// the WorldChange is not i.e. (it asserts there was a critic blow or not)
 ///
 /// given an intent, it generates a WorldChange : the description of a change applied to the world
-pub fn intent_to_world_change(intent: Intent) -> Vec<WorldChange> {
-    todo!()
+pub fn intent_to_world_change(
+    entity_id_to_entity: &HashMap<EntityId, Rc<Entity>>,
+    intent: Intent,
+) -> Vec<WorldChange> {
+    match intent.action {
+        Action::Attack(a) => {
+            let mut result = Vec::new();
+            // resolve attack
+            result.push(WorldChange::Attack(attack_solver::solve(
+                entity_id_to_entity,
+                a,
+                intent.entity,
+            )));
+            result
+        }
+        Action::Move(m) => {
+            let mut result = Vec::new();
+            let last = m.path.last().expect("Couldn't get the last Pos of Entity");
+            result.push(WorldChange::EntityMoved(intent.entity.unique_id, *last));
+            result
+        }
+        Action::Object(o) => todo!(),
+        Action::Spell(s) => todo!(),
+    }
 }
 
 /// resolve what effectively happens on the world and has an event system to trigger new intents to be sent according to what happened
 ///     a simple example would be: if someone attacks player A, player A always counter attacks
 ///     somehow more complex : if someone attacks player A and player A is in range of attacking, player A counter attacks
 pub fn apply_change_to_world(change: &WorldChange, gm: &mut map::Map) {
-    todo!()
+    match change {
+        WorldChange::Attack(_) => todo!(),
+        WorldChange::Death(_) => todo!(),
+        WorldChange::TerrainChange(_, _) => todo!(),
+        WorldChange::EntityMoved(_, _) => todo!(),
+    }
 }
