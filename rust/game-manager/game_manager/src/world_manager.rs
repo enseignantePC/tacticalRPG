@@ -28,7 +28,7 @@ pub enum WorldChange {
 // TODO : how the terrain is affected
 // TODO : what object is used, what spell is launched etc
 
-/// the function responsible for generating [WorldChange]s and appling them to the world
+/// the function responsible for generating [WorldChange]s and applying them to the world
 ///
 /// while the treatment of the intent can be randomise i.e. (chance of critics etc)
 /// the WorldChange is not i.e. (it asserts there was a critic blow or not)

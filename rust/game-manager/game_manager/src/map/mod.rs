@@ -28,7 +28,7 @@ pub mod position;
 pub use position::*;
 
 #[derive(Debug)]
-/// everything interactable that can be in the world and will be stored by the map
+/// everything interactive that can be in the world and will be stored by the map
 pub enum Occupant {
     Entity(Rc<Entity>),
     Obstacle(Obstacle),
@@ -36,7 +36,7 @@ pub enum Occupant {
 }
 
 pub struct Map {
-    /// intern dijkstramap
+    /// intern dijkstra_map
     dijkstra_map: DijkstraMap,
     /// pos to dijkstraPointId
     pos_to_dijkstra_point_id: FnvHashMap<Pos2D, dijkstra_map::PointId>,
@@ -271,9 +271,8 @@ impl Map {
     }
 
     /// the entity cannot :
-    /// - cross a pos where an ennemy entity is
-    /// this function shoud return a vector containing these innaccessible positions
-    fn get_uncrossable_points_for_entity(&mut self, entity: &Entity) -> Vec<PointId> {
+    /// - cross a pos where an enemy entity is
+    /// this function should return a vector containing these inaccessible positions
         let mut uncrossable_points: Vec<PointId> = Vec::new();
 
         for (team, set) in &self.team_id_to_set_of_position_taken {
@@ -302,8 +301,8 @@ impl Map {
             FnvHashSet::default(),
         );
     }
-    /// ! if the dji map hasnt been precalculated, this returns empty array
-    /// the paths returned doesnt include the point at which the entity is
+    /// ! if the dji map hasn't been precalculated, this returns empty array
+    /// the paths returned doesn't include the point at which the entity is
     fn end_points_ids_to_paths_to_end_points(
         &self,
         end_points_available: &[PointId],
@@ -315,7 +314,7 @@ impl Map {
             let mut v: Vec<Pos2D> = Vec::new();
 
             for yele in i {
-                // turn pointiD to pos
+                // turn pointID to pos
                 let pos = self.dijkstra_point_id_to_pos.get(&yele).unwrap();
                 // push pos
                 v.push(*pos)
@@ -324,6 +323,7 @@ impl Map {
         }
         paths
     }
+
     // pub fn print_terrain(&self) {
     //     // Je vais parcourir les positions,
     //     // chaque position en x est display à la suite

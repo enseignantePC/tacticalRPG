@@ -84,7 +84,7 @@ pub fn terrain_weights_to_dijkstra_terrain_weigth(
 /// it is currently hardcoded that they go through anything except walls,
 ///
 /// this could be the default while the entity concerned optionaly provide correction to it
-pub fn terrain_weigth_for_attacks() -> HashMap<TerrainType, f32> {
+pub fn terrain_weight_for_attacks() -> HashMap<TerrainType, f32> {
     let mut result: HashMap<TerrainType, f32> = HashMap::new();
 
     for terrain_type in [

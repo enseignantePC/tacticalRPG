@@ -16,9 +16,9 @@ pub use entity::*;
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Object {}
 
-/// movable or destructable (or interactable?) obstacle on the map
+/// movable or destructible (or intractable?) obstacle on the map
 ///
-/// destructable walls, traps
+/// destructible walls, traps
 /// ? should the logic be handled outside of the game via a kind of signal? sounds like a good idea
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Obstacle {}
