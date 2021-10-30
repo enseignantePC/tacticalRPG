@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use super::*;
 
 /// TODO should accept more context :
@@ -5,10 +7,13 @@ use super::*;
 /// - is it raining or whatever
 /// what kind of curse (tags?) are on the map for both people
 pub fn solve(
+    entity_id_to_entity: &HashMap<EntityId, Rc<Entity>>,
     attack: Attack,
-    entity_assailant: &Entity,
-    entity_attacked: &Entity,
+    entity_attacking: Rc<Entity>,
 ) -> ResolvedAttack {
+    let entity_attacked = entity_id_to_entity.get(&attack.target).expect(
+        "couldn't find entity corresponding to id {} while the entity is a target of an attack",
+    );
     let damage: f64 = attack.strength * entity_attacked.entity_intern.damage_reduction_factor();
     ResolvedAttack {
         damage_dealt: damage,
