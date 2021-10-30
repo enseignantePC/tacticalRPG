@@ -13,10 +13,10 @@ mod get_maps;
 /// Various 'getter' method for [`DijkstraMap`].
 mod getters;
 /// Implementation of some default [`DijkstraMap`]s : square and hexagonal grids.
-mod grids;
+pub mod grids;
 /// Various 'setter' method for [`DijkstraMap`].
 mod setters;
-/// contains trait that allows explicit conversion, operations, defaut values
+/// contains trait that allows explicit conversion, operations, default values
 /// on custom struct [`Weight`], [`PointId`] and [`Cost`].
 mod trait_conversions_ops;
 
@@ -248,7 +248,7 @@ impl DijkstraMap {
                     .unwrap_or(&Weight::infinity()), // you dont have x => weight is infinity
             };
 
-            // iterate over it's neighbours
+            // iterate over it's neighbors
             let empty_connections = FnvHashMap::default();
             for (&point2, &dir_cost) in connections(&point1).unwrap_or(&empty_connections).iter() {
                 let cost: Cost = point1_cost
