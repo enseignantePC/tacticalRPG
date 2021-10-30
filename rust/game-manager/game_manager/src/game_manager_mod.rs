@@ -113,7 +113,9 @@ impl GameManager {
                 // stores the change for historic purposes
                 self.world_changes.extend(world_change.clone());
                 // watch the change
-                let response: Vec<Intent> = self.action_watcher.watch(&next_intent);
+                let response: Vec<Intent> = self
+                    .action_watcher
+                    .watch(&self.entity_id_to_entity, &next_intent);
                 for k in response {
                     self.submit_intent_and_responses(k)
                 }
@@ -134,7 +136,9 @@ impl GameManager {
     /// and does the same for every intention yielded by the intent[Watcher], recursively
     fn submit_intent_and_responses(&mut self, next_intent: Intent) {
         self.intent_manager.submit(next_intent.clone());
-        let response: Vec<Intent> = self.intent_watcher.watch(&next_intent);
+        let response: Vec<Intent> = self
+            .intent_watcher
+            .watch(&self.entity_id_to_entity, &next_intent);
         for k in response {
             self.submit_intent_and_responses(k)
         }
