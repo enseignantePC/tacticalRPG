@@ -9,7 +9,7 @@
 //! - what each case of the world is made of
 //!
 //! It uses a [DijkstraMap] to do the calculation and abstracts it so it can communicate
-//! with a [GameManager][crate::game_manager::GameManager].
+//! with a [GameManager].
 
 use std::{
     collections::{HashMap, HashSet},

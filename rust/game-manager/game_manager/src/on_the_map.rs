@@ -1,8 +1,7 @@
 //! This module is responsible of everything that can `physically` be on the map
 //! - [Entity]s, that requires input to function
 //! - [Object]s, that should be intractable by every entity AND, shouldn't be stepped on when walking on the map (TODO)
-//! - [Obstacle]s, something intractable that doesn't require input : destructible walls, traps, etc
-
+//! - [crate::on_the_map::Obstacle]s, something intractable that doesn't require input : destructible walls, traps, etc
 
 use std::{collections::HashMap, fmt::Debug};
 

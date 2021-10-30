@@ -21,7 +21,7 @@ pub mod action;
 pub use action::*;
 /// This module is responsible for Turning an [Attack]
 /// (a description of an attack with an uncertain result) into
-/// an [ResolvedAttack] (a result without any randomness involved).
+/// an [attack_solver::ResolvedAttack] (a result without any randomness involved).
 pub mod attack_solver;
 /// This module is responsible for representing the world
 /// as a 2D grid and computing/keeping track of everything that happens,
