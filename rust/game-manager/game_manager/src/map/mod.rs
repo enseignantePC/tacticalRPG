@@ -291,7 +291,7 @@ impl Map {
         result
     }
 
-    fn enable_all_djikstra_points(&mut self) {
+    fn enable_all_dijkstra_points(&mut self) {
         for k in self.pos_to_dijkstra_point_id.values() {
             self.dijkstra_map.enable_point(*k).unwrap();
         }
@@ -300,6 +300,7 @@ impl Map {
     /// the entity cannot :
     /// - cross a pos where an enemy entity is
     /// this function should return a vector containing these inaccessible positions
+    fn get_uncrossable_points_for_entity(&mut self, entity: Rc<Entity>) -> Vec<PointId> {
         let mut uncrossable_points: Vec<PointId> = Vec::new();
 
         for (team, set) in &self.team_id_to_set_of_position_taken {
