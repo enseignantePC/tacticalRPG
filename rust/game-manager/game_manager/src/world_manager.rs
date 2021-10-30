@@ -63,11 +63,39 @@ pub fn intent_to_world_change(
 /// resolve what effectively happens on the world and has an event system to trigger new intents to be sent according to what happened
 ///     a simple example would be: if someone attacks player A, player A always counter attacks
 ///     somehow more complex : if someone attacks player A and player A is in range of attacking, player A counter attacks
-pub fn apply_change_to_world(change: &WorldChange, gm: &mut map::Map) {
+pub fn apply_change_to_world(change: &WorldChange, gm: &mut GameManager) {
     match change {
-        WorldChange::Attack(_) => todo!(),
-        WorldChange::Death(_) => todo!(),
+        WorldChange::Attack(a) => {
+            // get both entity and change their states
+            todo!();
+        }
+        WorldChange::Death(_) => {
+            // remove the entity from the map
+            todo!();
+        }
         WorldChange::TerrainChange(_, _) => todo!(),
         WorldChange::EntityMoved(_, _) => todo!(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_apply_change_to_world_attack() {
+        todo!()
+    }
+    #[test]
+    fn test_apply_change_to_world_move() {
+        todo!()
+    }
+    #[test]
+    fn test_apply_change_to_world_death() {
+        todo!()
+    }
+    #[test]
+    fn test_apply_change_to_world_terrain_change() {
+        todo!()
     }
 }
