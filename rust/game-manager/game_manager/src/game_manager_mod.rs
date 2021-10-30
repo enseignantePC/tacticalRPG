@@ -129,7 +129,7 @@ impl GameManager {
         let world_changes =
             world_manager::intent_to_world_change(&self.entity_id_to_entity, next_intent.clone());
         for world_change in &world_changes {
-            world_manager::apply_change_to_world(world_change, &mut self.map);
+            world_manager::apply_change_to_world(world_change, self);
         }
         world_changes
     }
