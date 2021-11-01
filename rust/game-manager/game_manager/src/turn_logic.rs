@@ -25,7 +25,12 @@ impl Intent {
     /// - only walking on step when moving
     /// TESTME : if the remainder path becomes empty, the remainder intent returned is None
     /// TESTME : the remainder intent is always smaller that the original intent
-    pub fn extract_minimal_intent(self) -> (Intent, Option<Intent>) {
+    pub fn extract_minimal_intent(
+        self
+    ) -> (
+        Intent,
+        Option<Intent>,
+    ) {
         match self.action {
             Action::Attack(a) => (self, None),
 
@@ -49,7 +54,10 @@ impl Intent {
                 } else {
                     Some(remainder_intent)
                 };
-                (minimal_intent, remainder_intent)
+                (
+                    minimal_intent,
+                    remainder_intent,
+                )
             }
 
             Action::Object(o) => (self, None),
@@ -65,9 +73,13 @@ impl Intent {
         entity_id: Option<i64>,
     ) -> Intent {
         Intent {
-            action: action.unwrap_or(Action::test_action(ActionKind::Move)),
+            action: action.unwrap_or(Action::test_action(
+                ActionKind::Move,
+            )),
             priority: priority.unwrap_or(0),
-            entity: Rc::new(Entity::test_entity(entity, entity_id)),
+            entity: Rc::new(Entity::test_entity(
+                entity, entity_id,
+            )),
         }
     }
 }
@@ -85,7 +97,10 @@ impl IntentManager {
     /// puts a new intent in the Queue, sorting it beforehand
     /// a new intent will be treated after older ones
     /// TODO : optimize this...
-    pub fn submit(&mut self, intent: Intent) {
+    pub fn submit(
+        &mut self,
+        intent: Intent,
+    ) {
         // sort this new intent in the queue
         self.queue.insert(0, intent.clone());
         // reaction to this intent with the same priority will be treated after this intent

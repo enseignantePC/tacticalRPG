@@ -7,7 +7,10 @@ pub use dijkstra_map::grids::Vector2D;
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Pos2D(pub Vector2D<i32, i32>);
 impl Pos2D {
-    pub fn new(x: i32, y: i32) -> Self {
+    pub fn new(
+        x: i32,
+        y: i32,
+    ) -> Self {
         let x = Vector2D::<i32, i32>::new(x, y);
         Pos2D { 0: x }
     }

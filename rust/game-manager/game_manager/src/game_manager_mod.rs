@@ -22,7 +22,10 @@ pub enum TeamId {
 
 impl TeamId {
     /// can entities of the supplied teams fight?
-    pub fn can_fight(&self, other_team: &Self) -> bool {
+    pub fn can_fight(
+        &self,
+        other_team: &Self,
+    ) -> bool {
         // if they are on different teams, yes
         if let (TeamId::Team(x), TeamId::Team(y)) = (self, other_team) {
             x != y
@@ -64,9 +67,14 @@ impl GameManager {
         let entity_id = self.make_available_entity_id();
         let entity = Rc::new(entity);
         if self.map.can_entity_be_accepted_at_pos(map_position) {
-            self.entity_id_to_entity.insert(entity_id, entity.clone());
-            self.map
-                .register_entity_at_pos(entity.clone(), map_position);
+            self.entity_id_to_entity.insert(
+                entity_id,
+                entity.clone(),
+            );
+            self.map.register_entity_at_pos(
+                entity.clone(),
+                map_position,
+            );
             return Ok(entity_id);
         }
         Err(())
@@ -82,7 +90,10 @@ impl GameManager {
     ///
     /// input can then be submitted in the form of that unique id
     /// via the method [GameManager.give_inputs_according_to_cache]
-    pub fn get_valid_intents_for_entity(&mut self, entity_id: &EntityId) -> Vec<Intent> {
+    pub fn get_valid_intents_for_entity(
+        &mut self,
+        entity_id: &EntityId,
+    ) -> Vec<Intent> {
         let mut result: Vec<Intent> = Vec::new();
         // TODO EXTRACT THERE ---------------------
         let entity = self.entity_id_to_entity.get(entity_id).unwrap();
@@ -97,7 +108,10 @@ impl GameManager {
     }
     /// make an entity declare an [Intent][super::turn_logic::Intent]
     /// the intent will be `watched` (see [Watcher]) when it is emitted and when it is realized
-    pub fn resolve_all_intents(&mut self, intent: Intent) -> Vec<WorldChange> {
+    pub fn resolve_all_intents(
+        &mut self,
+        intent: Intent,
+    ) -> Vec<WorldChange> {
         // stores what happens and returns it to external source
         let result: Vec<WorldChange> = Vec::new();
 
@@ -113,9 +127,10 @@ impl GameManager {
                 // stores the change for historic purposes
                 self.world_changes.extend(world_change.clone());
                 // watch the change
-                let response: Vec<Intent> = self
-                    .action_watcher
-                    .watch(&self.entity_id_to_entity, &next_intent);
+                let response: Vec<Intent> = self.action_watcher.watch(
+                    &self.entity_id_to_entity,
+                    &next_intent,
+                );
                 for k in response {
                     self.submit_intent_and_responses(k)
                 }
@@ -125,9 +140,14 @@ impl GameManager {
     }
     /// this method transform an intent into a worldchange and stores it in [GameManager.world_changes]
     /// this is where something that was wanted by an entity finally becomes reality
-    fn realise_intent(&mut self, next_intent: &Intent) -> Vec<WorldChange> {
-        let world_changes =
-            world_manager::intent_to_world_change(&self.entity_id_to_entity, next_intent.clone());
+    fn realise_intent(
+        &mut self,
+        next_intent: &Intent,
+    ) -> Vec<WorldChange> {
+        let world_changes = world_manager::intent_to_world_change(
+            &self.entity_id_to_entity,
+            next_intent.clone(),
+        );
         for world_change in &world_changes {
             world_manager::apply_change_to_world(world_change, self);
         }
@@ -135,11 +155,15 @@ impl GameManager {
     }
     /// submit an intent, call the intent watchers on that intent
     /// and does the same for every intention yielded by the intent[Watcher], recursively
-    fn submit_intent_and_responses(&mut self, next_intent: Intent) {
+    fn submit_intent_and_responses(
+        &mut self,
+        next_intent: Intent,
+    ) {
         self.intent_manager.submit(next_intent.clone());
-        let response: Vec<Intent> = self
-            .intent_watcher
-            .watch(&self.entity_id_to_entity, &next_intent);
+        let response: Vec<Intent> = self.intent_watcher.watch(
+            &self.entity_id_to_entity,
+            &next_intent,
+        );
         for k in response {
             self.submit_intent_and_responses(k)
         }

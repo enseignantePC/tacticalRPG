@@ -17,7 +17,10 @@ use super::*;
 ///
 /// TODO : add a way for event_watchers to signal they are not useful anymore (and can be dropped).
 pub struct Watcher {
-    event_watchers: Vec<(EntityId, Box<dyn EventWatchers>)>,
+    event_watchers: Vec<(
+        EntityId,
+        Box<dyn EventWatchers>,
+    )>,
 }
 
 impl Watcher {
@@ -36,8 +39,14 @@ impl Watcher {
                 Some(x) => x,
                 None => continue,
             };
-            if watcher.watch(watcher_entity, intent) {
-                let react_intent = watcher.react(watcher_entity, intent);
+            if watcher.watch(
+                watcher_entity,
+                intent,
+            ) {
+                let react_intent = watcher.react(
+                    watcher_entity,
+                    intent,
+                );
                 result.push(react_intent)
             };
         }
@@ -45,8 +54,15 @@ impl Watcher {
     }
 
     /// To add a new event watcher to the watcher
-    pub fn subscribe(&mut self, entity_id: EntityId, event_watcher: Box<dyn EventWatchers>) {
-        self.event_watchers.push((entity_id, event_watcher))
+    pub fn subscribe(
+        &mut self,
+        entity_id: EntityId,
+        event_watcher: Box<dyn EventWatchers>,
+    ) {
+        self.event_watchers.push((
+            entity_id,
+            event_watcher,
+        ))
     }
 }
 
@@ -54,10 +70,18 @@ impl Watcher {
 pub trait EventWatchers {
     /// When watching an Intent, an EventWatcher must be capable of
     /// deciding if an intent will trigger a reaction.
-    fn watch(&self, own_entity: &Entity, intent_analysed: &Intent) -> bool;
+    fn watch(
+        &self,
+        own_entity: &Entity,
+        intent_analysed: &Intent,
+    ) -> bool;
     /// When an intent triggers a reaction, the watcher must updates itself and its entity
     /// and issue an intent as a reaction
-    fn react(&self, own_entity: &Entity, intent_analysed: &Intent) -> Intent;
+    fn react(
+        &self,
+        own_entity: &Entity,
+        intent_analysed: &Intent,
+    ) -> Intent;
 }
 
 // TODO test all conditions and that they work, but before that, have a way to

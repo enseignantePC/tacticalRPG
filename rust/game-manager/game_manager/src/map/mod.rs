@@ -49,7 +49,10 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn new(width: usize, height: usize) -> Map {
+    pub fn new(
+        width: usize,
+        height: usize,
+    ) -> Map {
         let mut dijkstra_map = DijkstraMap::new();
         let pos_to_dijkstra_point_id = dijkstra_map.add_square_grid(
             width,
@@ -80,26 +83,40 @@ impl Map {
         }
     }
     /// returns a bool according to wether adding an entity at pos is possible
-    pub fn can_entity_be_accepted_at_pos(&self, position: &Pos2D) -> bool {
+    pub fn can_entity_be_accepted_at_pos(
+        &self,
+        position: &Pos2D,
+    ) -> bool {
         self.pos_to_occupant.contains_key(position)
     }
 
-    pub fn get_pos_for_entity(&self, id: EntityId) -> Option<Pos2D> {
+    pub fn get_pos_for_entity(
+        &self,
+        id: EntityId,
+    ) -> Option<Pos2D> {
         self.entity_id_to_pos.get(&id).map(|x| x.clone())
     }
 
     /// adds an entity on the map
     /// TODO : add a force option to put the entity on the map (by destroying whats there? by finding the closest place where the entity can go?)
-    pub fn register_entity_at_pos(&mut self, entity: Rc<Entity>, position: &Pos2D) {
+    pub fn register_entity_at_pos(
+        &mut self,
+        entity: Rc<Entity>,
+        position: &Pos2D,
+    ) {
         let team = entity.team.clone();
         let id = entity.unique_id.clone();
         self.entity_id_to_pos.insert(id, position.clone());
-        self.pos_to_occupant
-            .insert(position.clone(), Occupant::Entity(entity.clone()));
+        self.pos_to_occupant.insert(
+            position.clone(),
+            Occupant::Entity(entity.clone()),
+        );
 
         if !self.team_id_to_set_of_position_taken.contains_key(&team) {
-            self.team_id_to_set_of_position_taken
-                .insert(team, FnvHashSet::default());
+            self.team_id_to_set_of_position_taken.insert(
+                team,
+                FnvHashSet::default(),
+            );
         }
 
         self.team_id_to_set_of_position_taken
@@ -129,7 +146,10 @@ impl Map {
             .pos_to_occupant
             .remove_entry(&current_position)
             .expect("No occupant found at pos");
-        let res = self.pos_to_occupant.insert(next_position, occupant);
+        let res = self.pos_to_occupant.insert(
+            next_position,
+            occupant,
+        );
         if res.is_some() {
             panic!("erased old entry when it should have been empty")
         }
@@ -142,7 +162,10 @@ impl Map {
         set.insert(next_position);
     }
 
-    pub fn remove_entity_from_the_map(&mut self, entity: Rc<Entity>) {
+    pub fn remove_entity_from_the_map(
+        &mut self,
+        entity: Rc<Entity>,
+    ) {
         let id = &entity.unique_id;
         let current_position = self
             .get_pos_for_entity(*id)
@@ -162,7 +185,10 @@ impl Map {
     }
 
     // TESTME
-    pub fn get_valid_movements_for_entity(&mut self, entity: Rc<Entity>) -> Vec<Intent> {
+    pub fn get_valid_movements_for_entity(
+        &mut self,
+        entity: Rc<Entity>,
+    ) -> Vec<Intent> {
         let mut result = Vec::new();
         for path in self.get_valid_paths_for_entity(entity.clone()) {
             let intent = Intent {
@@ -176,15 +202,24 @@ impl Map {
         result
     }
 
-    pub fn get_valid_attacks_for_entity(&self, entity: Rc<Entity>) -> Vec<Intent> {
+    pub fn get_valid_attacks_for_entity(
+        &self,
+        entity: Rc<Entity>,
+    ) -> Vec<Intent> {
         todo!()
     }
 
-    pub fn get_valid_object_for_entity(&self, entity: Rc<Entity>) -> Vec<Intent> {
+    pub fn get_valid_object_for_entity(
+        &self,
+        entity: Rc<Entity>,
+    ) -> Vec<Intent> {
         todo!()
     }
 
-    pub fn get_valid_spells_for_entity(&self, entity: Rc<Entity>) -> Vec<Intent> {
+    pub fn get_valid_spells_for_entity(
+        &self,
+        entity: Rc<Entity>,
+    ) -> Vec<Intent> {
         todo!()
     }
 
@@ -200,7 +235,10 @@ impl Map {
     /// - as end points if entities are on the same team
     /// - as end points and travel points, if [Occupant] cannot be crossed
 
-    fn get_valid_paths_for_entity(&mut self, entity: Rc<Entity>) -> Vec<Vec<Pos2D>> {
+    fn get_valid_paths_for_entity(
+        &mut self,
+        entity: Rc<Entity>,
+    ) -> Vec<Vec<Pos2D>> {
         //store all points belonging to other teams
         // if loner, adds all point belonging to team except pos of entity
 
@@ -225,7 +263,10 @@ impl Map {
     /// all points you can get to
     /// minus where ur teammates are
     /// TODO : test me
-    fn points_available_filters_end_position(&mut self, entity: Rc<Entity>) -> Vec<PointId> {
+    fn points_available_filters_end_position(
+        &mut self,
+        entity: Rc<Entity>,
+    ) -> Vec<PointId> {
         let end_points_available: Vec<PointId> = self
             .dijkstra_map
             .get_all_points_with_cost_between(
@@ -250,7 +291,10 @@ impl Map {
     ///
     /// note : this gets which targets are available to the entity and should be presented to the entity as a list of choice BUT
     /// the entity internal state might have to filter this
-    fn get_attackable_entities_by_entity(&mut self, entity: Rc<Entity>) -> Vec<(Pos2D, EntityId)> {
+    fn get_attackable_entities_by_entity(
+        &mut self,
+        entity: Rc<Entity>,
+    ) -> Vec<(Pos2D, EntityId)> {
         // all entities in range that are not on the same team
         // TODO : make this a more complex Range struct that can deal with some different logic
         let mut result: Vec<(Pos2D, EntityId)> = Vec::new();
@@ -281,7 +325,10 @@ impl Map {
                 if let Occupant::Entity(e) = occupant {
                     // get all set except the one of entity.team
                     if entity.team.can_fight(&e.team) {
-                        result.push((end_point, e.unique_id))
+                        result.push((
+                            end_point,
+                            e.unique_id,
+                        ))
                     } else {
                         continue;
                     }
@@ -300,7 +347,10 @@ impl Map {
     /// the entity cannot :
     /// - cross a pos where an enemy entity is
     /// this function should return a vector containing these inaccessible positions
-    fn get_uncrossable_points_for_entity(&mut self, entity: Rc<Entity>) -> Vec<PointId> {
+    fn get_uncrossable_points_for_entity(
+        &mut self,
+        entity: Rc<Entity>,
+    ) -> Vec<PointId> {
         let mut uncrossable_points: Vec<PointId> = Vec::new();
 
         for (team, set) in &self.team_id_to_set_of_position_taken {

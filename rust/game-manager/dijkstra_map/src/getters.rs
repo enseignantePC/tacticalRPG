@@ -9,7 +9,10 @@ impl DijkstraMap {
     ///
     /// This function makes the (reasonable) assumption that there is an unused
     /// id. If this is not the case, it might enter an infinite loop.
-    pub fn get_available_id(&self, above: Option<PointId>) -> PointId {
+    pub fn get_available_id(
+        &self,
+        above: Option<PointId>,
+    ) -> PointId {
         let mut id: i32 = above.unwrap_or(PointId(0)).into();
         while self.has_point(PointId(id)) {
             id += 1;
@@ -18,13 +21,20 @@ impl DijkstraMap {
     }
 
     /// Returns [`true`] if `point` exists in the map.
-    pub fn has_point(&self, point: PointId) -> bool {
+    pub fn has_point(
+        &self,
+        point: PointId,
+    ) -> bool {
         self.points.contains_key(&point)
     }
 
     /// Returns [`true`] if both `source` and `target` exist, and there's a
     /// connection from `source` to `target`.
-    pub fn has_connection(&self, source: PointId, target: PointId) -> bool {
+    pub fn has_connection(
+        &self,
+        source: PointId,
+        target: PointId,
+    ) -> bool {
         match self.points.get(&source) {
             None => false,
             Some(PointInfo { connections, .. }) => connections.contains_key(&target),
@@ -32,14 +42,20 @@ impl DijkstraMap {
     }
 
     /// Gets the terrain type for the given point, or [`None`] if not specified.
-    pub fn get_terrain_for_point(&self, id: PointId) -> Option<TerrainType> {
+    pub fn get_terrain_for_point(
+        &self,
+        id: PointId,
+    ) -> Option<TerrainType> {
         self.points
             .get(&id)
             .map(|PointInfo { terrain_type, .. }| *terrain_type)
     }
 
     /// Returns [`true`] if `point` exists and is disabled.
-    pub fn is_point_disabled(&mut self, point: PointId) -> bool {
+    pub fn is_point_disabled(
+        &mut self,
+        point: PointId,
+    ) -> bool {
         self.disabled_points.contains(&point)
     }
 
@@ -47,7 +63,10 @@ impl DijkstraMap {
     /// path computed with [`recalculate`](DijkstraMap::recalculate).
     ///
     /// If there is no path, returns [`None`].
-    pub fn get_direction_at_point(&self, point: PointId) -> Option<PointId> {
+    pub fn get_direction_at_point(
+        &self,
+        point: PointId,
+    ) -> Option<PointId> {
         self.computed_info
             .get(&point)
             .map(|PointComputedInfo { direction, .. }| *direction)
@@ -56,7 +75,10 @@ impl DijkstraMap {
     /// Returns the cost of the shortest path computed with [`recalculate`](DijkstraMap::recalculate).
     ///
     /// If there is no path, the cost is [`INFINITY`](Cost::infinity).
-    pub fn get_cost_at_point(&self, point: PointId) -> Cost {
+    pub fn get_cost_at_point(
+        &self,
+        point: PointId,
+    ) -> Cost {
         self.computed_info
             .get(&point)
             .map(|PointComputedInfo { cost, .. }| *cost)
@@ -67,7 +89,10 @@ impl DijkstraMap {
     /// given `point` (note that `point` isn't included).
     ///
     /// If `point` is a target or is inaccessible, the iterator will be empty.
-    pub fn get_shortest_path_from_point(&self, point: PointId) -> ShortestPathIterator {
+    pub fn get_shortest_path_from_point(
+        &self,
+        point: PointId,
+    ) -> ShortestPathIterator {
         ShortestPathIterator {
             dijkstra_map: self,
             next_point: self.get_direction_at_point(point),
@@ -118,7 +143,11 @@ mod test {
         for i in 0..100 {
             let id = d.get_available_id(None);
             assert_eq!(id, PointId(i));
-            d.add_point(id, TerrainType::DefaultTerrain).unwrap();
+            d.add_point(
+                id,
+                TerrainType::DefaultTerrain,
+            )
+            .unwrap();
         }
     }
 
@@ -159,12 +188,20 @@ mod test {
 
         let mut d = DijkstraMap::new();
         for i in 0..5 {
-            d.add_point(PointId(i), TerrainType::DefaultTerrain)
-                .unwrap();
+            d.add_point(
+                PointId(i),
+                TerrainType::DefaultTerrain,
+            )
+            .unwrap();
         }
         for i in 0..4 {
-            d.connect_points(PointId(i + 1), PointId(i), None, Some(false))
-                .unwrap();
+            d.connect_points(
+                PointId(i + 1),
+                PointId(i),
+                None,
+                Some(false),
+            )
+            .unwrap();
         }
 
         d.recalculate(
@@ -177,10 +214,25 @@ mod test {
         );
 
         let mut path_iterator = d.get_shortest_path_from_point(PointId(3));
-        assert_eq!(path_iterator.next(), Some(PointId(2)));
-        assert_eq!(path_iterator.next(), Some(PointId(1)));
-        assert_eq!(path_iterator.next(), Some(PointId(0)));
-        assert_eq!(path_iterator.next(), None);
-        assert_eq!(path_iterator.next(), None);
+        assert_eq!(
+            path_iterator.next(),
+            Some(PointId(2))
+        );
+        assert_eq!(
+            path_iterator.next(),
+            Some(PointId(1))
+        );
+        assert_eq!(
+            path_iterator.next(),
+            Some(PointId(0))
+        );
+        assert_eq!(
+            path_iterator.next(),
+            None
+        );
+        assert_eq!(
+            path_iterator.next(),
+            None
+        );
     }
 }

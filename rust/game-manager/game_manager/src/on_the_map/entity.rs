@@ -27,7 +27,10 @@ impl ToVariant for Entity {
     fn to_variant(&self) -> gdnative::core_types::Variant {
         let dict = gdnative::core_types::Dictionary::new();
         dict.insert("team", self.team);
-        dict.insert("unique_id", self.unique_id);
+        dict.insert(
+            "unique_id",
+            self.unique_id,
+        );
         gdnative::core_types::Variant::from_dictionary(&dict.into_shared())
     }
 }
@@ -51,7 +54,10 @@ pub trait EntityIntern: Debug {
 
 #[cfg(test)]
 impl Entity {
-    pub fn test_entity(entity: Option<i64>, id: Option<i64>) -> Self {
+    pub fn test_entity(
+        entity: Option<i64>,
+        id: Option<i64>,
+    ) -> Self {
         #[derive(Debug)]
         struct Intern {}
         impl EntityIntern for Intern {

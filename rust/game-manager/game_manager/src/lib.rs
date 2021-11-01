@@ -1,4 +1,7 @@
-#![allow(dead_code, unused_imports)]
+#![allow(
+    dead_code,
+    unused_imports
+)]
 /// computes map pathfinding calculations
 use dijkstra_map::DijkstraMap;
 /// godot side wrappers

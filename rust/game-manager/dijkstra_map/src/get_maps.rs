@@ -8,7 +8,11 @@ impl DijkstraMap {
     }
 
     /// Returns a slice of all points with costs between `min_cost` and `max_cost` (inclusive), sorted by cost.
-    pub fn get_all_points_with_cost_between(&self, min_cost: Cost, max_cost: Cost) -> &[PointId] {
+    pub fn get_all_points_with_cost_between(
+        &self,
+        min_cost: Cost,
+        max_cost: Cost,
+    ) -> &[PointId] {
         let start_point = match self.sorted_points.binary_search_by(|a| {
             if self.get_cost_at_point(*a) < min_cost {
                 std::cmp::Ordering::Less
@@ -50,8 +54,20 @@ mod test {
         d.add_point(ID0, DEFAULT_TERRAIN).unwrap();
         d.add_point(ID1, DEFAULT_TERRAIN).unwrap();
         d.add_point(ID2, DEFAULT_TERRAIN).unwrap();
-        d.connect_points(ID0, ID1, None, Some(false)).unwrap();
-        d.connect_points(ID1, ID2, None, Some(false)).unwrap();
+        d.connect_points(
+            ID0,
+            ID1,
+            None,
+            Some(false),
+        )
+        .unwrap();
+        d.connect_points(
+            ID1,
+            ID2,
+            None,
+            Some(false),
+        )
+        .unwrap();
         d
     }
 
@@ -66,9 +82,18 @@ mod test {
             FnvHashMap::default(),
             FnvHashSet::default(),
         );
-        assert_eq!(d.get_direction_at_point(ID0), Some(ID0));
-        assert_eq!(d.get_direction_at_point(ID1), None);
-        assert_eq!(d.get_direction_at_point(ID2), None);
+        assert_eq!(
+            d.get_direction_at_point(ID0),
+            Some(ID0)
+        );
+        assert_eq!(
+            d.get_direction_at_point(ID1),
+            None
+        );
+        assert_eq!(
+            d.get_direction_at_point(ID2),
+            None
+        );
     }
 
     #[test]
@@ -82,9 +107,18 @@ mod test {
             FnvHashMap::default(),
             FnvHashSet::default(),
         );
-        assert_eq!(d.get_direction_at_point(ID0), Some(ID1));
-        assert_eq!(d.get_direction_at_point(ID1), Some(ID2));
-        assert_eq!(d.get_direction_at_point(ID2), Some(ID2));
+        assert_eq!(
+            d.get_direction_at_point(ID0),
+            Some(ID1)
+        );
+        assert_eq!(
+            d.get_direction_at_point(ID1),
+            Some(ID2)
+        );
+        assert_eq!(
+            d.get_direction_at_point(ID2),
+            Some(ID2)
+        );
     }
 
     #[test]
@@ -99,9 +133,18 @@ mod test {
             FnvHashMap::default(),
             FnvHashSet::default(),
         );
-        assert_eq!(d.get_direction_at_point(ID0), Some(ID0));
-        assert_eq!(d.get_direction_at_point(ID1), Some(ID0));
-        assert_eq!(d.get_direction_at_point(ID2), Some(ID1));
+        assert_eq!(
+            d.get_direction_at_point(ID0),
+            Some(ID0)
+        );
+        assert_eq!(
+            d.get_direction_at_point(ID1),
+            Some(ID0)
+        );
+        assert_eq!(
+            d.get_direction_at_point(ID2),
+            Some(ID1)
+        );
     }
 
     #[test]
@@ -116,9 +159,18 @@ mod test {
             FnvHashMap::default(),
             FnvHashSet::default(),
         );
-        assert_eq!(d.get_direction_at_point(ID0), None);
-        assert_eq!(d.get_direction_at_point(ID1), None);
-        assert_eq!(d.get_direction_at_point(ID2), Some(ID2));
+        assert_eq!(
+            d.get_direction_at_point(ID0),
+            None
+        );
+        assert_eq!(
+            d.get_direction_at_point(ID1),
+            None
+        );
+        assert_eq!(
+            d.get_direction_at_point(ID2),
+            Some(ID2)
+        );
     }
 
     #[test]
@@ -132,9 +184,18 @@ mod test {
             FnvHashMap::default(),
             FnvHashSet::default(),
         );
-        assert_eq!(d.get_cost_at_point(ID0), Cost(2.0));
-        assert_eq!(d.get_cost_at_point(ID1), Cost(1.0));
-        assert_eq!(d.get_cost_at_point(ID2), Cost(0.0));
+        assert_eq!(
+            d.get_cost_at_point(ID0),
+            Cost(2.0)
+        );
+        assert_eq!(
+            d.get_cost_at_point(ID1),
+            Cost(1.0)
+        );
+        assert_eq!(
+            d.get_cost_at_point(ID2),
+            Cost(0.0)
+        );
     }
 
     #[test]
@@ -148,26 +209,57 @@ mod test {
             FnvHashMap::default(),
             FnvHashSet::default(),
         );
-        assert_eq!(d.get_cost_at_point(ID0), Cost(0.0));
-        assert_eq!(d.get_cost_at_point(ID1), Cost::infinity());
-        assert_eq!(d.get_cost_at_point(ID2), Cost::infinity());
+        assert_eq!(
+            d.get_cost_at_point(ID0),
+            Cost(0.0)
+        );
+        assert_eq!(
+            d.get_cost_at_point(ID1),
+            Cost::infinity()
+        );
+        assert_eq!(
+            d.get_cost_at_point(ID2),
+            Cost::infinity()
+        );
     }
 
     #[test]
     fn terrain_behave_appropriatly() {
         let mut d = DijkstraMap::new();
-        d.add_point(ID0, TerrainType::Terrain(1))
-            .expect("cant add point");
-        d.add_point(ID1, TerrainType::Terrain(1))
-            .expect("cant add point");
-        d.add_point(ID2, TerrainType::Terrain(1))
-            .expect("cant add point");
-        d.connect_points(ID0, ID1, None, Some(false))
-            .expect("cant connect points");
-        d.connect_points(ID1, ID2, None, Some(false))
-            .expect("cant connect points");
+        d.add_point(
+            ID0,
+            TerrainType::Terrain(1),
+        )
+        .expect("cant add point");
+        d.add_point(
+            ID1,
+            TerrainType::Terrain(1),
+        )
+        .expect("cant add point");
+        d.add_point(
+            ID2,
+            TerrainType::Terrain(1),
+        )
+        .expect("cant add point");
+        d.connect_points(
+            ID0,
+            ID1,
+            None,
+            Some(false),
+        )
+        .expect("cant connect points");
+        d.connect_points(
+            ID1,
+            ID2,
+            None,
+            Some(false),
+        )
+        .expect("cant connect points");
         let mut terrain_weights = FnvHashMap::<TerrainType, Weight>::default();
-        terrain_weights.insert(TerrainType::Terrain(1), Weight(2.0));
+        terrain_weights.insert(
+            TerrainType::Terrain(1),
+            Weight(2.0),
+        );
         d.recalculate(
             &[ID2],
             None,
@@ -176,9 +268,18 @@ mod test {
             terrain_weights,
             FnvHashSet::default(),
         );
-        assert_eq!(d.get_cost_at_point(ID0), Cost(4.0));
-        assert_eq!(d.get_cost_at_point(ID1), Cost(2.0));
-        assert_eq!(d.get_cost_at_point(ID2), Cost(0.0));
+        assert_eq!(
+            d.get_cost_at_point(ID0),
+            Cost(4.0)
+        );
+        assert_eq!(
+            d.get_cost_at_point(ID1),
+            Cost(2.0)
+        );
+        assert_eq!(
+            d.get_cost_at_point(ID2),
+            Cost(0.0)
+        );
     }
 
     #[test]
@@ -193,7 +294,10 @@ mod test {
             FnvHashSet::default(),
         );
         assert_eq!(
-            dijkstra.get_all_points_with_cost_between(Cost(-f32::INFINITY), Cost(f32::INFINITY)),
+            dijkstra.get_all_points_with_cost_between(
+                Cost(-f32::INFINITY),
+                Cost(f32::INFINITY)
+            ),
             [ID2, ID1, ID0]
         );
         assert_eq!(
@@ -210,7 +314,10 @@ mod test {
     fn unreacheable_point() {
         let mut dijkstra = setup_id012_connect0to1_1to2();
         dijkstra
-            .add_point(PointId(3), TerrainType::DefaultTerrain)
+            .add_point(
+                PointId(3),
+                TerrainType::DefaultTerrain,
+            )
             .unwrap();
         dijkstra.recalculate(
             &[ID0],
@@ -222,6 +329,9 @@ mod test {
         );
 
         // unreacheable points are not in the computed map.
-        assert_eq!(dijkstra.get_direction_and_cost_map().get(&PointId(3)), None)
+        assert_eq!(
+            dijkstra.get_direction_and_cost_map().get(&PointId(3)),
+            None
+        )
     }
 }

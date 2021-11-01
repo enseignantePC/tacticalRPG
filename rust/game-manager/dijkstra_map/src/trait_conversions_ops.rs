@@ -7,7 +7,10 @@ mod cost {
 
     impl Mul<Cost> for Cost {
         type Output = Cost;
-        fn mul(self, rhs: Self::Output) -> Self::Output {
+        fn mul(
+            self,
+            rhs: Self::Output,
+        ) -> Self::Output {
             let (Cost(x), Cost(y)) = (rhs, self);
             Cost(x * y)
         }
@@ -15,7 +18,10 @@ mod cost {
 
     impl Mul<Weight> for Cost {
         type Output = Cost;
-        fn mul(self, rhs: Weight) -> Self::Output {
+        fn mul(
+            self,
+            rhs: Weight,
+        ) -> Self::Output {
             let (Cost(x), Weight(y)) = (self, rhs);
             Cost(x * y)
         }
@@ -23,7 +29,10 @@ mod cost {
 
     impl Add<Cost> for Cost {
         type Output = Cost;
-        fn add(self, rhs: Self::Output) -> Self::Output {
+        fn add(
+            self,
+            rhs: Self::Output,
+        ) -> Self::Output {
             let (Cost(x), Cost(y)) = (rhs, self);
             Cost(x + y)
         }
@@ -31,7 +40,10 @@ mod cost {
 
     impl Add<Weight> for Cost {
         type Output = Cost;
-        fn add(self, rhs: Weight) -> Self::Output {
+        fn add(
+            self,
+            rhs: Weight,
+        ) -> Self::Output {
             let (Cost(x), Weight(y)) = (self, rhs);
             Cost(x + y)
         }
@@ -81,14 +93,20 @@ mod weight {
 
     impl Add<Cost> for Weight {
         type Output = Cost;
-        fn add(self, rhs: Self::Output) -> Self::Output {
+        fn add(
+            self,
+            rhs: Self::Output,
+        ) -> Self::Output {
             let (Cost(x), Weight(y)) = (rhs, self);
             Cost(x + y)
         }
     }
     impl Add<Weight> for Weight {
         type Output = Weight;
-        fn add(self, rhs: Self::Output) -> Self::Output {
+        fn add(
+            self,
+            rhs: Self::Output,
+        ) -> Self::Output {
             let (Weight(x), Weight(y)) = (rhs, self);
             Weight(x + y)
         }
@@ -96,7 +114,10 @@ mod weight {
 
     impl Mul<Weight> for Weight {
         type Output = Weight;
-        fn mul(self, rhs: Self) -> Self::Output {
+        fn mul(
+            self,
+            rhs: Self,
+        ) -> Self::Output {
             let (Weight(x), Weight(y)) = (self, rhs);
             Weight(x * y)
         }
@@ -104,7 +125,10 @@ mod weight {
 
     impl Mul<Cost> for Weight {
         type Output = Cost;
-        fn mul(self, rhs: Self::Output) -> Self::Output {
+        fn mul(
+            self,
+            rhs: Self::Output,
+        ) -> Self::Output {
             let (Cost(x), Weight(y)) = (rhs, self);
             Cost(x * y)
         }
@@ -162,7 +186,10 @@ mod terrain_type {
         use super::*;
         #[test]
         fn terrain_conv_works() {
-            assert_eq!(TerrainType::from(-1), TerrainType::DefaultTerrain);
+            assert_eq!(
+                TerrainType::from(-1),
+                TerrainType::DefaultTerrain
+            );
         }
     }
 }

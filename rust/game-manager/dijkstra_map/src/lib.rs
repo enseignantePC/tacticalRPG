@@ -87,7 +87,10 @@ struct QueuePriority {
 }
 
 impl Ord for QueuePriority {
-    fn cmp(&self, other: &QueuePriority) -> std::cmp::Ordering {
+    fn cmp(
+        &self,
+        other: &QueuePriority,
+    ) -> std::cmp::Ordering {
         other
             .cost
             .partial_cmp(&self.cost)
@@ -97,7 +100,10 @@ impl Ord for QueuePriority {
 }
 
 impl PartialOrd for QueuePriority {
-    fn partial_cmp(&self, other: &QueuePriority) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(
+        &self,
+        other: &QueuePriority,
+    ) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -185,7 +191,9 @@ impl DijkstraMap {
         termination_points: FnvHashSet<PointId>,
     ) {
         let read = read.unwrap_or(Read::InputIsDestination);
-        let max_cost = max_cost.unwrap_or(Cost(std::f32::INFINITY));
+        let max_cost = max_cost.unwrap_or(Cost(
+            std::f32::INFINITY,
+        ));
 
         // initialize containers
         self.computed_info.clear();
@@ -265,7 +273,10 @@ impl DijkstraMap {
                     && cost <= max_cost
                     && !self.disabled_points.contains(&point2)
                 {
-                    open_queue.push_increase(point2, QueuePriority { id: point2, cost });
+                    open_queue.push_increase(
+                        point2,
+                        QueuePriority { id: point2, cost },
+                    );
                     self.computed_info.insert(
                         point2,
                         PointComputedInfo {
@@ -306,33 +317,65 @@ mod tests {
         fn create_map(reverse_order: bool) -> DijkstraMap {
             let mut dijkstra_map = DijkstraMap::new();
             dijkstra_map
-                .add_point(PointId(0), TerrainType::DefaultTerrain)
+                .add_point(
+                    PointId(0),
+                    TerrainType::DefaultTerrain,
+                )
                 .unwrap();
             dijkstra_map
-                .add_point(PointId(3), TerrainType::DefaultTerrain)
+                .add_point(
+                    PointId(3),
+                    TerrainType::DefaultTerrain,
+                )
                 .unwrap();
             if reverse_order {
                 for i in (1..=2).rev() {
                     dijkstra_map
-                        .add_point(PointId(i), TerrainType::DefaultTerrain)
+                        .add_point(
+                            PointId(i),
+                            TerrainType::DefaultTerrain,
+                        )
                         .unwrap();
                     dijkstra_map
-                        .connect_points(PointId(0), PointId(i), None, None)
+                        .connect_points(
+                            PointId(0),
+                            PointId(i),
+                            None,
+                            None,
+                        )
                         .unwrap();
                     dijkstra_map
-                        .connect_points(PointId(3), PointId(i), None, None)
+                        .connect_points(
+                            PointId(3),
+                            PointId(i),
+                            None,
+                            None,
+                        )
                         .unwrap();
                 }
             } else {
                 for i in 1..=2 {
                     dijkstra_map
-                        .add_point(PointId(i), TerrainType::DefaultTerrain)
+                        .add_point(
+                            PointId(i),
+                            TerrainType::DefaultTerrain,
+                        )
                         .unwrap();
                     dijkstra_map
-                        .connect_points(PointId(3), PointId(i), None, None)
+                        .connect_points(
+                            PointId(3),
+                            PointId(i),
+                            None,
+                            None,
+                        )
                         .unwrap();
                     dijkstra_map
-                        .connect_points(PointId(0), PointId(i), None, None)
+                        .connect_points(
+                            PointId(0),
+                            PointId(i),
+                            None,
+                            None,
+                        )
                         .unwrap();
                 }
             }
