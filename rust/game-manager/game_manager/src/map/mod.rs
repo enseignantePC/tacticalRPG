@@ -168,7 +168,7 @@ impl Map {
             let intent = Intent {
                 action: Action::Move(Move { path }),
                 // TODO : priority system
-                priority: 0i32,
+                priority: 0,
                 entity: entity.clone(),
             };
             result.push(intent);

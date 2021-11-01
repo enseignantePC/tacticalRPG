@@ -20,7 +20,7 @@ pub enum Action {
     Spell(Spell),
 }
 
-/// contains exhaustive info about the movement of an entity, excluing the initial pos of the entity
+/// contains exhaustive info about the movement of an entity, excluding the initial pos of the entity
 #[derive(PartialEq, Clone, Debug)]
 pub struct Move {
     /// every position the entity will cross to get to their final point,

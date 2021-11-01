@@ -48,3 +48,33 @@ pub trait EntityIntern: Debug {
     // TODO : make this a more complex Range struct that can deal with some different logic
     fn get_attack_ranges(&self) -> &[i32];
 }
+
+#[cfg(test)]
+impl Entity {
+    pub fn test_entity(entity: Option<i64>, id: Option<i64>) -> Self {
+        #[derive(Debug)]
+        struct Intern {}
+        impl EntityIntern for Intern {
+            fn terrain_weights(&self) -> HashMap<TerrainType, f32> {
+                todo!()
+            }
+
+            fn get_move_force(&self) -> f32 {
+                todo!()
+            }
+
+            fn damage_reduction_factor(&self) -> f64 {
+                todo!()
+            }
+
+            fn get_attack_ranges(&self) -> &[i32] {
+                todo!()
+            }
+        }
+        Entity {
+            team: TeamId::Team(entity.unwrap_or(0)),
+            unique_id: EntityId(id.unwrap_or(0)),
+            entity_intern: Box::new(Intern {}),
+        }
+    }
+}
