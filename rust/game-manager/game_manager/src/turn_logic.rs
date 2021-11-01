@@ -8,7 +8,7 @@ pub struct Intent {
     pub action: Action,
     /// an indicator that changes how fast the intent will be treated by the [IntentManager],
     /// higher priority means the intent will be treated faster.
-    pub priority: i32,
+    pub priority: i64,
     /// a reference to the entity that wants to do the action
     pub entity: Rc<Entity>,
 }
@@ -56,14 +56,20 @@ impl Intent {
             Action::Spell(s) => (self, None),
         }
     }
-    // for test purposes
-    // pub fn void_intent() -> Intent {
-    //     Intent {
-    //         action: Action::void_action(),
-    //         priority: 0,
-    //         entity: Rc::new(super::on_the_map::Entity::example_entity()),
-    //     }
-    // }
+    //
+    #[cfg(test)]
+    pub fn test_intent(
+        action: Option<Action>,
+        priority: Option<i64>,
+        entity: Option<i64>,
+        entity_id: Option<i64>,
+    ) -> Intent {
+        Intent {
+            action: action.unwrap_or(Action::test_action(ActionKind::Move)),
+            priority: priority.unwrap_or(0),
+            entity: Rc::new(Entity::test_entity(entity, entity_id)),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -73,6 +79,9 @@ pub struct IntentManager {
 }
 
 impl IntentManager {
+    pub fn new() -> Self {
+        IntentManager { queue: vec![] }
+    }
     /// puts a new intent in the Queue, sorting it beforehand
     /// a new intent will be treated after older ones
     /// TODO : optimize this...
@@ -91,7 +100,6 @@ impl IntentManager {
     ///     puts back the rest of intent in the queue
     ///     return the small intent
     /// fails if queue empty but this should be unreachable
-    /// ! TESTME an intent partially treated should not start at the beginning at the queue again
     pub fn extract_top_intent(&mut self) -> Result<Intent, ()> {
         let max_priority_intent = self.queue.pop().ok_or(())?;
         let (minimal_intent, remainder_intent) = max_priority_intent.extract_minimal_intent();
@@ -107,104 +115,4 @@ impl IntentManager {
 }
 
 #[cfg(test)]
-mod tests {
-    use std::vec;
-    use crate::map::Pos2D;
-
-    use super::*;
-
-
-    fn init() {
-        let mut im = IntentManager { queue: vec![] };
-        let path : Vec<Pos2D>;
-        let mut i = Intent {
-            action: Action::Move(),
-            priority: 0,
-            // TODO decouple so it can be easily tested
-            entity: ,
-        };
-    }
-
-
-
-    #[test]
-    fn sort_intents_correctly() {
-        let x;
-        todo!();
-    }
-}
-
-//     #[test]
-//     fn new_intents_gets_treated_last() {
-//         todo!()
-//     }
-//     #[test]
-//     fn remainder_intents_gets_treated_first() {
-//         todo!()
-//     }
-//     #[cfg(test)]
-//     mod extract_minimal_intent {
-//         use crate::map::Pos2D;
-
-//         use super::*;
-
-//         #[test]
-//         fn one() {
-//             let intent = Intent {
-//                 action: Action::Move(Move {
-//                     path: vec![Pos2D::new(1, 2)],
-//                 }),
-//                 priority: 0,
-//                 entity: Rc::new(super::Entity::example_entity()),
-//             };
-//             let (a, b) = intent.extract_minimal_intent();
-//             if let Action::Move(x) = a.action {
-//                 assert_eq!(x.path, vec![Pos2D::new(1, 2)]);
-//             } else {
-//                 assert!(false);
-//             };
-//             assert!(b.is_none());
-//         }
-//         #[test]
-//         fn two() {
-//             let intent = Intent {
-//                 action: Action::Move(Move {
-//                     path: vec![Pos2D::new(1, 2), Pos2D::new(3, 4), Pos2D::new(5, 6)],
-//                 }),
-//                 priority: 0,
-//                 entity: Rc::new(super::Entity::example_entity()),
-//             };
-//             let (a, b) = intent.extract_minimal_intent();
-//             if let Action::Move(x) = a.action {
-//                 assert_eq!(x.path, vec![Pos2D::new(1, 2)]);
-//             } else {
-//                 assert!(false);
-//             };
-//             assert!(b.is_some());
-//             let b = b.unwrap();
-//             if let Action::Move(x) = b.action {
-//                 assert_eq!(x.path, vec![Pos2D::new(3, 4), Pos2D::new(5, 6)]);
-//             } else {
-//                 assert!(false);
-//             };
-//         }
-//         #[test]
-//         fn priority_kept() {
-//             let intent = Intent {
-//                 action: Action::Move(Move {
-//                     path: vec![Pos2D::new(1, 2), Pos2D::new(3, 4), Pos2D::new(5, 6)],
-//                 }),
-//                 priority: 4,
-//                 entity: Rc::new(super::Entity::example_entity()),
-//             };
-//             let (a, b) = intent.extract_minimal_intent();
-//             assert_eq!(a.priority, 4);
-//             assert_eq!(
-//                 b.expect("remainder intent not expected to be none")
-//                     .priority,
-//                 4
-//             );
-//             dbg!(a);
-//         }
-//     }
-// }
+mod tests;

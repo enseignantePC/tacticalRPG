@@ -15,7 +15,7 @@ pub struct EntityId(pub i64);
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy, ToVariant)]
 pub enum TeamId {
     /// a unique identifier for each team
-    Team(i32),
+    Team(i64),
     /// the entity has no team and can attack anyone
     Loner,
 }

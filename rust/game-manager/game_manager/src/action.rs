@@ -65,9 +65,20 @@ pub enum ActionKind {
 
 impl Action {
     /// return an action devoid of sense most of the time for testing purposes
-    pub fn void_action() -> Action {
-        Action::Move(Move {
-            path: vec![Pos2D::new(0, 0)],
-        })
+    #[cfg(test)]
+    pub fn test_action(kind: ActionKind) -> Action {
+        match kind {
+            ActionKind::Attack => Action::Attack(Attack {
+                _type: AttackType::Base,
+                strength: 5f64,
+                crit_chance: 0f32,
+                target: EntityId(0),
+            }),
+            ActionKind::Move => Action::Move(Move {
+                path: vec![Pos2D::new(0, 2), Pos2D::new(0, 1)],
+            }),
+            ActionKind::Object => todo!(),
+            ActionKind::Spell => todo!(),
+        }
     }
 }
