@@ -259,7 +259,7 @@ impl Map {
             self.recalculates_dijkstra_map_for_entity_with_force(
                 entity.clone(),
                 *this_range as f32,
-                // this should be a map where every terrain has a weisght of one, so the attacks flings no matter the terrain
+                // this should be a map where every terrain has a weight of one, so the attacks flings no matter the terrain
                 // OR, we could forbid walls, or other terrain, anyway, needs thinking
                 terrain_weight_for_attacks(),
             );
@@ -325,7 +325,7 @@ impl Map {
             None,
             Some(Cost(force)),
             Vec::new(),
-            terrains::terrain_weights_to_dijkstra_terrain_weigth(&terrain_weights),
+            terrains::terrain_weights_to_dijkstra_terrain_weight(&terrain_weights),
             FnvHashSet::default(),
         );
     }
@@ -341,9 +341,9 @@ impl Map {
             let i = self.dijkstra_map.get_shortest_path_from_point(*ele);
             let mut v: Vec<Pos2D> = Vec::new();
 
-            for yele in i {
+            for id in i {
                 // turn pointID to pos
-                let pos = self.dijkstra_point_id_to_pos.get(&yele).unwrap();
+                let pos = self.dijkstra_point_id_to_pos.get(&id).unwrap();
                 // push pos
                 v.push(*pos)
             }

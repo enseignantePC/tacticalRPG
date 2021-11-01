@@ -21,7 +21,7 @@ pub enum TeamId {
 }
 
 impl TeamId {
-    /// can entities of the suplied teams fight?
+    /// can entities of the supplied teams fight?
     pub fn can_fight(&self, other_team: &Self) -> bool {
         // if they are on different teams, yes
         if let (TeamId::Team(x), TeamId::Team(y)) = (self, other_team) {
@@ -96,7 +96,7 @@ impl GameManager {
         result
     }
     /// make an entity declare an [Intent][super::turn_logic::Intent]
-    /// the intent will be `watched` (see [Watcher]) when it is emitted and when it is realised
+    /// the intent will be `watched` (see [Watcher]) when it is emitted and when it is realized
     pub fn resolve_all_intents(&mut self, intent: Intent) -> Vec<WorldChange> {
         // stores what happens and returns it to external source
         let result: Vec<WorldChange> = Vec::new();

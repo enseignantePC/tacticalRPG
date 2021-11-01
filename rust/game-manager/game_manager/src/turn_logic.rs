@@ -106,30 +106,34 @@ impl IntentManager {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use std::vec;
+#[cfg(test)]
+mod tests {
+    use std::vec;
+    use crate::map::Pos2D;
 
-//     use super::*;
+    use super::*;
 
-//     #[test]
-//     fn sort_intents_correctly() {
-//         let a = ActionManager {};
-//         let mut im = IntentManager { queue: vec![] };
 
-//         let mut i = Intent::void_intent();
-//         i.priority = 1;
-//         im.submit(i.clone());
+    fn init() {
+        let mut im = IntentManager { queue: vec![] };
+        let path : Vec<Pos2D>;
+        let mut i = Intent {
+            action: Action::Move(),
+            priority: 0,
+            // TODO decouple so it can be easily tested
+            entity: ,
+        };
+    }
 
-//         i.priority = 7;
-//         im.submit(i.clone());
 
-//         i.priority = 4;
-//         im.submit(i.clone());
 
-//         dbg!(im.queue.pop());
-//         todo!()
-//     }
+    #[test]
+    fn sort_intents_correctly() {
+        let x;
+        todo!();
+    }
+}
+
 //     #[test]
 //     fn new_intents_gets_treated_last() {
 //         todo!()

@@ -86,7 +86,7 @@ pub enum GameStatus {
 //         panic!()
 //     }
 //     #[test]
-//     fn can_retrieve_choices_from_gamemanager() {
+//     fn can_retrieve_choices_from_game_manager() {
 //         todo!()
 //     }
 //     #[test]

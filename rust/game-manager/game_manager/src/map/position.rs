@@ -1,6 +1,6 @@
 use super::*;
 use gdnative::prelude::*;
-// pub mod djikstra;
+// pub mod dijkstra;
 
 pub use dijkstra_map::grids::Vector2D;
 
@@ -23,7 +23,7 @@ impl Deref for Pos2D {
 
 impl ToVariant for Pos2D {
     fn to_variant(&self) -> Variant {
-        let mut dict = Dictionary::new();
+        let dict = Dictionary::new();
         dict.insert("x", self.x);
         dict.insert("y", self.y);
         Variant::from_dictionary(&dict.into_shared())

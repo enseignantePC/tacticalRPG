@@ -53,7 +53,7 @@ impl InputManager {
             x += 1;
             x
         };
-        for (k, v) in entity_valid_intents.iter().enumerate() {
+        for (_, v) in entity_valid_intents.iter().enumerate() {
             let x = option_id_generator();
             let io = InputOption {
                 unique_id: x,
@@ -72,7 +72,7 @@ impl InputManager {
     /// it consumes the cache if the input is valid
     ///
     /// returns a vector of the [WorldChange]s that happened in the world
-    /// fails if the input is invalid (aka, its unique id doesnt exist in the [InputCache])
+    /// fails if the input is invalid (aka, its unique id doesn't exist in the [InputCache])
     pub fn give_inputs_according_to_cache(
         &mut self,
         id_of_valid_input_cache: i32,
@@ -91,7 +91,7 @@ impl InputManager {
                 unique_id: _,
                 intent,
             } = input_options.remove(&id_of_valid_input_cache).unwrap();
-            use ::game_manager::Intent;
+
             Ok(self.game_manager.resolve_all_intents(intent))
         }
     }

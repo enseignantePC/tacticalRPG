@@ -66,7 +66,7 @@ impl Into<String> for TerrainType {
 // TODO : TESTME
 /// This is glue code for mapping the terrain_weights member of an [Entity] to the terrain_weights arg
 /// expected by the [DijkstraMap].
-pub fn terrain_weights_to_dijkstra_terrain_weigth(
+pub fn terrain_weights_to_dijkstra_terrain_weight(
     terrain_weigth: &HashMap<terrains::TerrainType, f32>,
 ) -> FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> {
     let mut result: FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> =
