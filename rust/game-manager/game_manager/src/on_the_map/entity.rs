@@ -32,16 +32,6 @@ impl ToVariant for Entity {
     }
 }
 
-impl Entity {
-    pub fn can_attack(&self, other_entity: &Entity) -> bool {
-        if self.team == TeamId::Loner || other_entity.team == TeamId::Loner {
-            true
-        } else {
-            self.team != other_entity.team
-        }
-    }
-}
-
 pub trait EntityIntern: Debug {
     fn terrain_weights(&self) -> HashMap<TerrainType, f32>;
     /// determines how far the entity will be able to move
