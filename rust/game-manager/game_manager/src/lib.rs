@@ -118,7 +118,7 @@ pub enum GameStatus {
 //     fn double_attack_if_deadly() {
 //         todo!()
 //     }
-//     /// player A attacks player B, a second attack wont kill player B so player A doesnt attacks a second time
+//     /// player A attacks player B, a second attack wont kill player B so player A doesn't attacks a second time
 //     #[test]
 //     fn no_double_attack_if_not_deadly() {
 //         todo!()
