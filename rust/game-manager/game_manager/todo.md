@@ -1,11 +1,11 @@
-- [] Add a way to define spell easily
-- [] Add tests for WorldManager
-- [] Add tests for map state after World::apply_change_to_world
-- [] Add tests for Watcher
-- [] Add integration tests for GameManager
-- [] Add a few custom spell and test them
-- [] Design a better system for attack resolution
-- [] Design a system for Ranges (applied to attacks and spells and objects) 
+- [ ] Add a way to define spell easily
+- [ ] Add tests for WorldManager
+- [ ] Add tests for map state after World::apply_change_to_world
+- [ ] Add tests for Watcher
+- [ ] Add integration tests for GameManager
+- [ ] Add a few custom spell and test them
+- [ ] Design a better system for attack resolution
+- [ ] Design a system for Ranges (applied to attacks and spells and objects) 
 Range {
     Shape {
         // map.cost_in_between, with a special dict of Terrain -> Cost = 1 or infinity
@@ -21,6 +21,6 @@ Range {
         max_target
     }
 }
-- [] Design a system for selecting targets on the map that takes
+- [ ] Design a system for selecting targets on the map that takes
     - a vec of range
     - a vec of team_filter (all, same_team,other_team,loner,Id(x))

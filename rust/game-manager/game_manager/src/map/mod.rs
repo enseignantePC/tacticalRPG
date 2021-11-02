@@ -34,6 +34,29 @@ pub enum Occupant {
     Obstacle(Obstacle),
     Object(Object),
 }
+/// You provide a Query to the select function
+/// to describe what can of search you want it to perform.
+pub struct Query {}
+
+pub struct Selector {
+    /// the current Pos being searched for the query.
+    current_position: Pos2D,
+    /// Each of this range will be checked for the position
+    /// and the matches returned, possible with duplicates.
+    ranges: Vec<Range>,
+}
+/// all ranges search are relative to a position in the [Selector]
+pub enum Range {
+    /// the shape, described as a set of position (relative to 0,0 the current pos being searched)
+    /// everything in the shape will be selected.
+    Shape,
+    /// Will match if in direction (at max_distance) (through max matches)
+    /// note that this doesn't go through portals.
+    /// TODO check in direction (Pos2D) and map is linked in dijkstra_map (DijkstraMapPosId)
+    Direction,
+    /// Custom Iterator that gives Pos that will be checked in that order.
+    Iterator,
+}
 
 pub struct Map {
     /// intern dijkstra_map
@@ -397,6 +420,12 @@ impl Map {
             paths.push(v);
         }
         paths
+    }
+
+    /// The idea behind this method is that you provide a description of the objects you want on the map
+    /// and it returns a slice of Positions.
+    pub fn select(&self) {
+        todo!()
     }
 
     // pub fn print_terrain(&self) {
