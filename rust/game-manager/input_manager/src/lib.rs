@@ -5,9 +5,11 @@
 
 use std::collections::HashMap;
 
+use ::game_manager::thiserror::Error;
 use ::game_manager::Intent;
 use ::game_manager::WorldChange;
 use ::game_manager::*;
+
 /// this is how a [GameManager] will communicate what choices are available for currently playing entity
 /// it will be cloned and cached by the game_manager so we can use the id to declare the choice
 /// spec : an id that will be used to reference the
@@ -40,11 +42,14 @@ pub struct InputCache {
     entity_chosen_to_play: EntityId,
     input_options: HashMap<i32, InputOption>,
 }
+#[derive(Error, Debug)]
+#[error("Trying to access an InputCache that is none")]
+pub struct InputCacheIsNone;
 
 impl InputManager {
     pub fn get_valid_intents_for_entity(
         &mut self,
-        entity_valid_intents: &Vec<Intent>,
+        entity_valid_intents: &[Intent],
     ) -> HashMap<i32, InputOption> {
         let mut to_cache: HashMap<i32, InputOption> = HashMap::new();
         // used to generate id of
@@ -76,9 +81,9 @@ impl InputManager {
     pub fn give_inputs_according_to_cache(
         &mut self,
         id_of_valid_input_cache: i32,
-    ) -> Result<Vec<WorldChange>, ()> {
+    ) -> Result<Vec<WorldChange>, InputCacheIsNone> {
         if self.input_cache.is_none() {
-            Err(())
+            Err(InputCacheIsNone {})
         } else {
             // get the content of the cache
             let cloned_cache = self.input_cache.take().unwrap();

@@ -40,15 +40,13 @@ pub fn intent_to_world_change(
 ) -> Vec<WorldChange> {
     match intent.action {
         Action::Attack(a) => {
-            let mut result = Vec::new();
-            // resolve attack
-            result.push(WorldChange::Attack(
+            let mut result = vec![WorldChange::Attack(
                 attack_solver::solve(
                     entity_id_to_entity,
                     a,
                     intent.entity,
                 ),
-            ));
+            )];
             result
         }
         Action::Move(m) => {

@@ -122,7 +122,7 @@ mod test_extract_top_intent {
                 vec![Pos2D::new(0, 1)]
             )
         } else {
-            assert!(false, "bad type")
+            panic!("bad type")
         }
     }
     #[test]

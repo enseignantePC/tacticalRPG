@@ -1,6 +1,12 @@
 use std::rc::Rc;
 
+use thiserror::Error;
+
 use super::*;
+
+#[derive(Debug, Error)]
+#[error("Queue empty was reached but this shouldn't be possible")]
+pub struct QueueEmptyReached;
 /// represents the intention of an [Entity] to do any kind of [Action] in the world
 #[derive(Debug, Clone)]
 pub struct Intent {
@@ -73,9 +79,7 @@ impl Intent {
         entity_id: Option<i64>,
     ) -> Intent {
         Intent {
-            action: action.unwrap_or(Action::test_action(
-                ActionKind::Move,
-            )),
+            action: action.unwrap_or_else(|| Action::test_action(ActionKind::Move)),
             priority: priority.unwrap_or(0),
             entity: Rc::new(Entity::test_entity(
                 entity, entity_id,
@@ -102,9 +106,9 @@ impl IntentManager {
         intent: Intent,
     ) {
         // sort this new intent in the queue
-        self.queue.insert(0, intent.clone());
+        self.queue.insert(0, intent);
         // reaction to this intent with the same priority will be treated after this intent
-        self.queue.sort_by(|a, b| (&a).priority.cmp(&b.priority));
+        self.queue.sort_by(|a, b| (a).priority.cmp(&b.priority));
     }
 
     /// Extract precisely one smallest step of the next intent in queue
@@ -115,17 +119,23 @@ impl IntentManager {
     ///     puts back the rest of intent in the queue
     ///     return the small intent
     /// fails if queue empty but this should be unreachable
-    pub fn extract_top_intent(&mut self) -> Result<Intent, ()> {
-        let max_priority_intent = self.queue.pop().ok_or(())?;
+    pub fn extract_top_intent(&mut self) -> Result<Intent, QueueEmptyReached> {
+        let max_priority_intent = self.queue.pop().ok_or(QueueEmptyReached {})?;
         let (minimal_intent, remainder_intent) = max_priority_intent.extract_minimal_intent();
-        if remainder_intent.is_some() {
-            self.queue.push(remainder_intent.unwrap());
+        if let Some(x) = remainder_intent {
+            self.queue.push(x);
         };
         Ok(minimal_intent)
     }
 
     pub fn is_queue_empty(&self) -> bool {
         self.queue.is_empty()
+    }
+}
+
+impl Default for IntentManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

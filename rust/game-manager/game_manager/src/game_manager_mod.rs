@@ -1,6 +1,8 @@
 //! The most interesting structure here is the [GameManager].
 //! It is responsible of handling all the other module and making them work together
 //! to offer a good interface for dealing with the intern state of the game.
+use thiserror::Error;
+
 use super::*;
 use std::rc::Rc;
 
@@ -35,6 +37,9 @@ impl TeamId {
         }
     }
 }
+#[derive(Error, Debug)]
+#[error("map.can_entity_be_accepted_at_pos failed when trying to insert the entity on the map")]
+pub struct ErrorPosCannotAcceptEntity {}
 
 /// handles and connect everything
 pub struct GameManager {
@@ -61,7 +66,7 @@ impl GameManager {
         &mut self,
         entity: on_the_map::Entity,
         map_position: &map::Pos2D,
-    ) -> Result<EntityId, ()> {
+    ) -> Result<EntityId, ErrorPosCannotAcceptEntity> {
         // generate an id for the entity
         // check if the place on the map can accept the entity
         let entity_id = self.make_available_entity_id();
@@ -71,13 +76,10 @@ impl GameManager {
                 entity_id,
                 entity.clone(),
             );
-            self.map.register_entity_at_pos(
-                entity.clone(),
-                map_position,
-            );
+            self.map.register_entity_at_pos(entity, map_position);
             return Ok(entity_id);
         }
-        Err(())
+        Err(ErrorPosCannotAcceptEntity {})
     }
     /// TODO FIXDOC
     /// generate valid inputs for entity
@@ -113,31 +115,35 @@ impl GameManager {
         intent: Intent,
     ) -> Vec<WorldChange> {
         // stores what happens and returns it to external source
-        let result: Vec<WorldChange> = Vec::new();
+        let mut result: Vec<WorldChange> = Vec::new();
 
         self.submit_intent_and_responses(intent);
 
         while !self.intent_manager.is_queue_empty() {
             let next_intent = self.intent_manager.extract_top_intent();
-            if next_intent.is_err() {
-                return result;
-            } else {
-                let next_intent = next_intent.unwrap();
-                let world_change = self.realise_intent(&next_intent);
-                // stores the change for historic purposes
-                self.world_changes.extend(world_change.clone());
-                // watch the change
-                let response: Vec<Intent> = self.action_watcher.watch(
-                    &self.entity_id_to_entity,
-                    &next_intent,
-                );
-                for k in response {
-                    self.submit_intent_and_responses(k)
+
+            match next_intent {
+                Ok(_) => {
+                    let next_intent = next_intent.unwrap();
+                    let world_change = self.realise_intent(&next_intent);
+                    // stores the change for historic purposes
+                    self.world_changes.extend(world_change.clone());
+                    // watch the change
+                    let response: Vec<Intent> = self.action_watcher.watch(
+                        &self.entity_id_to_entity,
+                        &next_intent,
+                    );
+                    for k in response {
+                        self.submit_intent_and_responses(k)
+                    }
+                    result.extend(world_change);
                 }
+                Err(_) => break,
             }
         }
         result
     }
+
     /// this method transform an intent into a worldchange and stores it in [GameManager.world_changes]
     /// this is where something that was wanted by an entity finally becomes reality
     fn realise_intent(

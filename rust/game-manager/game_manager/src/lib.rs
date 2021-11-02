@@ -17,6 +17,7 @@ use gdnative::prelude::*;
 ///
 /// a system of optional tags on the map that are used by entity to determine stuff
 use std::collections::HashMap;
+pub use thiserror;
 /// This module is responsible for offering a description of things
 /// that entity can do while the game is playing
 /// such things are called actions and represented by an [Action] structure.

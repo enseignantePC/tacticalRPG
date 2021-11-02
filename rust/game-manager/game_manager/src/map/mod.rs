@@ -70,8 +70,8 @@ impl Map {
         let mut dijkstra_point_id_to_pos: FnvHashMap<dijkstra_map::PointId, Pos2D> =
             FnvHashMap::default();
         for ele in &pos_to_dijkstra_point_id {
-            let (pos, dji_id) = ele.clone();
-            dijkstra_point_id_to_pos.insert(*dji_id, pos.clone());
+            let (pos, dji_id) = ele;
+            dijkstra_point_id_to_pos.insert(*dji_id, *pos);
         }
         Map {
             dijkstra_map,
@@ -94,7 +94,7 @@ impl Map {
         &self,
         id: EntityId,
     ) -> Option<Pos2D> {
-        self.entity_id_to_pos.get(&id).map(|x| x.clone())
+        self.entity_id_to_pos.get(&id).copied()
     }
 
     /// adds an entity on the map
@@ -104,25 +104,22 @@ impl Map {
         entity: Rc<Entity>,
         position: &Pos2D,
     ) {
-        let team = entity.team.clone();
-        let id = entity.unique_id.clone();
-        self.entity_id_to_pos.insert(id, position.clone());
+        let team = entity.team;
+        let id = entity.unique_id;
+        self.entity_id_to_pos.insert(id, *position);
         self.pos_to_occupant.insert(
-            position.clone(),
-            Occupant::Entity(entity.clone()),
+            *position,
+            Occupant::Entity(entity),
         );
 
-        if !self.team_id_to_set_of_position_taken.contains_key(&team) {
-            self.team_id_to_set_of_position_taken.insert(
-                team,
-                FnvHashSet::default(),
-            );
-        }
+        self.team_id_to_set_of_position_taken
+            .entry(team)
+            .or_insert_with(FnvHashSet::default);
 
         self.team_id_to_set_of_position_taken
             .get_mut(&team)
             .unwrap()
-            .insert(position.clone());
+            .insert(*position);
     }
 
     /// moves an entity to a new position, updating the maps internal accordingly
@@ -281,7 +278,7 @@ impl Map {
                     .unwrap()
                     .contains(x)
             })
-            .map(|x| x.clone())
+            .copied()
             .collect();
         end_points_available
     }
@@ -354,7 +351,7 @@ impl Map {
         let mut uncrossable_points: Vec<PointId> = Vec::new();
 
         for (team, set) in &self.team_id_to_set_of_position_taken {
-            if (&entity.team != team) || (&entity.team == &TeamId::Loner) {
+            if (&entity.team != team) || (entity.team == TeamId::Loner) {
                 for pos in set {
                     uncrossable_points.push(*self.pos_to_dijkstra_point_id.get(pos).unwrap())
                 }

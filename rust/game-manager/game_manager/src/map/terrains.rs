@@ -1,8 +1,8 @@
 //! This is the representation of the type of terrain
 //! from the side of the game_manager
 //!
-//! Note : this requires a lot of dumb code and makes me unsure how usefull it is
-//! to decouple entirerly things from djikstra crate
+//! Note : this requires a lot of dumb code and makes me unsure how useful it is
+//! to decouple entirely things from dijkstra crate
 //!
 //! Note : this could be simplified a lot by use of a macro (if ever someone feels up to it?)
 
@@ -23,9 +23,9 @@ pub enum TerrainType {
     Sky,
 }
 
-impl Into<i32> for &TerrainType {
-    fn into(self) -> i32 {
-        match self {
+impl From<&TerrainType> for i32 {
+    fn from(val: &TerrainType) -> Self {
+        match val {
             TerrainType::Ground => 0,
             TerrainType::Forest => 1,
             TerrainType::Wall => 2,
@@ -51,9 +51,9 @@ impl TryFrom<i32> for TerrainType {
     }
 }
 
-impl Into<String> for TerrainType {
-    fn into(self) -> String {
-        match self {
+impl From<TerrainType> for String {
+    fn from(val: TerrainType) -> Self {
+        match val {
             TerrainType::Ground => "Ground".to_string(),
             TerrainType::Forest => "Forest".to_string(),
             TerrainType::Wall => "Wall".to_string(),
@@ -67,17 +67,17 @@ impl Into<String> for TerrainType {
 /// This is glue code for mapping the terrain_weights member of an [Entity] to the terrain_weights arg
 /// expected by the [DijkstraMap].
 pub fn terrain_weights_to_dijkstra_terrain_weight(
-    terrain_weigth: &HashMap<terrains::TerrainType, f32>
+    terrain_weight: &HashMap<terrains::TerrainType, f32>
 ) -> FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> {
     let mut result: FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> =
         FnvHashMap::default();
 
-    for (terrain, weight) in terrain_weigth {
+    for (terrain, weight) in terrain_weight {
         let dji_terrain_type = dijkstra_map::TerrainType::Terrain(terrain.into());
-        let dji_weigth = dijkstra_map::Weight(*weight);
+        let dji_weight = dijkstra_map::Weight(*weight);
         result.insert(
             dji_terrain_type,
-            dji_weigth,
+            dji_weight,
         );
     }
     result
@@ -86,7 +86,7 @@ pub fn terrain_weights_to_dijkstra_terrain_weight(
 /// This maps is used to determine where and through what type of terrain can attack go
 /// it is currently hardcoded that they go through anything except walls,
 ///
-/// this could be the default while the entity concerned optionaly provide correction to it
+/// this could be the default while the entity concerned optionally provide correction to it
 pub fn terrain_weight_for_attacks() -> HashMap<TerrainType, f32> {
     let mut result: HashMap<TerrainType, f32> = HashMap::new();
 
@@ -97,12 +97,12 @@ pub fn terrain_weight_for_attacks() -> HashMap<TerrainType, f32> {
         TerrainType::Water,
         TerrainType::Sky,
     ] {
-        let weigth = 1.0;
-        result.insert(terrain_type, weigth);
+        let weight = 1.0;
+        result.insert(terrain_type, weight);
     }
     let terrain_type = TerrainType::Wall;
-    let weigth = f32::INFINITY;
-    result.insert(terrain_type, weigth);
+    let weight = f32::INFINITY;
+    result.insert(terrain_type, weight);
 
     result
 }

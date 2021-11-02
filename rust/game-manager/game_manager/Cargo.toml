@@ -9,3 +9,4 @@ edition = "2018"
 fnv = "1.0.7"
 gdnative = "0.9"
 dijkstra_map = { path = "../dijkstra_map" }
+thiserror = "1.0.30"
