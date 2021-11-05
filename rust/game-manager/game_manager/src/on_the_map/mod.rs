@@ -5,7 +5,7 @@
 
 use std::{collections::HashMap, fmt::Debug, rc::Rc};
 
-use crate::{map::terrains::TerrainType, EntityId, TeamId};
+use crate::{map::terrains::Terrain, EntityId, TeamId};
 
 pub mod entity;
 pub use entity::*;

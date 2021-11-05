@@ -36,7 +36,7 @@ impl ToVariant for Entity {
 }
 
 pub trait EntityIntern: Debug {
-    fn terrain_weights(&self) -> HashMap<TerrainType, f32>;
+    fn terrain_weights(&self) -> HashMap<Terrain, f32>;
     /// determines how far the entity will be able to move
     fn get_move_force(&self) -> f32;
 
@@ -61,7 +61,7 @@ impl Entity {
         #[derive(Debug)]
         struct Intern {}
         impl EntityIntern for Intern {
-            fn terrain_weights(&self) -> HashMap<TerrainType, f32> {
+            fn terrain_weights(&self) -> HashMap<Terrain, f32> {
                 todo!()
             }
 

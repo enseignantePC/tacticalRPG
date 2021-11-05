@@ -8,7 +8,7 @@ use std::rc::Rc;
 
 use crate::{
     attack_solver::ResolvedAttack,
-    map::{terrains::TerrainType, Pos2D},
+    map::{terrains::Terrain, Pos2D},
 };
 
 use super::*;
@@ -20,7 +20,7 @@ use super::*;
 pub enum WorldChange {
     Attack(ResolvedAttack),
     Death(EntityId),
-    TerrainChange(Pos2D, TerrainType),
+    TerrainChange(Pos2D, Terrain),
     EntityMoved(EntityId, Pos2D),
 }
 

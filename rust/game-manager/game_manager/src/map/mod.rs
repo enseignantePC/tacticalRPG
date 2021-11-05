@@ -388,7 +388,7 @@ impl Map {
         &mut self,
         entity: Rc<Entity>,
         force: f32,
-        terrain_weights: HashMap<TerrainType, f32>,
+        terrain_weights: HashMap<Terrain, f32>,
     ) {
         let position = self.entity_id_to_pos.get(&entity.unique_id).unwrap();
         self.dijkstra_map.recalculate(

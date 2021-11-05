@@ -1,3 +1,5 @@
+- [ ] declare terrain in a struct
+- [ ] impl string to map
 - [ ] Add a way to define spell easily
 - [ ] Add tests for WorldManager
 - [ ] Add tests for map state after World::apply_change_to_world
