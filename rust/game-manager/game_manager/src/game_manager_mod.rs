@@ -37,6 +37,8 @@ impl TeamId {
         }
     }
 }
+
+// TODO use this via anyhow?
 #[derive(Error, Debug)]
 #[error("map.can_entity_be_accepted_at_pos failed when trying to insert the entity on the map")]
 pub struct ErrorPosCannotAcceptEntity {}
