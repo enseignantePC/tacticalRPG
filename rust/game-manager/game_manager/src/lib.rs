@@ -21,8 +21,8 @@ pub use thiserror;
 /// This module is responsible for offering a description of things
 /// that entity can do while the game is playing
 /// such things are called actions and represented by an [Action] structure.
-pub mod action;
-pub use action::*;
+pub mod entity_action;
+pub use entity_action::*;
 /// This module is responsible for Turning an [Attack]
 /// (a description of an attack with an uncertain result) into
 /// an [attack_solver::ResolvedAttack] (a result without any randomness involved).
