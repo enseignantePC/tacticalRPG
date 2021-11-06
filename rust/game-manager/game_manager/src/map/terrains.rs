@@ -94,11 +94,11 @@ pub fn terrain_weights_to_dijkstra_terrain_weight(
 pub fn terrain_weight_for_attacks() -> HashMap<Terrain, f32> {
     let mut result: HashMap<Terrain, f32> = HashMap::new();
 
-    for terrain_type in todo!() {
-        let weight = 1.0;
-        result.insert(terrain_type, weight);
-    }
-    result.insert(terrain_type, weight);
-
+    // for terrain_type in todo!() {
+    //     let weight = 1.0;
+    //     result.insert(terrain_type, weight);
+    // }
+    // result.insert(terrain_type, weight);
+    todo!();
     result
 }
