@@ -55,7 +55,7 @@ pub trait EntityIntern: Debug {
 #[cfg(test)]
 impl Entity {
     pub fn test_entity(
-        entity: Option<i64>,
+        team_id: Option<i64>,
         id: Option<i64>,
     ) -> Self {
         #[derive(Debug)]
@@ -78,7 +78,7 @@ impl Entity {
             }
         }
         Entity {
-            team: TeamId::Team(entity.unwrap_or(0)),
+            team: TeamId::Team(team_id.unwrap_or(0)),
             unique_id: EntityId(id.unwrap_or(0)),
             entity_intern: Box::new(Intern {}),
         }

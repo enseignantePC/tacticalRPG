@@ -27,6 +27,20 @@ pub struct Terrain {
     _type: TerrainType,
 }
 
+impl Terrain {
+    pub(crate) fn new(
+        unique_id: i32,
+        name: String,
+        _type: TerrainType,
+    ) -> Self {
+        Terrain {
+            unique_id,
+            name,
+            _type,
+        }
+    }
+}
+
 #[derive(Eq, Hash, PartialEq, Debug, Clone, ToVariant)]
 pub enum TerrainType {
     ImpossibleToCross,
