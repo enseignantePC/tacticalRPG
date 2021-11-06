@@ -1,15 +1,13 @@
 //! # Module map
 //!
-//! This module is responsible for representing the world as a 2D grid
-//! and computing/keeping track of everything that happens grid wise
-//! holding information about :
-//! - the form of the world
+//! This module keeps information about :
+//! - the form of the world, what is connected to what etc
 //! - what is it made of (TerrainType)
-//! - who is where
+//! - where each of the entity is.
 //! - what each case of the world is made of
 //!
-//! It uses a [DijkstraMap] to do the calculation and abstracts it so it can communicate
-//! with a [GameManager].
+//! It uses a [Map] that wraps [DijkstraMap] to do the calculation and abstracts
+//! it so it can communicate with a [GameManager].
 
 use std::{
     collections::{HashMap, HashSet},
@@ -27,38 +25,10 @@ use terrains::*;
 pub mod position;
 pub use position::*;
 
+pub mod select;
+use select::*;
 
-/// You provide a Query to the select function
-/// to describe what can of search you want it to perform.
-pub struct Query {}
-
-pub struct Selector {
-    /// the current Pos being searched for the query.
-    current_position: Pos2D,
-    /// A descriptor of which things to match
-    team_mask: TeamMask,
-    /// Each of this range will be checked for the position
-    /// and the matches returned, possible with duplicates.
-    ranges: Vec<Range>,
-}
-/// all ranges search are relative to a position in the [Selector]
-pub enum Range {
-    /// the shape, described as a set of position
-    /// everything in the shape will be selected.
-    /// it will work even if the Pos2D aren't connected in the map
-    Shape,
-    /// Will match if in direction (at max_distance) (through max matches)
-    /// note that this doesn't go through portals.
-    /// TODO check in direction (Pos2D) and map is linked in dijkstra_map (DijkstraMapPosId)
-    /// TODO a ForcedDirection that goes through
-    Direction,
-    /// Custom Iterator that gives Pos that will be checked in that order.
-    /// TODO : most complicated example : A ForcedDirection that go
-    /// TODO : through portals (at each out or one chosen at random)
-    /// TODO : and change direction then.
-    Closure,
-}
-
+#[derive(Debug)]
 pub struct Map {
     /// intern dijkstra_map
     dijkstra_map: DijkstraMap,
@@ -122,14 +92,19 @@ impl Map {
     }
 
     /// adds an entity on the map
+    /// fails if an entity is already at pos
     /// TODO : add a force option to put the entity on the map (by destroying whats there? by finding the closest place where the entity can go?)
     pub fn register_entity_at_pos(
         &mut self,
         entity: Rc<Entity>,
         position: &Pos2D,
-    ) {
+    ) -> Result<(), ()> {
         let team = entity.team;
         let id = entity.unique_id;
+        if self.entity_id_to_pos.get(&id).is_some() {
+            return Err(());
+        }
+
         self.entity_id_to_pos.insert(id, *position);
         self.pos_to_occupant.insert(
             *position,
@@ -144,35 +119,37 @@ impl Map {
             .get_mut(&team)
             .unwrap()
             .insert(*position);
+        Ok(())
     }
 
-    /// moves an entity to a new position, updating the maps internal accordingly
+    /// moves an entity to a new position, updating the maps internal accordingly.
+    ///  fails if an entity is present on arrival
     pub fn move_entity_from_current_position_to_next_position(
         &mut self,
         entity: Rc<Entity>,
         next_position: Pos2D,
-    ) {
-        let id = &entity.unique_id;
+    ) -> Result<(), ()> {
+        let id = entity.unique_id;
         let current_position = self
-            .get_pos_for_entity(*id)
+            .get_pos_for_entity(id)
             .expect("no position found for entity_id");
 
-        self.entity_id_to_pos.remove_entry(id);
-        let res = self.entity_id_to_pos.insert(*id, next_position);
+        self.entity_id_to_pos.remove_entry(&id);
+        let res = self.entity_id_to_pos.insert(id, next_position);
         if res.is_some() {
-            panic!("erased old entry when it should have been empty")
+            panic!("trying to move entity whom'st id is not on the map")
         }
 
         let (_, occupant) = self
             .pos_to_occupant
             .remove_entry(&current_position)
-            .expect("No occupant found at pos");
+            .expect("trying to move entity who is not at pos");
         let res = self.pos_to_occupant.insert(
             next_position,
             occupant,
         );
         if res.is_some() {
-            panic!("erased old entry when it should have been empty")
+            return Err(());
         }
 
         let set = self
@@ -181,6 +158,7 @@ impl Map {
             .expect("no set found for team when it should have had");
         set.remove(&current_position);
         set.insert(next_position);
+        Ok(())
     }
 
     pub fn remove_entity_from_the_map(
@@ -466,3 +444,37 @@ impl Map {
     //     }
     // }
 }
+
+pub struct UnInitializedMap {
+    next_id: i32,
+    id_to_terrain: HashMap<i32, Terrain>,
+    terrain_to_id: HashMap<Terrain, i32>,
+}
+
+impl UnInitializedMap {
+    pub(crate) fn new() -> Self {
+        UnInitializedMap {
+            next_id: 0,
+            id_to_terrain: HashMap::default(),
+            terrain_to_id: HashMap::default(),
+        }
+    }
+
+    fn declare_terrain(
+        &self,
+        arg: &str,
+        entity_may_cross: TerrainType,
+    ) -> i32 {
+        todo!()
+    }
+
+    fn get(
+        &self,
+        id: i32,
+    ) -> Terrain {
+        todo!()
+    }
+}
+
+#[cfg(test)]
+mod tests;

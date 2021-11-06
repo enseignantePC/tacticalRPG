@@ -66,7 +66,7 @@ impl GameManager {
         &mut self,
         entity: on_the_map::Entity,
         map_position: &map::Pos2D,
-    ) -> Result<EntityId, ErrorPosCannotAcceptEntity> {
+    ) -> Result<EntityId, ()> {
         // generate an id for the entity
         // check if the place on the map can accept the entity
         let entity_id = self.make_available_entity_id();
@@ -76,10 +76,10 @@ impl GameManager {
                 entity_id,
                 entity.clone(),
             );
-            self.map.register_entity_at_pos(entity, map_position);
+            self.map.register_entity_at_pos(entity, map_position)?;
             return Ok(entity_id);
         }
-        Err(ErrorPosCannotAcceptEntity {})
+        Ok(entity_id)
     }
     /// TODO FIXDOC
     /// generate valid inputs for entity
