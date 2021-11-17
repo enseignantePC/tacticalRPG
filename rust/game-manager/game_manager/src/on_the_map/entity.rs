@@ -62,19 +62,19 @@ impl Entity {
         struct Intern {}
         impl EntityIntern for Intern {
             fn terrain_weights(&self) -> HashMap<Terrain, f32> {
-                todo!()
+                panic!()
             }
 
             fn get_move_force(&self) -> f32 {
-                todo!()
+                panic!()
             }
 
             fn damage_reduction_factor(&self) -> f64 {
-                todo!()
+                panic!()
             }
 
             fn get_attack_ranges(&self) -> &[i32] {
-                todo!()
+                panic!()
             }
         }
         Entity {

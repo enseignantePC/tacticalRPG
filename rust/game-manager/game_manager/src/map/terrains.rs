@@ -30,7 +30,7 @@ impl TerrainManager {
         }
     }
 
-    fn new_id(mut self) -> i32 {
+    fn new_id(&mut self) -> i32 {
         self.max_used_id += 1;
         self.max_used_id - 1
     }

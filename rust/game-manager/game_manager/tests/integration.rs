@@ -4,7 +4,7 @@ fn new_manager() {
     let mut builder = todo!();
     let id_dirt = builder.with_terrain_crossable("Dirt");
     let id_water = builder.with_terrain_attack_crossable("Water");
-    let id_wall = builder.with_terrain_crossable("Wall");
+    let id_wall = builder.with_terrain_uncrossable("Wall");
     builder.with_map(todo!());
     builder.build()
 }

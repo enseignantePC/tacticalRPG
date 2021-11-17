@@ -6,7 +6,7 @@
 //! - where each of the entity is.
 //! - what each case of the world is made of
 //!
-//! It uses a [Map] that wraps [DijkstraMap] to do the calculation and abstracts
+//! It uses a [map::Map] that wraps [DijkstraMap] to do the calculation and abstracts
 //! it so it can communicate with a [GameManager].
 
 use std::{

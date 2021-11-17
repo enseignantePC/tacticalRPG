@@ -86,7 +86,7 @@ pub trait EventWatchers {
 
 // TODO test all conditions and that they work, but before that, have a way to
 // TODO create them efficiently.
-// TODO a module with condition, some struct that impl EventWatchers and autodisable after n turn or n.watch
+// TODO a module with condition, some struct that impl EventWatchers and auto disable after n turn or n.watch
 #[cfg(test)]
 mod tests {
     use super::*;

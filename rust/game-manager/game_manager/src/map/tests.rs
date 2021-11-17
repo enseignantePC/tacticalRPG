@@ -19,7 +19,7 @@ impl UnInitializedMap {
         );
         let id2 = uninitialized.declare_terrain(
             "Wall",
-            TerrainType::ImpossibleToCross,
+            TerrainType::NoneMayCross,
         );
         uninitialized
     }
