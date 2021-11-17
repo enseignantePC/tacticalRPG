@@ -293,6 +293,7 @@ impl Map {
     fn get_attackable_entities_by_entity(
         &mut self,
         entity: Rc<Entity>,
+        terrain_manager: TerrainManager,
     ) -> Vec<(Pos2D, EntityId)> {
         // all entities in range that are not on the same team
         // TODO : make this a more complex Range struct that can deal with some different logic
@@ -304,7 +305,7 @@ impl Map {
                 *this_range as f32,
                 // this should be a map where every terrain has a weight of one, so the attacks flings no matter the terrain
                 // OR, we could forbid walls, or other terrain, anyway, needs thinking
-                terrain_weight_for_attacks(),
+                terrain_manager.terrain_weight_for_attacks(),
             );
             let end_points_available = self.dijkstra_map.get_all_points_with_cost_between(
                 Cost(0f32),
