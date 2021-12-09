@@ -57,82 +57,135 @@ pub struct InputOption {
     pub intent: Intent,
 }
 
-/// The InputManager is responsible for communicating
-/// with an external sources that will provide inputs.
-///
-/// It keeps track of the state of the game to always permit to be asked what
-/// - inputs must be submitted
-/// - what is the context/ what are the options etc
-///
-pub struct InputManager {
-    /// stores what input are available after a query via [GameManager::get_valid_inputs_for_entity]
-    game_manager: GameManager,
-    input_cache: Option<InputCache>,
-    currently_playing: EntityId,
+#[derive(Error, Debug)]
+pub enum ChooseActionError {
+    #[error(
+        "Trying to make a choice for entity but input cache is None.\
+    \nHave you called query_entity_options?"
+    )]
+    InputCacheNull,
+    #[error(
+        "Trying to make a choice for entity but the \
+        key provided didn't correspond to any result."
+    )]
+    IllegalChoice,
 }
 
-/// this is stored by the [InputManager] after you chose which Entity was going to play and i gave you a choice in the form
-/// of a Vec<InputOption>
-pub struct InputCache {
-    entity_chosen_to_play: EntityId,
-    input_options: HashMap<i32, InputOption>,
-}
 #[derive(Error, Debug)]
-#[error("Trying to access an InputCache that is none")]
-pub struct InputCacheIsNone;
+pub enum QueryEntityOptionsError {
+    #[error(
+        "Trying to query entity options but playable\
+     entities cache is None, have you called \
+     query_playable_entities?"
+    )]
+    PlayableEntitiesCacheNull,
+    #[error(
+        "Trying to query entity options \
+    for an entity not in the cache.\
+    Maybe you have some confused code somewhere? \
+    Be wary when you cast an unknown u32 to an EntityId,\
+    they are not to be trusted!"
+    )]
+    EntityRequestedNotFound,
+}
 
 impl InputManager {
-    pub fn get_valid_intents_for_entity(
+    pub fn new(game_manager: GameManager) -> Self {
+        InputManager {
+            game_manager,
+            input_cache: None,
+            playable_entities: None,
+        }
+    }
+
+    /// returns a list of id's corresponding to
+    /// valid entities that can play
+    /// and updates the cache.
+    pub fn query_playable_entities(&mut self) -> Vec<EntityId> {
+        let get_playable_entities = self.game_manager.get_playable_entities();
+        self.playable_entities = Some(get_playable_entities.clone());
+        get_playable_entities
+    }
+
+    pub fn query_entity_options(
         &mut self,
-        entity_valid_intents: &[Intent],
-    ) -> HashMap<i32, InputOption> {
-        let mut to_cache: HashMap<i32, InputOption> = HashMap::new();
+        entity_id: EntityId,
+    ) -> Result<InputCache, QueryEntityOptionsError> {
+        if self.playable_entities.is_some()
+            && self.playable_entities.take().unwrap().contains(&entity_id)
+        {
+            let valid_intents_for_entity =
+                self.game_manager.get_valid_intents_for_entity(&entity_id);
+
+            let cache = Self::_intents_to_cache(
+                entity_id,
+                valid_intents_for_entity.as_slice(),
+            );
+            self.input_cache = Some((
+                cache.clone(),
+                entity_id,
+            ));
+            Ok(cache)
+        } else if self.playable_entities.is_none() {
+            Err(QueryEntityOptionsError::PlayableEntitiesCacheNull)
+        } else {
+            Err(QueryEntityOptionsError::EntityRequestedNotFound)
+        }
+    }
+
+    /// Make an entity try to do an Action.
+    ///
+    /// Returns a vector of the [WorldChange]s that happened in the world
+    /// as a consequence of the input.
+    ///
+    /// Or fails if the input is invalid (aka, its unique id doesn't exist in
+    /// the [InputCache]).
+    ///
+    /// You must typically call query_playable_entities and query_entity_options to get
+    /// the choice id.
+    ///
+    /// !WARNING : it is currently the responsibility of the input manager
+    /// !to forbid illegal inputs, current system can be abused! It should
+    /// !be implemented as States built into types instead.
+    pub fn choose_action_for_entity(
+        &mut self,
+        choice_id: i32,
+    ) -> Result<Vec<WorldChange>, ChooseActionError> {
+        if self.input_cache.is_none() {
+            Err(ChooseActionError::InputCacheNull)
+        } else {
+            // get the content of the cache
+            let (cloned_cache, _) = self.input_cache.take().unwrap();
+
+            if let Some(input_option) = cloned_cache.get(&choice_id) {
+                Ok(self
+                    .game_manager
+                    .resolve_all_intents(input_option.intent.clone()))
+            } else {
+                Err(ChooseActionError::IllegalChoice)
+            }
+        }
+    }
+
+    fn _intents_to_cache(
+        _: EntityId,
+        valid_intents_for_entity: &[Intent],
+    ) -> InputCache {
+        let mut map: HashMap<i32, InputOption> = HashMap::new();
         // used to generate id of
         let mut x = -1;
         let mut option_id_generator = move || {
             x += 1;
             x
         };
-        for (_, v) in entity_valid_intents.iter().enumerate() {
+        for (_, v) in valid_intents_for_entity.iter().enumerate() {
             let x = option_id_generator();
             let io = InputOption {
                 unique_id: x,
                 intent: v.clone(),
             };
-            to_cache.insert(x, io);
+            map.insert(x, io);
         }
-        self.input_cache = Some(InputCache {
-            entity_chosen_to_play: self.currently_playing,
-            input_options: to_cache.clone(),
-        });
-        to_cache
-    }
-
-    /// if a player p is playing its turn, give the intent for that player
-    /// it consumes the cache if the input is valid
-    ///
-    /// returns a vector of the [WorldChange]s that happened in the world
-    /// fails if the input is invalid (aka, its unique id doesn't exist in the [InputCache])
-    pub fn give_inputs_according_to_cache(
-        &mut self,
-        id_of_valid_input_cache: i32,
-    ) -> Result<Vec<WorldChange>, InputCacheIsNone> {
-        if self.input_cache.is_none() {
-            Err(InputCacheIsNone {})
-        } else {
-            // get the content of the cache
-            let cloned_cache = self.input_cache.take().unwrap();
-            let InputCache {
-                entity_chosen_to_play: _,
-                mut input_options,
-            } = cloned_cache;
-
-            let InputOption {
-                unique_id: _,
-                intent,
-            } = input_options.remove(&id_of_valid_input_cache).unwrap();
-
-            Ok(self.game_manager.resolve_all_intents(intent))
-        }
+        map
     }
 }

@@ -51,10 +51,6 @@ pub struct GameManager {
     pub entity_id_to_entity: HashMap<EntityId, Rc<Entity>>,
     /// Manages the intents (aka inputs) that declares how the entities want to act on the world
     intent_manager: IntentManager,
-    fight_started: bool,
-    fight_ended: bool,
-    // TODO MOVE TO OTHER CRATE
-    entity_currently_awaiting_input: Option<EntityId>,
     /// watch and react to intent emitted
     intent_watcher: Watcher,
     /// watch and react to action done
