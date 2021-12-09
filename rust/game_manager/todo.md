@@ -1,6 +1,10 @@
 - [ ] declare terrain in a struct
-- [ ] impl string to map
+- [ ] impl string to map && map to string
+- [ ] impl clean, extendable import to map
 - [ ] Add a way to define spell easily
+- [ ] Add a way to define object easily
+- [ ] Add a way to define some Entity `property` so they 
+        can easily implement EventWatchers (first for counter attacks)
 - [ ] Add tests for WorldManager
 - [ ] Add tests for map state after World::apply_change_to_world
 - [ ] Add tests for Watcher
