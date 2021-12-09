@@ -40,17 +40,19 @@ impl TeamId {
 
 /// handles and connect everything
 pub struct GameManager {
-    /// represents the world (2D grid) and everything that is on it
+    /// represents the world (2D grid) and everything that is on it.
     map: map::Map,
-    /// how the game manager stores and references entity that are on the map
     pub entity_id_to_entity: HashMap<EntityId, Rc<Entity>>,
-    /// Manages the intents (aka inputs) that declares how the entities want to act on the world
+    /// handles the interaction between the world and
+    /// then [entities](Entity) via [Intent]s.
     intent_manager: IntentManager,
-    /// watch and react to intent emitted
+    /// handles terrain and translation to [DijkstraMap]
+    terrain_manager: map::terrains::TerrainManager,
+    /// watch and react to intent emitted.
     intent_watcher: Watcher,
-    /// watch and react to action done
+    /// watch and react to action done.
     action_watcher: Watcher,
-    /// A simple history field, storing chronologically what happens
+    /// A simple history field, storing chronologically what happens.
     world_changes: Vec<WorldChange>,
 }
 

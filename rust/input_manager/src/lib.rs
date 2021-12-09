@@ -2,7 +2,7 @@
 //!
 //! It provides a clean interface to an external source.
 //! The [InputManager] will be the access point from which you can:
-//! - query what is possible to do for currently playing [Entity] via [InputOption]
+//! - query what is possible to do for currently playing [game_manager::Entity] via [InputOption]
 //!
 //!
 //! - [] Query what entities can play
@@ -29,10 +29,9 @@ mod godot_interface;
 /// you then query what they can do via query_entity_options
 /// you then choose what an entity will do choose_action_for_entity
 pub struct InputManager {
-    /// stores what input are available after
-    /// a query via [GameManager::get_valid_inputs_for_entity]
     game_manager: GameManager,
-    /// A cache with the play_options for the entity
+    /// stores what input are available for an [game_manager::Entity] after
+    /// a query via [InputManager::query_entity_options]
     input_cache: Option<(InputCache, EntityId)>,
     playable_entities: Option<Vec<EntityId>>,
 }

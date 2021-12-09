@@ -4,7 +4,7 @@
 //! - the form of the world, what is connected to what etc
 //! - what is it made of (TerrainType)
 //! - where each of the entity is.
-//! - what each case of the world is made of
+//! - what each case of the world is made of.
 //!
 //! It uses a [map::Map] that wraps [DijkstraMap] to do the calculation and abstracts
 //! it so it can communicate with a [GameManager].
@@ -35,7 +35,6 @@ pub struct Map {
     /// pos to dijkstraPointId
     pos_to_dijkstra_point_id: FnvHashMap<Pos2D, dijkstra_map::PointId>,
     dijkstra_point_id_to_pos: FnvHashMap<dijkstra_map::PointId, Pos2D>,
-    /// TODO : wire this up
     entity_id_to_pos: FnvHashMap<EntityId, Pos2D>,
     pos_to_occupant: FnvHashMap<Pos2D, Occupant>,
     /// for each team, the set of position taken by the team

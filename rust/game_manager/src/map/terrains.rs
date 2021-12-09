@@ -1,11 +1,13 @@
-//! This is the representation of the type of terrain
-//! for the game_manager
+//! # The Map.terrain module
+//!
+//! It deals with different Terrains on which entity may
+//! be forbidden to step. Or attack etc. and translation
+//! from this concept to the intern [DijkstraMap]
 //!
 //! The TerrainManager will be used to
-//! declare what [Terrain]s exist and what is their type
-//! so the [GameManager][crate::GameManager] can deal with them in a nice manner
-//!
-//! Each [Terrain] may be of a different [TerrainType]
+//! declare what [Terrain]s exist and what is their
+//! [TerrainType] so the [GameManager][crate::GameManager]
+//! can deal with them in a nice manner.
 
 use super::*;
 use bidir_map::BidirMap;

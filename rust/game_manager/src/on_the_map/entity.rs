@@ -6,16 +6,10 @@ use gdnative::core_types::ToVariant;
 
 use super::*;
 
-/// As entities are the most important thing on the map
-/// they should be the most flexible thing possible
+/// You should think of entities as everything that can
+/// play on the map.
 ///
-/// It makes more and more sense that it should be a trait.
-/// possibly in the form of a Godot Node, capable of calling some
-/// gdscript code to satisfy the trait
-/// (which would probably make it unsafe)?
-///
-/// or maybe the entity should be handled entirely by the external source
-/// As i am too much of a newbie at rust, this is a source of worry.
+/// This is an interface between the [crate::GameManager]
 #[derive(Debug)]
 pub struct Entity {
     pub team: TeamId,
