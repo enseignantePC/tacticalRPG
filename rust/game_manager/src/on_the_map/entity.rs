@@ -41,10 +41,27 @@ pub trait EntityIntern: Debug {
     fn terrain_weights(&self) -> HashMap<Terrain, f32>;
     /// determines how far the entity will be able to move
     fn get_move_force(&self) -> f32;
-
     /// damage reduction when fighting, should depend on SOMETHING
     fn damage_reduction_factor(&self) -> f64;
-
+    /// how likely to play before other entities.
+    /// TODO IS THIS DETERMINIST???
+    fn initiative(&self) -> f64;
+    /// whether the entity can play other moves in the turn or is it `exhausted`.
+    /// ! WARNING if the entity returns can_play == true, it should return non empty input options
+    /// ! when queried! Otherwise the GameManager will have trouble knowing when the turn is over.
+    /// ! In the end the GameManager should become smart enough to `eliminate` a player when
+    /// ! it says it can play but return no options.
+    ///
+    /// ! This is subtle because the player answer if they can play according to their state,
+    /// ! their actual options is not their scope.
+    /// ! So how should the game manager decide when the turn is over?
+    /// ! It could check before returning from get_playable_entities that the entities return
+    /// ! have at least one option. Find the first team that does. If no such team exist the
+    /// ! turn is terminated.
+    /// !
+    /// ! But what to do to avoid infinite loops in the case where all Entities could play
+    /// ! but they are blocked? ...
+    fn can_play(&self) -> bool;
     /// At what distance(s) the entity can strike
     /// currently broken but should depend on
     /// - the weapon
@@ -77,6 +94,14 @@ impl Entity {
 
             fn get_attack_ranges(&self) -> &[i32] {
                 panic!()
+            }
+
+            fn initiative(&self) -> f64 {
+                todo!()
+            }
+
+            fn can_play(&self) -> bool {
+                todo!()
             }
         }
         Entity {

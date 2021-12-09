@@ -146,6 +146,48 @@ impl GameManager {
         result
     }
 
+    /// TODO : TEST ME
+    /// Returns the list of entity that should be given the choice to play now
+    ///
+    /// It's a list of entities of the same team that are nice enough that they
+    /// would let the others play first :)
+    ///
+    /// ! WARNING if the entity returns can_play == true, it should return non empty input options
+    /// ! when queried! Otherwise the GameManager will have trouble knowing when the turn is over.
+    /// ! In the end the GameManager should become smart enough to `eliminate` a player when
+    /// ! it says it can play but return no options.
+    /// !
+    /// ! This is subtle because the player answer if they can play according to their state,
+    /// ! their actual options is not their scope.
+    /// ! So how should the game manager decide when the turn is over?
+    /// ! It could check before returning from get_playable_entities that the entities return
+    /// ! have at least one option. Find the first team that does. If no such team exist the
+    /// ! turn is terminated.
+    /// !
+    /// ! But what to do to avoid infinite loops in the case where all Entities could play
+    /// ! but they are blocked? ...
+    pub fn get_playable_entities(&mut self) -> Vec<EntityId> {
+        // sort entities by initiative
+        let entities: Vec<Rc<Entity>> = self.entity_id_to_entity.values().cloned().collect();
+        let mut entities: Vec<Rc<Entity>> = entities
+            .iter()
+            .filter(|&x| x.entity_intern.can_play())
+            .cloned()
+            .collect();
+        entities.sort_by(|a, b| {
+            b.entity_intern
+                .initiative()
+                .partial_cmp(&a.entity_intern.initiative())
+                .expect("Couldn't cmp initiative")
+        });
+        let mut selected: Vec<Rc<Entity>> = vec![entities.remove(0)];
+        let entities: Vec<Rc<Entity>> = entities
+            .into_iter()
+            .take_while(|e| e.team.can_fight(&selected.first().unwrap().team))
+            .collect();
+        selected.extend(entities);
+        selected.iter().map(|x| x.unique_id).collect()
+    }
 
     /// this method transform an [Intent] into a [WorldChange]s
     /// and stores it in [GameManager.world_changes]
