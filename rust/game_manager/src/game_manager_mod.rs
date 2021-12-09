@@ -59,7 +59,7 @@ impl GameManager {
         &mut self,
         entity: on_the_map::Entity,
         map_position: &map::Pos2D,
-    ) -> Result<EntityId, ()> {
+    ) -> Result<EntityId, PositionOccupied> {
         // generate an id for the entity
         // check if the place on the map can accept the entity
         let entity_id = self.make_available_entity_id();

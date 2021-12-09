@@ -15,7 +15,8 @@ use std::{
     fmt::{write, Debug, Display},
 };
 
-/// This struct holds [Terrain] value and is meant to be owned by a [GameManager][crate::GameManager]
+/// This struct holds [Terrain] value and is meant to
+/// be owned by a [GameManager][crate::GameManager]
 #[derive(Debug)]
 pub struct TerrainManager {
     max_used_id: i32,
@@ -62,9 +63,9 @@ impl TerrainManager {
             TerrainType::NoneMayCross,
         );
     }
-    /// this returns a map where every terrain
-    /// has a weight of one, so the attacks flings no matter the terrain
-    /// except attacks through which the terrain cannot pass through (they have infinite weight)
+    /// this returns a map where every terrain has a weight of one, so the
+    /// attacks flings no matter the terrain except attacks through which
+    /// the terrain cannot pass through (they have infinite weight).
     pub fn terrain_weight_for_attacks(&self) -> HashMap<Terrain, f32> {
         let mut result: HashMap<Terrain, f32> = HashMap::new();
         let attack_may_cross: HashMap<Terrain, f32> = self
@@ -109,18 +110,25 @@ impl TerrainManager {
     ) {
         let id = self.new_id();
         let t = Terrain {
-            unique_id: id.clone(),
+            unique_id: id,
             name: name.into(),
             _type,
         };
         self.bi_map
-            .insert(id.clone(), t)
+            .insert(id, t)
             .expect("tried to add an already existing terrain or id to the terrain manager");
     }
 }
 
+impl Default for TerrainManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // TODO : TESTME
-/// This is glue code for mapping the terrain_weights member of an [Entity] to the terrain_weights arg
+/// This is glue code for mapping the terrain_weights member
+/// of an [Entity] to the terrain_weights arg
 /// expected by the [DijkstraMap].
 pub fn terrain_weights_to_dijkstra_terrain_weight(
     terrain_weight: &HashMap<terrains::Terrain, f32>

@@ -75,7 +75,7 @@ pub fn apply_change_to_world(
     _game_manager: &mut GameManager,
 ) {
     match change {
-        WorldChange::Attack(a) => {
+        WorldChange::Attack(_) => {
             // get both entity and change their states
             todo!();
         }

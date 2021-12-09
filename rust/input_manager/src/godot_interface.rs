@@ -10,8 +10,6 @@ use gdnative::prelude::*;
 #[inherit(Reference)]
 pub struct InterfaceBuilder {}
 
-use gdnative::prelude::*;
-
 #[methods]
 impl InterfaceBuilder {
     fn new(_owner: &Reference) -> Self {
