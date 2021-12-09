@@ -1,8 +1,10 @@
-//! This module is responsible for accepting [WorldChange]s
+//! # The world manager module
+//!
+//! It is responsible for accepting [WorldChange]s
 //! (a representation of what happened to the world) and
 //! - Updating the state of the game accordingly
 //! (for instance moving an entity around on the map) after it was decided the entity should move.
-//! - Storing them for history purposes
+//! - Storing them (this is the built in implementation of an history)
 
 use std::rc::Rc;
 

@@ -15,7 +15,7 @@ use std::{
     rc::Rc,
 };
 
-use crate::{on_the_map::*, Action, DijkstraMap, EntityId, Intent, Move, TeamId};
+use crate::{on_the_map::*, Action, DijkstraMap, EntityId, Intent, Move, PositionOccupied, TeamId};
 use dijkstra_map::{Cost, PointId};
 use fnv::{FnvHashMap, FnvHashSet};
 
@@ -56,11 +56,12 @@ impl Map {
             None,
             None,
         );
-        let mut intermed: FnvHashMap<Pos2D, PointId> = FnvHashMap::default();
+        // todo, give a better name
+        let mut value: FnvHashMap<Pos2D, PointId> = FnvHashMap::default();
         for (k, v) in pos_to_dijkstra_point_id {
-            intermed.insert(Pos2D(k), v);
+            value.insert(Pos2D(k), v);
         }
-        let pos_to_dijkstra_point_id = intermed;
+        let pos_to_dijkstra_point_id = value;
         let mut dijkstra_point_id_to_pos: FnvHashMap<dijkstra_map::PointId, Pos2D> =
             FnvHashMap::default();
         for ele in &pos_to_dijkstra_point_id {
@@ -98,11 +99,11 @@ impl Map {
         &mut self,
         entity: Rc<Entity>,
         position: &Pos2D,
-    ) -> Result<(), ()> {
+    ) -> Result<(), PositionOccupied> {
         let team = entity.team;
         let id = entity.unique_id;
         if self.entity_id_to_pos.get(&id).is_some() {
-            return Err(());
+            return Err(PositionOccupied);
         }
 
         self.entity_id_to_pos.insert(id, *position);
@@ -121,7 +122,7 @@ impl Map {
             .insert(*position);
         Ok(())
     }
-
+    #[allow(clippy::result_unit_err)]
     /// moves an entity to a new position, updating the maps internal accordingly.
     ///  fails if an entity is present on arrival
     pub fn move_entity_from_current_position_to_next_position(

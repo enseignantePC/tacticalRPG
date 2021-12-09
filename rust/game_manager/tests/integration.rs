@@ -1,9 +1,12 @@
 #![allow(clippy::single_component_path_imports)]
-#![allow(unused_imports)]
+#![allow(
+    unused_imports,
+    clippy::diverging_sub_expression
+)]
 use game_manager;
 
 fn new_manager() {
-    let mut _builder: () = todo!();
+    let _ = todo!();
     // let id_dirt = builder.with_terrain_crossable("Dirt");
     // let id_water = builder.with_terrain_attack_crossable("Water");
     // let id_wall = builder.with_terrain_uncrossable("Wall");

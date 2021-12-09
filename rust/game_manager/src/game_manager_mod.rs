@@ -38,11 +38,6 @@ impl TeamId {
     }
 }
 
-// TODO use this via anyhow?
-#[derive(Error, Debug)]
-#[error("map.can_entity_be_accepted_at_pos failed when trying to insert the entity on the map")]
-pub struct ErrorPosCannotAcceptEntity {}
-
 /// handles and connect everything
 pub struct GameManager {
     /// represents the world (2D grid) and everything that is on it
@@ -224,3 +219,7 @@ impl GameManager {
         EntityId(i)
     }
 }
+
+#[derive(Error, Debug)]
+#[error("Tried to add an entity at pos, but the position is occupied")]
+pub struct PositionOccupied;

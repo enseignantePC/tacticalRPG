@@ -1,9 +1,5 @@
 use super::*;
 
-/// You provide a Query to the select function
-/// to describe what can of search you want it to perform.
-pub struct Query {}
-
 pub struct Selector {
     /// the current Pos being searched for the query.
     current_position: Pos2D,
@@ -13,7 +9,7 @@ pub struct Selector {
     /// and the matches returned, possible with duplicates.
     ranges: Vec<Range>,
 }
-/// all ranges search are relative to a position in the [Selector]
+/// all range searches are relative to a position in the [Selector]
 pub enum Range {
     /// the shape, described as a set of position
     /// everything in the shape will be selected.
