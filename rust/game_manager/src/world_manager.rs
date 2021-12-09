@@ -60,8 +60,8 @@ pub fn intent_to_world_change(
             );
             result
         }
-        Action::Object(o) => todo!(),
-        Action::Spell(s) => todo!(),
+        Action::Object(_) => todo!(),
+        Action::Spell(_) => todo!(),
     }
 }
 
@@ -70,7 +70,7 @@ pub fn intent_to_world_change(
 ///     somehow more complex : if someone attacks player A and player A is in range of attacking, player A counter attacks
 pub fn apply_change_to_world(
     change: &WorldChange,
-    gm: &mut GameManager,
+    _game_manager: &mut GameManager,
 ) {
     match change {
         WorldChange::Attack(a) => {

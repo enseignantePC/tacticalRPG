@@ -9,15 +9,15 @@ impl Map {
 impl UnInitializedMap {
     fn test_imap() -> Self {
         let uninitialized = UnInitializedMap::new();
-        let id0 = uninitialized.declare_terrain(
+        let _id0 = uninitialized.declare_terrain(
             "Dirt",
             TerrainType::EntityMayCross,
         );
-        let id1 = uninitialized.declare_terrain(
+        let _id1 = uninitialized.declare_terrain(
             "Water",
             TerrainType::AttackMayCross,
         );
-        let id2 = uninitialized.declare_terrain(
+        let _id2 = uninitialized.declare_terrain(
             "Wall",
             TerrainType::NoneMayCross,
         );

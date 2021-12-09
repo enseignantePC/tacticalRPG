@@ -46,32 +46,32 @@ impl OccupantMask {
     /// - if is any and not in except vector
     pub fn select(
         &self,
-        o: &Occupant,
+        occupant: &Occupant,
     ) -> bool {
         match self {
             OccupantMask::AllExcept(v) => {
-                for k in v.iter() {
-                    if let OccupantMask::AllExcept(v) = k {
+                for occupant_mask in v.iter() {
+                    if let OccupantMask::AllExcept(_occupant_masks) = occupant_mask {
                         panic!("Nested OccupantMask::AllExcept dont have meaning")
                     };
                 }
-                !v.iter().any(|x| x.select(o))
+                !v.iter().any(|x| x.select(occupant))
             }
             OccupantMask::Entity => {
                 matches!(
-                    o,
+                    occupant,
                     Occupant::Entity(_x)
                 )
             }
             OccupantMask::Obstacle => {
                 matches!(
-                    o,
+                    occupant,
                     Occupant::Obstacle(_x)
                 )
             }
             OccupantMask::Object => {
                 matches!(
-                    o,
+                    occupant,
                     Occupant::Object(_x)
                 )
             }
@@ -96,7 +96,7 @@ impl TeamMask {
     ) -> bool {
         match self {
             TeamMask::AllExcept(v) => v.iter().any(|x| {
-                if let TeamMask::AllExcept(y) = x {
+                if let TeamMask::AllExcept(_team_masks) = x {
                     panic!("Nested TeamMask::AllExcept dont have meaning")
                 };
                 !v.iter().any(|x| -> bool { x.select(id) })

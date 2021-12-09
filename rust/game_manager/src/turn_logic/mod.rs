@@ -38,11 +38,11 @@ impl Intent {
         Option<Intent>,
     ) {
         match self.action {
-            Action::Attack(a) => (self, None),
+            Action::Attack(_attack) => (self, None),
 
-            Action::Move(mut m) => {
-                let next_path = vec![m.path.remove(0)];
-                let remainder_should_be_none = m.path.is_empty();
+            Action::Move(mut _move) => {
+                let next_path = vec![_move.path.remove(0)];
+                let remainder_should_be_none = _move.path.is_empty();
                 let (minimal_intent, remainder_intent) = (
                     Intent {
                         action: Action::Move(Move { path: next_path }),
@@ -50,7 +50,7 @@ impl Intent {
                         entity: self.entity.clone(),
                     },
                     Intent {
-                        action: Action::Move(Move { path: m.path }),
+                        action: Action::Move(Move { path: _move.path }),
                         priority: self.priority,
                         entity: self.entity.clone(),
                     },
@@ -66,8 +66,8 @@ impl Intent {
                 )
             }
 
-            Action::Object(o) => (self, None),
-            Action::Spell(s) => (self, None),
+            Action::Object(_) => (self, None),
+            Action::Spell(_) => (self, None),
         }
     }
     //

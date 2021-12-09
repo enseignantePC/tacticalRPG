@@ -203,21 +203,21 @@ impl Map {
 
     pub fn get_valid_attacks_for_entity(
         &self,
-        entity: Rc<Entity>,
+        _entity: Rc<Entity>,
     ) -> Vec<Intent> {
         todo!()
     }
 
     pub fn get_valid_object_for_entity(
         &self,
-        entity: Rc<Entity>,
+        _entity: Rc<Entity>,
     ) -> Vec<Intent> {
         todo!()
     }
 
     pub fn get_valid_spells_for_entity(
         &self,
-        entity: Rc<Entity>,
+        _entity: Rc<Entity>,
     ) -> Vec<Intent> {
         todo!()
     }
@@ -463,15 +463,15 @@ impl UnInitializedMap {
 
     fn declare_terrain(
         &self,
-        arg: &str,
-        entity_may_cross: TerrainType,
+        _arg: &str,
+        _entity_may_cross: TerrainType,
     ) -> i32 {
         todo!()
     }
 
     fn get(
         &self,
-        id: i32,
+        _id: i32,
     ) -> Terrain {
         todo!()
     }
