@@ -36,6 +36,8 @@ impl ToVariant for Entity {
 }
 
 pub trait EntityIntern: Debug {
+    /// determines how easily the entity travels different terrain types
+    /// TODO say more about dijkstra, where are we about reworking terrains?
     fn terrain_weights(&self) -> HashMap<Terrain, f32>;
     /// determines how far the entity will be able to move
     fn get_move_force(&self) -> f32;

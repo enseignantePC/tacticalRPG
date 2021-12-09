@@ -2,8 +2,34 @@
     dead_code,
     unused_imports
 )]
+
+//! # The Game Manager crate
+//!
+//! It builds on the dijkstra-map crate to provide a powerful system
+//! and expressive system for dealing with anything tactical rpg related
+//! (or at least it's is goal).
+//!
+//! It's being designed with the objectives of being
+//! - complete
+//! - extendable
+//! - customizable
+//!
+//! In particular it should be easy to plug in your own logic
+//! if you want to override what defines an Actor, how the combat system works
+//! in general etc..
+//!
+//! It's full workflow should be explained with beautiful diagrams and such
+//! but we're not there yet!
+//!
+//! note : add links up there ;)
+//!
+//! Features :
+//! - [ ] complete this list ;)
+//! - [ ] Override logic systems from gdscript
+
 /// computes map pathfinding calculations
 use dijkstra_map::DijkstraMap;
+pub use gdnative;
 /// godot side wrappers
 use gdnative::prelude::*;
 /// TODO : Documentation

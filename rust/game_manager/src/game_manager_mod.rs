@@ -6,7 +6,7 @@ use thiserror::Error;
 use super::*;
 use std::rc::Rc;
 
-/// This is an identifier that a [GameManager] can use to get a reference to an entity
+/// This is an identifier that a [GameManager] can use to get a reference to an [Entity]
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Debug, ToVariant)]
 pub struct EntityId(pub i64);
 
@@ -146,8 +146,9 @@ impl GameManager {
         result
     }
 
-    /// this method transform an intent into a worldchange and stores it in [GameManager.world_changes]
-    /// this is where something that was wanted by an entity finally becomes reality
+
+    /// this method transform an [Intent] into a [WorldChange]s
+    /// and stores it in [GameManager.world_changes]
     fn realise_intent(
         &mut self,
         next_intent: &Intent,

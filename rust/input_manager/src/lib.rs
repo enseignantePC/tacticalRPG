@@ -1,24 +1,59 @@
-//! This module is responsible of offering a clean interface to an external source.
+//! # The Input Manager
+//!
+//! It provides a clean interface to an external source.
 //! The [InputManager] will be the access point from which you can:
 //! - query what is possible to do for currently playing [Entity] via [InputOption]
-//! - answer what the entity will do via ~ dont know yet, an _answer method or smt
-
-use std::collections::HashMap;
+//!
+//!
+//! - [] Query what entities can play
+//! - [] Query what intents can be emitted for one of this entity
+//! - [] Choose one of these actions
+//!
+//! right now, if you provide an entity, you get a map of id -> Valid Intent
+//! TODO
+//! You will get a map of id -> (ActionKind, parameters)
+//! for instance 0 -> Movement, list of positions
+//! TODO
 
 use ::game_manager::thiserror::Error;
-use ::game_manager::Intent;
-use ::game_manager::WorldChange;
-use ::game_manager::*;
+use ::game_manager::{EntityId, GameManager, Intent, WorldChange};
+use std::collections::HashMap;
 
-/// this is how a [GameManager] will communicate what choices are available for currently playing entity
-/// it will be cloned and cached by the game_manager so we can use the id to declare the choice
-/// spec : an id that will be used to reference the
+mod godot_interface;
+
+/// The [InputManager] communicates with an external source that  provide inputs
+/// and the [GameManager] that updates in consequence of these inputs (and also
+/// provides valid inputs).
+///
+/// you ask what entities can play with query_playable_entities
+/// you then query what they can do via query_entity_options
+/// you then choose what an entity will do choose_action_for_entity
+pub struct InputManager {
+    /// stores what input are available after
+    /// a query via [GameManager::get_valid_inputs_for_entity]
+    game_manager: GameManager,
+    /// A cache with the play_options for the entity
+    input_cache: Option<(InputCache, EntityId)>,
+    playable_entities: Option<Vec<EntityId>>,
+}
+
+/// this is stored by the [InputManager] after you chose which
+/// Entity was going to play and i gave you a choice in the form
+/// of a Vec<InputOption>
+pub type InputCache = HashMap<i32, InputOption>;
+
+/// this is how a [GameManager] will communicate what choices are available
+/// the chosen entity.
+///
+/// A copy is kept by the input manager so you provide a key for selecting your
+/// option (and not an intent, so you can't make up an illegal one you filthy
+/// bastard yes you 💕).
 #[derive(Clone)]
 pub struct InputOption {
-    /// this id should be unique and will be communicated to the game manager
-    /// to ensure this specific [InputOption] will be selected
+    /// A unique id that can be communicated back to the
+    /// [InputManager] to ensure the intent field is selected.
     pub unique_id: i32,
-    /// the [Intent] corresponding
+    /// a valid (means it was provided by the game manager) [Intent].
     pub intent: Intent,
 }
 
