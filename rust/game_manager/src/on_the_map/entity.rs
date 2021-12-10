@@ -4,6 +4,8 @@
 
 use gdnative::core_types::ToVariant;
 
+use crate::{map::select::Selector, Action};
+
 use super::*;
 
 /// You should think of entities as everything that can
@@ -34,7 +36,7 @@ pub trait EntityIntern: Debug {
     /// TODO say more about dijkstra, where are we about reworking terrains?
     fn terrain_weights(&self) -> HashMap<Terrain, f32>;
     /// determines how far the entity will be able to move
-    fn get_move_force(&self) -> f32;
+    fn move_force(&self) -> f32;
     /// damage reduction when fighting, should depend on SOMETHING
     fn damage_reduction_factor(&self) -> f64;
     /// how likely to play before other entities.
@@ -56,13 +58,16 @@ pub trait EntityIntern: Debug {
     /// ! But what to do to avoid infinite loops in the case where all Entities could play
     /// ! but they are blocked? ...
     fn can_play(&self) -> bool;
-    /// At what distance(s) the entity can strike
-    /// currently broken but should depend on
-    /// - the weapon
-    /// - the entity
-    /// - ? a plethora of other stuff, should the logic be handled by the external source?
+    /// This is how an entity communicate what actions they can do,
+    /// what range they provide etc.
+    fn ranges_to_actions(&self) -> HashMap<Selector, Action>;
+    // At what distance(s) the entity can strike
+    // currently broken but should depend on
+    // - the weapon
+    // - the entity
+    // - ? a plethora of other stuff, should the logic be handled by the external source?
     // TODO : make this a more complex Range struct that can deal with some different logic
-    fn get_attack_ranges(&self) -> &[i32];
+    // fn get_attack_ranges(&self) -> &[i32];
 }
 
 #[cfg(test)]
@@ -78,15 +83,11 @@ impl Entity {
                 panic!()
             }
 
-            fn get_move_force(&self) -> f32 {
+            fn move_force(&self) -> f32 {
                 panic!()
             }
 
             fn damage_reduction_factor(&self) -> f64 {
-                panic!()
-            }
-
-            fn get_attack_ranges(&self) -> &[i32] {
                 panic!()
             }
 
@@ -95,6 +96,10 @@ impl Entity {
             }
 
             fn can_play(&self) -> bool {
+                todo!()
+            }
+
+            fn ranges_to_actions(&self) -> HashMap<Selector, Action> {
                 todo!()
             }
         }

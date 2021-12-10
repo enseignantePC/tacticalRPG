@@ -17,6 +17,8 @@ use std::{
     fmt::{write, Debug, Display},
 };
 
+pub type TerrainMap = HashMap<Terrain, f32>;
+
 /// This struct holds [Terrain] value and is meant to
 /// be owned by a [GameManager][crate::GameManager]
 #[derive(Debug)]
@@ -73,8 +75,8 @@ impl TerrainManager {
     /// attacks flings no matter the terrain except attacks through which
     /// the terrain cannot pass through (they have infinite weight).
     pub fn terrain_weight_for_attacks(&self) -> HashMap<Terrain, f32> {
-        let mut result: HashMap<Terrain, f32> = HashMap::new();
-        let attack_may_cross: HashMap<Terrain, f32> = self
+        let mut result: TerrainMap = HashMap::new();
+        let attack_may_cross: TerrainMap = self
             .bi_map
             .second_col()
             .into_iter()
@@ -87,7 +89,7 @@ impl TerrainManager {
             .map(|t| (t.clone(), 1f32))
             .collect();
 
-        let attack_may_not_cross: HashMap<Terrain, f32> = self
+        let attack_may_not_cross: TerrainMap = self
             .bi_map
             .second_col()
             .into_iter()
@@ -134,7 +136,7 @@ impl TerrainManager {
 /// of an [Entity] to the terrain_weights arg
 /// expected by the [DijkstraMap].
 pub fn terrain_weights_to_dijkstra_terrain_weight(
-    terrain_weight: &HashMap<terrains::Terrain, f32>
+    terrain_weight: &TerrainMap
 ) -> FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> {
     let mut result: FnvHashMap<dijkstra_map::TerrainType, dijkstra_map::Weight> =
         FnvHashMap::default();

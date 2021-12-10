@@ -250,7 +250,7 @@ impl Map {
 
         self.recalculates_dijkstra_map_for_entity_with_force(
             entity.clone(),
-            entity.entity_intern.get_move_force(),
+            entity.entity_intern.move_force(),
             entity.entity_intern.terrain_weights(),
         );
 
@@ -270,7 +270,7 @@ impl Map {
             .dijkstra_map
             .get_all_points_with_cost_between(
                 Cost(0f32),
-                Cost(entity.entity_intern.get_move_force()),
+                Cost(entity.entity_intern.move_force()),
             )
             .iter()
             .filter(|&x| {
@@ -285,57 +285,67 @@ impl Map {
         end_points_available
     }
 
-    /// this methods is used to determine what occupant might be attacked by a specified [Entity]
-    /// this returns a tuple of (a position where there is an entity, an EntityId that can be attacked)
-    ///
-    /// note : this gets which targets are available to the entity and should be presented to the entity as a list of choice BUT
-    /// the entity internal state might have to filter this
-    fn get_attackable_entities_by_entity(
+    /// Returns every matching ranges where the entity can do something
+    /// It serves as a choice provider for entities.
+    fn get_actions_for_entity(
         &mut self,
         entity: Rc<Entity>,
         terrain_manager: TerrainManager,
-    ) -> Vec<(Pos2D, EntityId)> {
-        // all entities in range that are not on the same team
-        // TODO : make this a more complex Range struct that can deal with some different logic
-        let mut result: Vec<(Pos2D, EntityId)> = Vec::new();
-        for this_range in entity.entity_intern.get_attack_ranges() {
-            // see what is in range
-            self.recalculates_dijkstra_map_for_entity_with_force(
-                entity.clone(),
-                *this_range as f32,
-                // this should be a map where every terrain has a weight of one, so the attacks flings no matter the terrain
-                // OR, we could forbid walls, or other terrain, anyway, needs thinking
-                terrain_manager.terrain_weight_for_attacks(),
-            );
-            let end_points_available = self.dijkstra_map.get_all_points_with_cost_between(
-                Cost(0f32),
-                Cost(entity.entity_intern.get_move_force()),
-            );
+    ) -> Vec<(
+        Action,
+        SelectorResult,
+    )> {
+        let mut result: Vec<(
+            Action,
+            SelectorResult,
+        )> = Vec::new();
+        let x = entity.entity_intern.ranges_to_actions();
 
-            for end_point in end_points_available {
-                // pour chaque position
-                let end_point = *self.dijkstra_point_id_to_pos.get(end_point).unwrap();
-                // si il y a personne, continue
-                if self.pos_to_occupant.get(&end_point).is_none() {
-                    continue;
-                }
-                let occupant = self.pos_to_occupant.get(&end_point).unwrap();
-                // si il y a un loner, on garde toutes les positions
-
-                if let Occupant::Entity(e) = occupant {
-                    // get all set except the one of entity.team
-                    if entity.team.can_fight(&e.team) {
-                        result.push((
-                            end_point,
-                            e.unique_id,
-                        ))
-                    } else {
-                        continue;
-                    }
-                }
+        for (selector, action) in x.into_iter() {
+            match selector.select(&self) {
+                Some(match_) => result.push((action, match_)),
+                None => {}
             }
         }
-        result
+
+        // for this_range in entity.entity_intern.get_attack_ranges() {
+        //     self.recalculates_dijkstra_map_for_entity_with_force(
+        //         entity.clone(),
+        //         *this_range as f32,
+        //         // this should be a map where every terrain has a weight of one, so the attacks flings no matter the terrain
+        //         // OR, we could forbid walls, or other terrain, anyway, needs thinking
+        //         terrain_manager.terrain_weight_for_attacks(),
+        //     );
+        //     let end_points_available = self.dijkstra_map.get_all_points_with_cost_between(
+        //         Cost(0f32),
+        //         Cost(entity.entity_intern.move_force()),
+        //     );
+
+        //     for end_point in end_points_available {
+        //         // pour chaque position
+        //         let end_point = *self.dijkstra_point_id_to_pos.get(end_point).unwrap();
+        //         // si il y a personne, continue
+        //         if self.pos_to_occupant.get(&end_point).is_none() {
+        //             continue;
+        //         }
+        //         let occupant = self.pos_to_occupant.get(&end_point).unwrap();
+        //         // si il y a un loner, on garde toutes les positions
+
+        //         if let Occupant::Entity(e) = occupant {
+        //             // get all set except the one of entity.team
+        //             if entity.team.can_fight(&e.team) {
+        //                 result.push((
+        //                     end_point,
+        //                     e.unique_id,
+        //                 ))
+        //             } else {
+        //                 continue;
+        //             }
+        //         }
+        //     }
+        // }
+        // result
+        todo!()
     }
 
     fn enable_all_dijkstra_points(&mut self) {
@@ -354,7 +364,7 @@ impl Map {
         let mut uncrossable_points: Vec<PointId> = Vec::new();
 
         for (team, set) in &self.team_id_to_set_of_position_taken {
-            if (&entity.team != team) || (entity.team == TeamId::Loner) {
+            if entity.team.can_fight(team) {
                 for pos in set {
                     uncrossable_points.push(*self.pos_to_dijkstra_point_id.get(pos).unwrap())
                 }

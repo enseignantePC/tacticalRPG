@@ -81,12 +81,21 @@ impl OccupantMask {
 
 /// Describes which Teams should or should not
 /// match while doing a query.
-///
-///
 pub enum TeamMask {
     AllExcept(Vec<TeamMask>),
     ThisTeam(TeamId),
     NotThisTeam(TeamId),
+}
+
+impl TeamMask {
+    /// returns true if an team should be
+    /// excluded by a search with mask TeamMask.
+    pub fn filter(
+        &self,
+        team: TeamId,
+    ) -> bool {
+        todo!()
+    }
 }
 
 impl TeamMask {
