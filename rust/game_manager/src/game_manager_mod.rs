@@ -57,6 +57,20 @@ pub struct GameManager {
 }
 
 impl GameManager {
+    /// note : terrain manager is initiated
+    /// with default terrain == DEFAULT
+    pub fn new(map: map::Map) -> Self {
+        GameManager {
+            map,
+            entity_id_to_entity: HashMap::default(),
+            intent_manager: IntentManager::new(),
+            intent_watcher: Watcher::new(),
+            action_watcher: Watcher::new(),
+            world_changes: vec![],
+            terrain_manager: map::terrains::TerrainManager::new("DEFAULT"),
+        }
+    }
+
     pub fn register_entity(
         &mut self,
         entity: on_the_map::Entity,

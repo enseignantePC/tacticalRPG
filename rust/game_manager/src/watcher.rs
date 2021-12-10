@@ -24,6 +24,11 @@ pub struct Watcher {
 }
 
 impl Watcher {
+    pub fn new() -> Self {
+        Watcher {
+            event_watchers: vec![],
+        }
+    }
     /// when an intent is watched, every watcher that subscribed will look at it and decide if its
     /// going to react or not.
     ///
@@ -63,6 +68,12 @@ impl Watcher {
             entity_id,
             event_watcher,
         ))
+    }
+}
+
+impl Default for Watcher {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

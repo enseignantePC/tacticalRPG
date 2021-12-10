@@ -26,11 +26,15 @@ pub struct TerrainManager {
 }
 
 impl TerrainManager {
-    pub fn new() -> Self {
-        Self {
+    /// Note : A valid manager has at least one terrain
+    /// and it's crossable.
+    pub fn new(name: &str) -> Self {
+        let mut s = Self {
             max_used_id: 0,
             bi_map: BidirMap::new(),
-        }
+        };
+        s.with_terrain_crossable(name);
+        s
     }
 
     fn new_id(&mut self) -> i32 {
@@ -41,29 +45,29 @@ impl TerrainManager {
     pub fn with_terrain_crossable(
         &mut self,
         name: &str,
-    ) {
+    ) -> &mut Self {
         self.new_terrain(
             name,
             TerrainType::EntityMayCross,
-        );
+        )
     }
     pub fn with_terrain_attack_crossable(
         &mut self,
         name: &str,
-    ) {
+    ) -> &mut Self {
         self.new_terrain(
             name,
             TerrainType::AttackMayCross,
-        );
+        )
     }
     pub fn with_terrain_uncrossable(
         &mut self,
         name: &str,
-    ) {
+    ) -> &mut Self {
         self.new_terrain(
             name,
             TerrainType::NoneMayCross,
-        );
+        )
     }
     /// this returns a map where every terrain has a weight of one, so the
     /// attacks flings no matter the terrain except attacks through which
@@ -109,22 +113,19 @@ impl TerrainManager {
         &mut self,
         name: &str,
         _type: TerrainType,
-    ) {
+    ) -> &mut Self {
         let id = self.new_id();
         let t = Terrain {
             unique_id: id,
             name: name.into(),
             _type,
         };
-        self.bi_map
-            .insert(id, t)
-            .expect("tried to add an already existing terrain or id to the terrain manager");
-    }
-}
+        self.bi_map.insert(id, t).ok_or(()).expect_err(
+            "tried to add an already existing terrain\
+             or id to the terrain manager",
+        );
 
-impl Default for TerrainManager {
-    fn default() -> Self {
-        Self::new()
+        self
     }
 }
 
