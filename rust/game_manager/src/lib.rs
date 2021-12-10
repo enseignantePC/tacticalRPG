@@ -94,27 +94,54 @@ pub enum GameStatus {
     FightEnded,
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     use crate::on_the_map::Entity;
+#[cfg(test)]
+mod game_manager_tests {
+    use super::*;
+    use crate::on_the_map::Entity;
 
-//     fn basic_initialise_map() -> map::Map {
-//         map::Map::new(20, 20)
-//     }
-//     fn basic_initialise_game_manager() -> GameManager {
-//         let manager = GameManager::new();
-//         manager.initialise()
-//     }
-//     #[test]
-//     fn basic_test() {
-//         // initialize the game manager
-//         let mut gm = basic_initialise_game_manager();
-//         //  one player
-//         let result = gm.register_entity(Entity::example_entity(), &map::Pos2D::new(0, 0));
-//         result.unwrap();
-//         panic!()
-//     }
+    fn basic_initialise_map() -> map::Map {
+        map::Map::new(20, 20)
+    }
+    fn basic_initialise_game_manager() -> GameManager {
+        GameManager::new(basic_initialise_map())
+    }
+    #[test]
+    fn new() {
+        // initialize the game manager
+        let _gm = basic_initialise_game_manager();
+    }
+    #[test]
+    fn register_entity() {
+        // initialize the game manager
+        let mut gm = basic_initialise_game_manager();
+        //  one player
+        let result = gm.register_entity(
+            Entity::test_entity(None, None),
+            &map::Pos2D::new(0, 0),
+        );
+        result.unwrap();
+    }
+    // TODO fix bug where gm thinks entity is id n and entity thinks its id is not n
+    #[test]
+    fn cant_register_entity_at_same_pos() {
+        // initialize the game manager
+        let mut gm = basic_initialise_game_manager();
+        //  one player
+        let result = gm.register_entity(
+            Entity::test_entity(None, None),
+            &map::Pos2D::new(0, 0),
+        );
+        result.unwrap();
+        let result = gm.register_entity(
+            Entity::test_entity(None, None),
+            &map::Pos2D::new(0, 0),
+        );
+        if let Err(PositionOccupied) = result {
+        } else {
+            panic!("This should have resulted in an error!")
+        }
+    }
+}
 //     #[test]
 //     fn can_retrieve_choices_from_game_manager() {
 //         todo!()
