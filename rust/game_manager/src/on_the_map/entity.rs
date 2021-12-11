@@ -74,16 +74,17 @@ pub trait EntityIntern: Debug {
     // - ? a plethora of other stuff, should the logic be handled by the external source?
     // TODO : make this a more complex Range struct that can deal with some different logic
     // fn get_attack_ranges(&self) -> &[i32];
+    fn action_possible_to_intent(
+        &self,
+        action: Action,
+        context: SelectorResult,
+    ) -> Intent;
 }
-
 #[cfg(test)]
-impl Entity {
-    pub fn test_entity(
-        team_id: Option<i64>,
-        id: Option<i64>,
-    ) -> Self {
         #[derive(Debug)]
         struct Intern {}
+
+#[cfg(test)]
         impl EntityIntern for Intern {
             fn terrain_weights(&self) -> HashMap<Terrain, f32> {
                 panic!()
@@ -108,6 +109,13 @@ impl Entity {
             fn ranges_to_actions(&self) -> HashMap<Selector, Action> {
                 todo!()
             }
+
+    fn action_possible_to_intent(
+        &self,
+        action: Action,
+        context: SelectorResult,
+    ) -> Intent {
+        todo!()
         }
         Entity {
             team: TeamId::Team(team_id.unwrap_or(0)),

@@ -106,14 +106,29 @@ impl GameManager {
     ) -> Vec<Intent> {
         let mut result: Vec<Intent> = Vec::new();
         // TODO EXTRACT THERE ---------------------
-        let entity = self.entity_id_to_entity.get(entity_id).unwrap();
-        let _move: Vec<Intent> = self.map.get_valid_movements_for_entity(entity.clone());
-        let _attacks: Vec<Intent> = self.map.get_valid_attacks_for_entity(entity.clone());
-        let _objects: Vec<Intent> = self.map.get_valid_object_for_entity(entity.clone());
-        let _spells: Vec<Intent> = self.map.get_valid_spells_for_entity(entity.clone());
-        result.extend(_attacks);
-        result.extend(_objects);
-        result.extend(_spells);
+        let entity = self.entity_id_to_entity.get(entity_id).unwrap_or_else(|| {
+            panic!(
+                "Tried to get intents for entity with id:{:?}\
+            \nbut no such entity could be found",
+                entity_id
+            )
+        });
+        for (k, v) in entity.entity_intern.ranges_to_actions() {
+            if let Some(select_result) = k.select(&self.map) {
+                result.push(
+                    entity
+                        .entity_intern
+                        .action_possible_to_intent(v, select_result),
+                )
+            }
+        }
+        // let _move: Vec<Intent> = self.map.get_valid_movements_for_entity(entity.clone());
+        // let _attacks: Vec<Intent> = self.map.get_valid_attacks_for_entity(entity.clone());
+        // let _objects: Vec<Intent> = self.map.get_valid_object_for_entity(entity.clone());
+        // let _spells: Vec<Intent> = self.map.get_valid_spells_for_entity(entity.clone());
+        // result.extend(_attacks);
+        // result.extend(_objects);
+        // result.extend(_spells);
         result
     }
     /// make an entity declare an [Intent][super::turn_logic::Intent]

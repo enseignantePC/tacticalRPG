@@ -303,7 +303,7 @@ impl Map {
     fn get_actions_for_entity(
         &mut self,
         entity: Rc<Entity>,
-        terrain_manager: TerrainManager,
+        _terrain_manager: TerrainManager,
     ) -> Vec<(
         Action,
         SelectorResult,
@@ -315,9 +315,8 @@ impl Map {
         let x = entity.entity_intern.ranges_to_actions();
 
         for (selector, action) in x.into_iter() {
-            match selector.select(&self) {
-                Some(match_) => result.push((action, match_)),
-                None => {}
+            if let Some(match_) = selector.select(self) {
+                result.push((action, match_))
             }
         }
 
