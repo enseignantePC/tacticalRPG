@@ -75,36 +75,31 @@ impl GameManager {
         }
     }
 
-    pub fn register_entity(
+    pub fn register_entity_at_pos(
         &mut self,
-        entity: on_the_map::Entity,
+        entity: Box<dyn on_the_map::EntityIntern>,
+        team: TeamId,
         map_position: &map::Pos2D,
-    ) -> Result<EntityId, PositionOccupied> {
+    ) -> Result<Rc<Entity>, AccessPositionError> {
         // generate an id for the entity
         // check if the place on the map can accept the entity
         let entity_id = self.make_available_entity_id();
+        let entity = on_the_map::Entity {
+            team,
+            unique_id: entity_id,
+            entity_intern: entity,
+        };
         let entity = Rc::new(entity);
-        if self.map.can_entity_be_accepted_at_pos(map_position) {
+        self.map.register_entity_at_pos(
+            entity.clone(),
+            map_position,
+        )?;
             self.entity_id_to_entity.insert(
                 entity_id,
                 entity.clone(),
             );
-            self.map.register_entity_at_pos(entity, map_position)?;
-            return Ok(entity_id);
+        Ok(entity)
         }
-        Ok(entity_id)
-    }
-    /// TODO FIXDOC
-    /// generate valid inputs for entity
-    /// - what movements are okay
-    /// - what attacks are okay
-    /// - etc
-    ///
-    /// stores and return a hashmap of the form :
-    ///         unique id -> valid_intent
-    ///
-    /// input can then be submitted in the form of that unique id
-    /// via the method [GameManager.give_inputs_according_to_cache]
     pub fn get_valid_intents_for_entity(
         &mut self,
         entity_id: &EntityId,

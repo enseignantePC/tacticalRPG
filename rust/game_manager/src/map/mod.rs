@@ -9,15 +9,15 @@
 //! It uses a [map::Map] that wraps [DijkstraMap] to do the calculation and abstracts
 //! it so it can communicate with a [GameManager].
 
+use super::{on_the_map::*, Action, DijkstraMap, EntityId, Intent, Move, TeamId};
+use dijkstra_map::{Cost, PointId};
+use fnv::{FnvHashMap, FnvHashSet};
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,
     rc::Rc,
 };
-
-use crate::{on_the_map::*, Action, DijkstraMap, EntityId, Intent, Move, PositionOccupied, TeamId};
-use dijkstra_map::{Cost, PointId};
-use fnv::{FnvHashMap, FnvHashSet};
+use thiserror::Error;
 
 pub mod terrains;
 use terrains::*;
@@ -32,6 +32,8 @@ use select::*;
 pub struct Map {
     /// intern dijkstra_map
     dijkstra_map: DijkstraMap,
+    width: i32,
+    height: i32,
     /// pos to dijkstraPointId
     pos_to_dijkstra_point_id: FnvHashMap<Pos2D, dijkstra_map::PointId>,
     dijkstra_point_id_to_pos: FnvHashMap<dijkstra_map::PointId, Pos2D>,
@@ -41,15 +43,23 @@ pub struct Map {
     team_id_to_set_of_position_taken: FnvHashMap<TeamId, FnvHashSet<Pos2D>>,
 }
 
+#[derive(Error, Debug)]
+pub enum AccessPositionError {
+    #[error("Tried to add an entity at pos, but the position is occupied")]
+    PositionOccupied,
+    #[error("Tried to add an entity at pos, but the position is out of bounds")]
+    PositionOutOfBounds,
+}
+
 impl Map {
     pub fn new(
-        width: usize,
-        height: usize,
+        width: i32,
+        height: i32,
     ) -> Map {
         let mut dijkstra_map = DijkstraMap::new();
         let pos_to_dijkstra_point_id = dijkstra_map.add_square_grid(
-            width,
-            height,
+            width as usize,
+            height as usize,
             None,
             dijkstra_map::TerrainType::DefaultTerrain,
             None,
@@ -74,6 +84,8 @@ impl Map {
             entity_id_to_pos: FnvHashMap::default(),
             pos_to_occupant: FnvHashMap::default(),
             team_id_to_set_of_position_taken: FnvHashMap::default(),
+            width,
+            height,
         }
     }
     /// returns a bool according to wether adding an entity at pos is possible
@@ -98,13 +110,14 @@ impl Map {
         &mut self,
         entity: Rc<Entity>,
         position: &Pos2D,
-    ) -> Result<(), PositionOccupied> {
+    ) -> Result<(), AccessPositionError> {
         let team = entity.team;
         let id = entity.unique_id;
-        if self.entity_id_to_pos.get(&id).is_some() {
-            return Err(PositionOccupied);
+        if self.pos_to_occupant.contains_key(position) {
+            return Err(AccessPositionError::PositionOccupied);
+        } else if !self.in_bounds(position) {
+            return Err(AccessPositionError::PositionOutOfBounds);
         }
-
         self.entity_id_to_pos.insert(id, *position);
         self.pos_to_occupant.insert(
             *position,
@@ -412,10 +425,11 @@ impl Map {
         paths
     }
 
-    /// The idea behind this method is that you provide a description of the objects you want on the map
-    /// and it returns a slice of Positions.
-    pub fn select(&self) {
-        todo!()
+    pub fn in_bounds(
+        &self,
+        pos: &Pos2D,
+    ) -> bool {
+        pos.x >= 0 && pos.x <= self.width && pos.y >= 0 && pos.y <= self.height
     }
 
     // pub fn print_terrain(&self) {
