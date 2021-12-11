@@ -1,7 +1,11 @@
+//! # The game manager module.
+//!
 //! The most interesting structure here is the [GameManager].
 //! It is responsible of handling all the other module and making them work together
 //! to offer a good interface for dealing with the intern state of the game.
 use thiserror::Error;
+
+use crate::map::AccessPositionError;
 
 use super::*;
 use std::rc::Rc;
@@ -37,7 +41,7 @@ impl TeamId {
         }
     }
 }
-
+#[derive(Debug)]
 /// handles and connect everything
 pub struct GameManager {
     /// represents the world (2D grid) and everything that is on it.
@@ -236,17 +240,13 @@ impl GameManager {
     }
 }
 
-#[derive(Error, Debug)]
-#[error("Tried to add an entity at pos, but the position is occupied")]
-pub struct PositionOccupied;
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::on_the_map::Entity;
 
     fn basic_initialise_map() -> map::Map {
-        map::Map::new(20, 20)
+        map::Map::new(2, 2)
     }
     fn basic_initialise_game_manager() -> GameManager {
         GameManager::new(basic_initialise_map())
@@ -257,14 +257,16 @@ mod tests {
         let _gm = basic_initialise_game_manager();
     }
     #[test]
-    fn register_entity() {
+    fn can_register_one_entity() {
         // initialize the game manager
         let mut gm = basic_initialise_game_manager();
         //  one player
-        let result = gm.register_entity(
-            Entity::test_entity(None, None),
+        let result = gm.register_entity_at_pos(
+            Entity::test_entity_intern(),
+            TeamId::Loner,
             &map::Pos2D::new(0, 0),
         );
+        // dbg!(gm);
         result.unwrap();
     }
     // TODO fix bug where gm thinks entity is id n and entity thinks its id is not n
@@ -273,20 +275,70 @@ mod tests {
         // initialize the game manager
         let mut gm = basic_initialise_game_manager();
         //  one player
-        let result = gm.register_entity(
-            Entity::test_entity(None, None),
+        let result = gm
+            .register_entity_at_pos(
+                Entity::test_entity_intern(),
+                TeamId::Loner,
+            &map::Pos2D::new(0, 0),
+            )
+            .expect("should be feasible to add an entity");
+        dbg!(&gm);
+        let result = gm.register_entity_at_pos(
+            Entity::test_entity_intern(),
+            TeamId::Loner,
             &map::Pos2D::new(0, 0),
         );
-        result.unwrap();
-        let result = gm.register_entity(
-            Entity::test_entity(None, None),
-            &map::Pos2D::new(0, 0),
-        );
+        dbg!(gm);
         if let Err(PositionOccupied) = result {
+            // everything is fine
         } else {
-            panic!("This should have resulted in an error!")
+            panic!("Adding two entities at the same position should fail")
+        };
+    }
+    #[test]
+    fn can_register_entities_at_different_pos() {
+        let mut gm = basic_initialise_game_manager();
+        //  one player
+        gm.register_entity_at_pos(
+            Entity::test_entity_intern(),
+            TeamId::Loner,
+            &map::Pos2D::new(0, 0),
+        )
+        .unwrap();
+        gm.register_entity_at_pos(
+            Entity::test_entity_intern(),
+            TeamId::Loner,
+            &map::Pos2D::new(1, 0),
+        )
+        .unwrap();
+        gm.register_entity_at_pos(
+            Entity::test_entity_intern(),
+            TeamId::Loner,
+            &map::Pos2D::new(0, 1),
+        )
+        .unwrap();
+        gm.register_entity_at_pos(
+            Entity::test_entity_intern(),
+            TeamId::Loner,
+            &map::Pos2D::new(1, 1),
+        )
+        .unwrap();
+    }
+    #[test]
+    fn cant_register_entity_out_of_map() {
+        let mut gm = basic_initialise_game_manager();
+        //  one player
+        if let Err(AccessPositionError::PositionOutOfBounds) = gm.register_entity_at_pos(
+            Entity::test_entity_intern(),
+            TeamId::Loner,
+            &map::Pos2D::new(3, 0),
+        ) {
+            // all is fine
+        } else {
+            panic!("We should get an out of bounds!")
         }
     }
+    //test that when entity is moved, all fields are updated in consequence
 }
 //     #[test]
 //     fn can_retrieve_choices_from_game_manager() {

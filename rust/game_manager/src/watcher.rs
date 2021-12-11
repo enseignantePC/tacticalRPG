@@ -16,11 +16,36 @@ use super::*;
 /// be capable of watching the same events multiple times?
 ///
 /// TODO : add a way for event_watchers to signal they are not useful anymore (and can be dropped).
+
 pub struct Watcher {
     event_watchers: Vec<(
         EntityId,
         Box<dyn EventWatchers>,
     )>,
+}
+
+impl std::fmt::Debug for Watcher {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
+        let my_vec: Vec<String> = self
+            .event_watchers
+            .iter()
+            .map(|(id, _)| {
+                format!(
+                    "{:?} : Some Event Watcher",
+                    id
+                )
+            })
+            .collect();
+        f.debug_struct("Watcher")
+            .field(
+                "event_watchers",
+                &my_vec,
+            )
+            .finish()
+    }
 }
 
 impl Watcher {

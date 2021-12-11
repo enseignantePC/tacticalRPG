@@ -4,7 +4,10 @@
 
 use gdnative::core_types::ToVariant;
 
-use crate::{map::select::Selector, Action};
+use crate::{
+    map::select::{Selector, SelectorResult},
+    Action, Intent,
+};
 
 use super::*;
 
@@ -12,6 +15,9 @@ use super::*;
 /// play on the map.
 ///
 /// This is an interface between the [crate::GameManager]
+///
+/// Note : currently since every field is public, it's possible to create
+/// entities with invalid id ...
 #[derive(Debug)]
 pub struct Entity {
     pub team: TeamId,

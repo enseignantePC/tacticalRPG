@@ -92,7 +92,7 @@ impl TeamMask {
     /// excluded by a search with mask TeamMask.
     pub fn filter(
         &self,
-        team: TeamId,
+        _team: TeamId,
     ) -> bool {
         todo!()
     }

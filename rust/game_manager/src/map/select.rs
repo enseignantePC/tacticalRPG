@@ -112,7 +112,7 @@ impl Pattern {
             Either::Patterns(x) => (
                 x.iter()
                     .map(|y| y.select(depth_level + 1))
-                    .map(|(p, depth)| p)
+                    .map(|(p, _depth)| p)
                     .flatten()
                     .collect(),
                 depth_level + 1,

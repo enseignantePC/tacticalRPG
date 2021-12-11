@@ -1,6 +1,6 @@
-//! # Module map
+//! # the map module
 //!
-//! This module keeps information about :
+//! It provides the [Map] type that keeps information about :
 //! - the form of the world, what is connected to what etc
 //! - what is it made of (TerrainType)
 //! - where each of the entity is.
