@@ -81,34 +81,34 @@ pub trait EntityIntern: Debug {
     ) -> Intent;
 }
 #[cfg(test)]
-        #[derive(Debug)]
-        struct Intern {}
+#[derive(Debug)]
+struct Intern {}
 
 #[cfg(test)]
-        impl EntityIntern for Intern {
-            fn terrain_weights(&self) -> HashMap<Terrain, f32> {
-                panic!()
-            }
+impl EntityIntern for Intern {
+    fn terrain_weights(&self) -> HashMap<Terrain, f32> {
+        panic!()
+    }
 
-            fn move_force(&self) -> f32 {
-                panic!()
-            }
+    fn move_force(&self) -> f32 {
+        panic!()
+    }
 
-            fn damage_reduction_factor(&self) -> f64 {
-                panic!()
-            }
+    fn damage_reduction_factor(&self) -> f64 {
+        panic!()
+    }
 
-            fn initiative(&self) -> f64 {
-                todo!()
-            }
+    fn initiative(&self) -> f64 {
+        todo!()
+    }
 
-            fn can_play(&self) -> bool {
-                todo!()
-            }
+    fn can_play(&self) -> bool {
+        todo!()
+    }
 
-            fn ranges_to_actions(&self) -> HashMap<Selector, Action> {
-                todo!()
-            }
+    fn ranges_to_actions(&self) -> HashMap<Selector, Action> {
+        todo!()
+    }
 
     fn action_possible_to_intent(
         &self,
@@ -116,11 +116,22 @@ pub trait EntityIntern: Debug {
         context: SelectorResult,
     ) -> Intent {
         todo!()
-        }
+    }
+}
+
+#[cfg(test)]
+impl Entity {
+    pub fn test_entity(
+        team_id: Option<i64>,
+        id: Option<i64>,
+    ) -> Self {
         Entity {
             team: TeamId::Team(team_id.unwrap_or(0)),
             unique_id: EntityId(id.unwrap_or(0)),
             entity_intern: Box::new(Intern {}),
         }
+    }
+    pub fn test_entity_intern() -> Box<dyn EntityIntern> {
+        Box::new(Intern {})
     }
 }

@@ -94,12 +94,12 @@ impl GameManager {
             entity.clone(),
             map_position,
         )?;
-            self.entity_id_to_entity.insert(
-                entity_id,
-                entity.clone(),
-            );
+        self.entity_id_to_entity.insert(
+            entity_id,
+            entity.clone(),
+        );
         Ok(entity)
-        }
+    }
     pub fn get_valid_intents_for_entity(
         &mut self,
         entity_id: &EntityId,
@@ -289,7 +289,7 @@ mod tests {
             .register_entity_at_pos(
                 Entity::test_entity_intern(),
                 TeamId::Loner,
-            &map::Pos2D::new(0, 0),
+                &map::Pos2D::new(0, 0),
             )
             .expect("should be feasible to add an entity");
         dbg!(&gm);
