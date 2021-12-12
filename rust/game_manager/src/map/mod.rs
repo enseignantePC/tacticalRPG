@@ -199,43 +199,22 @@ impl Map {
     }
 
     // TESTME
-    pub fn get_valid_movements_for_entity(
-        &mut self,
-        entity: Rc<Entity>,
-    ) -> Vec<Intent> {
-        let mut result = Vec::new();
-        for path in self.get_valid_paths_for_entity(entity.clone()) {
-            let intent = Intent {
-                action: Action::Move(Move { path }),
-                // TODO : priority system
-                priority: 0,
-                entity: entity.clone(),
-            };
-            result.push(intent);
-        }
-        result
-    }
-
-    pub fn get_valid_attacks_for_entity(
-        &self,
-        _entity: Rc<Entity>,
-    ) -> Vec<Intent> {
-        todo!()
-    }
-
-    pub fn get_valid_object_for_entity(
-        &self,
-        _entity: Rc<Entity>,
-    ) -> Vec<Intent> {
-        todo!()
-    }
-
-    pub fn get_valid_spells_for_entity(
-        &self,
-        _entity: Rc<Entity>,
-    ) -> Vec<Intent> {
-        todo!()
-    }
+    // pub fn get_valid_movements_for_entity(
+    //     &mut self,
+    //     entity: Rc<Entity>,
+    // ) -> Vec<Intent> {
+    //     let mut result = Vec::new();
+    //     for path in self.get_valid_paths_for_entity(entity.clone()) {
+    //         let intent = Intent {
+    //             action: Action::Move(Move { path }),
+    //             // TODO : priority system
+    //             priority: 0,
+    //             entity: entity.clone(),
+    //         };
+    //         result.push(intent);
+    //     }
+    //     result
+    // }
 
     /// Computes where an entity might go by what path and return the path in the form of
     /// a list of path to get to reachable position excluding the first position where the entity is standing.
@@ -249,118 +228,81 @@ impl Map {
     /// - as end points if entities are on the same team
     /// - as end points and travel points, if [Occupant] cannot be crossed
 
-    fn get_valid_paths_for_entity(
-        &mut self,
-        entity: Rc<Entity>,
-    ) -> Vec<Vec<Pos2D>> {
-        //store all points belonging to other teams
-        // if loner, adds all point belonging to team except pos of entity
+    // fn get_valid_paths_for_entity(
+    //     &mut self,
+    //     entity: Rc<Entity>,
+    // ) -> Vec<Vec<Pos2D>> {
+    //     //store all points belonging to other teams
+    //     // if loner, adds all point belonging to team except pos of entity
 
-        let points_that_cannot_be_crossed = self.get_uncrossable_points_for_entity(entity.clone());
-        self.enable_all_dijkstra_points();
+    //     let points_that_cannot_be_crossed = self.get_uncrossable_points_for_entity(entity.clone());
+    //     self.enable_all_dijkstra_points();
 
-        for k in &points_that_cannot_be_crossed {
-            self.dijkstra_map.disable_point(*k).unwrap();
-        }
+    //     for k in &points_that_cannot_be_crossed {
+    //         self.dijkstra_map.disable_point(*k).unwrap();
+    //     }
 
-        self.recalculates_dijkstra_map_for_entity_with_force(
-            entity.clone(),
-            entity.entity_intern.move_force(),
-            entity.entity_intern.terrain_weights(),
-        );
+    //     self.recalculates_dijkstra_map_at_pos_with_force(
+    //         entity.clone(),
+    //         entity.entity_intern.move_force(),
+    //         entity.entity_intern.terrain_weights(),
+    //     );
 
-        let end_points_available = self.points_available_filters_end_position(entity);
+    //     let end_points_available = self.points_available_filters_end_position(entity);
 
-        self.end_points_ids_to_paths_to_end_points(end_points_available.as_slice())
-    }
+    //     self.end_points_ids_to_paths_to_end_points(end_points_available.as_slice())
+    // }
 
     /// all points you can get to
     /// minus where ur teammates are
     /// TODO : test me
-    fn points_available_filters_end_position(
-        &mut self,
-        entity: Rc<Entity>,
-    ) -> Vec<PointId> {
-        let end_points_available: Vec<PointId> = self
-            .dijkstra_map
-            .get_all_points_with_cost_between(
-                Cost(0f32),
-                Cost(entity.entity_intern.move_force()),
-            )
-            .iter()
-            .filter(|&x| {
-                let x = self.dijkstra_point_id_to_pos.get(x).unwrap();
-                self.team_id_to_set_of_position_taken
-                    .get(&entity.team)
-                    .unwrap()
-                    .contains(x)
-            })
-            .copied()
-            .collect();
-        end_points_available
-    }
+    // fn points_available_filters_end_position(
+    //     &mut self,
+    //     entity: Rc<Entity>,
+    // ) -> Vec<PointId> {
+    //     let end_points_available: Vec<PointId> = self
+    //         .dijkstra_map
+    //         .get_all_points_with_cost_between(
+    //             Cost(0f32),
+    //             Cost(entity.entity_intern.move_force()),
+    //         )
+    //         .iter()
+    //         .filter(|&x| {
+    //             let x = self.dijkstra_point_id_to_pos.get(x).unwrap();
+    //             self.team_id_to_set_of_position_taken
+    //                 .get(&entity.team)
+    //                 .unwrap()
+    //                 .contains(x)
+    //         })
+    //         .copied()
+    //         .collect();
+    //     end_points_available
+    // }
 
     /// Returns every matching ranges where the entity can do something
     /// It serves as a choice provider for entities.
-    fn get_actions_for_entity(
-        &mut self,
-        entity: Rc<Entity>,
-        _terrain_manager: TerrainManager,
-    ) -> Vec<(
-        Action,
-        SelectorResult,
-    )> {
-        let mut result: Vec<(
-            Action,
-            SelectorResult,
-        )> = Vec::new();
-        let x = entity.entity_intern.ranges_to_actions();
+    // fn get_actions_for_entity(
+    //     &mut self,
+    //     entity: Rc<Entity>,
+    //     _terrain_manager: TerrainManager,
+    // ) -> Vec<(
+    //     Action,
+    //     SelectorResult,
+    // )> {
+    //     let mut result: Vec<(
+    //         Action,
+    //         SelectorResult,
+    //     )> = Vec::new();
+    //     let x = entity.entity_intern.selector_map();
 
-        for (selector, action) in x.into_iter() {
-            if let Some(match_) = selector.select(self) {
-                result.push((action, match_))
-            }
-        }
-
-        // for this_range in entity.entity_intern.get_attack_ranges() {
-        //     self.recalculates_dijkstra_map_for_entity_with_force(
-        //         entity.clone(),
-        //         *this_range as f32,
-        //         // this should be a map where every terrain has a weight of one, so the attacks flings no matter the terrain
-        //         // OR, we could forbid walls, or other terrain, anyway, needs thinking
-        //         terrain_manager.terrain_weight_for_attacks(),
-        //     );
-        //     let end_points_available = self.dijkstra_map.get_all_points_with_cost_between(
-        //         Cost(0f32),
-        //         Cost(entity.entity_intern.move_force()),
-        //     );
-
-        //     for end_point in end_points_available {
-        //         // pour chaque position
-        //         let end_point = *self.dijkstra_point_id_to_pos.get(end_point).unwrap();
-        //         // si il y a personne, continue
-        //         if self.pos_to_occupant.get(&end_point).is_none() {
-        //             continue;
-        //         }
-        //         let occupant = self.pos_to_occupant.get(&end_point).unwrap();
-        //         // si il y a un loner, on garde toutes les positions
-
-        //         if let Occupant::Entity(e) = occupant {
-        //             // get all set except the one of entity.team
-        //             if entity.team.can_fight(&e.team) {
-        //                 result.push((
-        //                     end_point,
-        //                     e.unique_id,
-        //                 ))
-        //             } else {
-        //                 continue;
-        //             }
+    //     for (selector, action) in x.into_iter() {
+    //         if let Some(match_) = selector.select(self) {
+    //             result.push((action, match_))
         //         }
         //     }
+
+    //     todo!()
         // }
-        // result
-        todo!()
-    }
 
     fn enable_all_dijkstra_points(&mut self) {
         for k in self.pos_to_dijkstra_point_id.values() {
@@ -387,19 +329,18 @@ impl Map {
         uncrossable_points
     }
     /// given a `force`, rebakes the [DijkstraMap] for an entity
-    fn recalculates_dijkstra_map_for_entity_with_force(
+    fn recalculates_dijkstra_map_at_pos_with_force(
         &mut self,
-        entity: Rc<Entity>,
+        position: &Pos2D,
         force: f32,
-        terrain_weights: HashMap<Terrain, f32>,
+        terrain_weights: &HashMap<Terrain, f32>,
     ) {
-        let position = self.entity_id_to_pos.get(&entity.unique_id).unwrap();
         self.dijkstra_map.recalculate(
             &[*self.pos_to_dijkstra_point_id.get(position).unwrap()],
             None,
             Some(Cost(force)),
             Vec::new(),
-            terrains::terrain_weights_to_dijkstra_terrain_weight(&terrain_weights),
+            terrains::terrain_weights_to_dijkstra_terrain_weight(terrain_weights),
             FnvHashSet::default(),
         );
     }

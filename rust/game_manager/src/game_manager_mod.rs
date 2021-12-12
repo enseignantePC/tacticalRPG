@@ -284,8 +284,7 @@ mod tests {
         // initialize the game manager
         let mut gm = basic_initialise_game_manager();
         //  one player
-        let result = gm
-            .register_entity_at_pos(
+        gm.register_entity_at_pos(
                 Entity::test_entity_intern(),
                 TeamId::Loner,
                 &map::Pos2D::new(0, 0),
