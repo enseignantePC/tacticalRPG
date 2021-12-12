@@ -16,20 +16,20 @@ pub use entity::*;
 /// interactive object present on the map that any entity can interact with
 /// (interrupter, usable etc, card to collection, ammo, new weapons)
 /// ? should the logic be handled outside of the game via a kind of signal? sounds like a good idea
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Object {}
 
 /// movable or destructible (or intractable?) obstacle on the map
 ///
 /// destructible walls, traps
 /// ? should the logic be handled outside of the game via a kind of signal? sounds like a good idea
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Obstacle {}
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// everything interactive that can be in the world and will be stored by the map
 pub enum Occupant {
-    Entity(Rc<Entity>),
+    Entity(EntityId),
     Obstacle(Obstacle),
     Object(Object),
 }

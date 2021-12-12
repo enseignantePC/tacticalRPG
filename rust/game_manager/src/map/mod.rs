@@ -123,7 +123,7 @@ impl Map {
         self.entity_id_to_pos.insert(id, *position);
         self.pos_to_occupant.insert(
             *position,
-            Occupant::Entity(entity),
+            Occupant::Entity(id),
         );
 
         self.team_id_to_set_of_position_taken
