@@ -28,14 +28,14 @@ pub struct Selector {
 impl Selector {
     pub fn select(
         self,
-        map: &Map,
+        map: &mut Map,
     ) -> Option<SelectorResult> {
         let Selector {
             excluded_entity,
             team_mask,
             pattern,
         }: Selector = self;
-        let (result, _) = pattern.select(0);
+        let result = pattern.select(map);
         todo!()
     }
 }
@@ -83,7 +83,12 @@ pub enum PatternKind {
     // yield the points that are between min_dist_from_point
     // and min_dist_from_point + len
     // on the [DijkstraMap]
-    DijkstraCross(i32, u32, TerrainMap),
+    Dijkstra(
+        f32,
+        f32,
+        TerrainMap,
+        Mask,
+    ),
     /// the shape, described as a set of position
     /// everything in the shape, around the current point will be selected.
     Shape(Vec<Pos2D>),
@@ -100,41 +105,111 @@ pub enum PatternKind {
 }
 
 impl PatternKind {
+    /// TODO : this actually does the work only for entity! what happens if you match an occupant,
+    /// TODO : it should deal with that too!
     fn select(
         &self,
-        pos: &Pos2D,
-    ) -> Vec<PatternResult> {
+        position: &Pos2D,
+        map: &mut Map,
+    ) -> PatternResult {
         match self {
-            PatternKind::DijkstraCross(_, _, _) => todo!(),
-            PatternKind::Shape(_) => todo!(),
-            PatternKind::Direction => todo!(),
+            PatternKind::Dijkstra(min_dist, dist_len, terrain_map, mask) => {
+                let mut to_return = PatternResult {
+                    position_matches: vec![],
+                    entity_matches: vec![],
+                };
+                map.recalculates_dijkstra_map_at_pos_with_force(
+                    position,
+                    min_dist + dist_len,
+                    terrain_map,
+                );
+                // disable every forbidden points so they cannot be crossed nor selected
+                mask.mask(map);
+
+                for point in map.dijkstra_map.get_all_points_with_cost_between(
+                    Cost(*min_dist),
+                    Cost(min_dist + dist_len),
+                ) {
+                    let pos_match = map.dijkstra_point_id_to_pos.get(point).expect(
+                        "Could get an id for a non existent position in the \
+                        map from a selector, this should not be possible for a map",
+                    );
+                    to_return.position_matches.push(*pos_match);
+                    let occupant = map.pos_to_occupant.get(pos_match);
+                    if let Some(Occupant::Entity(x)) = occupant {
+                        to_return.entity_matches.push((
+                            x.unique_id,
+                            *pos_match,
+                        ));
+                    }
+                }
+                to_return
+            }
+            PatternKind::Shape(shape_positions) => {
+                let mut to_return = PatternResult {
+                    position_matches: vec![],
+                    entity_matches: vec![],
+                };
+                for each_pos in shape_positions {
+                    let next_pos = each_pos + position;
+                    update_result_with_occupant_at_pos(
+                        map,
+                        &next_pos,
+                        &mut to_return,
+                    );
+                }
+                to_return
+            }
+            PatternKind::Direction => {
+                // get the position via  Dijkstra and then check if they are always
+                // in the same direction?
+                todo!()
+            }
             PatternKind::Closure => todo!(),
         }
     }
 }
 
+/// TODO this is where something more general should be made so
+/// TODO occupant will not be ignored if they are not entity.
+fn update_result_with_occupant_at_pos(
+    map: &mut Map,
+    pos_match: &Pos2D,
+    to_return: &mut PatternResult,
+) {
+    let occupant = map.pos_to_occupant.get(pos_match);
+    if let Some(Occupant::Entity(x)) = occupant {
+        to_return.entity_matches.push((
+            x.unique_id,
+            *pos_match,
+        ));
+    }
+}
+
+/// returns a vec of patterns result, the last result
+/// in the vector are the deepest one.
 impl Pattern {
     fn select(
         &self,
-        depth_level: i32,
-    ) -> (
-        Vec<PatternResult>,
-        i32,
-    ) {
+        map: &mut Map,
+    ) -> HashMap<i32, Vec<PatternResult>> {
         match &self.relative {
-            Either::Pos(pos) => (
-                self.kind.select(pos),
-                depth_level,
-            ),
+            Either::Pos(pos) => {
+                let result = HashMap::new();
+                result.insert(
+                    0,
+                    vec![self.kind.select(pos, map)],
+                );
+                result
+            }
             // !TODO! This is probably logically wrong
-            Either::Patterns(x) => (
-                x.iter()
-                    .map(|y| y.select(depth_level + 1))
-                    .map(|(p, _depth)| p)
-                    .flatten()
-                    .collect(),
-                depth_level + 1,
-            ),
+            Either::Patterns(inner_patterns) => {
+                let stack: Vec<PatternResult>;
+                for k in inner_patterns {
+                    let res = k.select(map);
+                }
+                todo!()
+            }
         }
     }
 }
@@ -156,5 +231,5 @@ pub struct SelectorResult;
 /// TODO : it should deal with that too!
 struct PatternResult {
     position_matches: Vec<Pos2D>,
-    entity_matches: Vec<(EntityId, Pos2D)>,
+    entity_matches: Vec<(Occupant, Pos2D)>,
 }

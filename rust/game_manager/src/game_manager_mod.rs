@@ -285,11 +285,11 @@ mod tests {
         let mut gm = basic_initialise_game_manager();
         //  one player
         gm.register_entity_at_pos(
-                Entity::test_entity_intern(),
-                TeamId::Loner,
-                &map::Pos2D::new(0, 0),
-            )
-            .expect("should be feasible to add an entity");
+            Entity::test_entity_intern(),
+            TeamId::Loner,
+            &map::Pos2D::new(0, 0),
+        )
+        .expect("should be feasible to add an entity");
         dbg!(&gm);
         let result = gm.register_entity_at_pos(
             Entity::test_entity_intern(),
