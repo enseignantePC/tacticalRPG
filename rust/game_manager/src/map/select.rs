@@ -61,6 +61,24 @@ enum Either {
     Patterns(Vec<Pattern>),
 }
 
+/// Describing what occupant should not be
+/// selected (and their position should be disabled)
+/// while performing a search
+pub enum Mask {
+    OnlyEntities(Option<TeamMask>),
+}
+
+impl Mask {
+    /// disable all the points that shouldn't be included in the search,
+    /// this can be because it contains entity from team X for example
+    pub fn mask(
+        &self,
+        map: &mut Map,
+    ) {
+        todo!()
+    }
+}
+
 pub enum PatternKind {
     // yield the points that are between min_dist_from_point
     // and min_dist_from_point + len

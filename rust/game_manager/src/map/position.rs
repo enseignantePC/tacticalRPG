@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 use super::*;
 use gdnative::prelude::*;
 // pub mod dijkstra;
@@ -30,5 +32,16 @@ impl ToVariant for Pos2D {
         dict.insert("x", self.x);
         dict.insert("y", self.y);
         Variant::from_dictionary(&dict.into_shared())
+    }
+}
+
+impl Add for &Pos2D {
+    type Output = Pos2D;
+
+    fn add(
+        self,
+        rhs: Self,
+    ) -> Self::Output {
+        Pos2D(self.0 + rhs.0)
     }
 }

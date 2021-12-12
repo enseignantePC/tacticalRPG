@@ -5,7 +5,10 @@
 
 use std::{collections::HashMap, fmt::Debug, rc::Rc};
 
-use crate::{map::terrains::Terrain, EntityId, TeamId};
+use crate::{
+    map::{terrains::Terrain, Map},
+    EntityId, TeamId,
+};
 
 pub mod entity;
 pub use entity::*;
@@ -94,6 +97,13 @@ impl TeamMask {
         &self,
         _team: TeamId,
     ) -> bool {
+        todo!()
+    }
+    /// disable points in the map that shouldn't be crossed while searching with current team mask
+    pub fn mask(
+        &self,
+        map: &mut Map,
+    ) {
         todo!()
     }
 }
