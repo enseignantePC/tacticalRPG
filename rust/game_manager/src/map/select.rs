@@ -133,6 +133,9 @@ pub struct SelectorResult;
 /// it got along the way.
 /// - Every position matching the query
 /// - Every EntityId matching the query
+///
+/// TODO : this actually does the work only for entity! what happens if you match an occupant,
+/// TODO : it should deal with that too!
 struct PatternResult {
     position_matches: Vec<Pos2D>,
     entity_matches: Vec<(EntityId, Pos2D)>,

@@ -226,7 +226,7 @@ impl GameManager {
         world_changes
     }
     /// submit an intent, call the intent watchers on that intent
-    /// and does the same for every intention yielded by the intent[Watcher], recursively
+    /// and does the same for every intention yielded by the (IntentWatcher)[Watcher], recursively
     fn submit_intent_and_responses(
         &mut self,
         next_intent: Intent,

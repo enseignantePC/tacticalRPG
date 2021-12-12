@@ -8,6 +8,8 @@
 //!
 //! It uses a [map::Map] that wraps [DijkstraMap] to do the calculation and abstracts
 //! it so it can communicate with a [GameManager].
+//!
+//! At one point I'd like to remove a maximum of reference to [Entity] in the methods of map.
 
 use super::{on_the_map::*, Action, DijkstraMap, EntityId, Intent, Move, TeamId};
 use dijkstra_map::{Cost, PointId};

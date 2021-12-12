@@ -24,7 +24,7 @@ pub enum Action {
 #[derive(PartialEq, Clone, Debug)]
 pub struct Move {
     /// every position the entity will cross to get to their final point,
-    ///     excluding where they are now
+    ///     including where they are now
     ///     ending where they will end
     pub path: Vec<Pos2D>,
 }

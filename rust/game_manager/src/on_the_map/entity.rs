@@ -65,8 +65,10 @@ pub trait EntityIntern: Debug {
     /// ! but they are blocked? ...
     fn can_play(&self) -> bool;
     /// This is how an entity communicate what actions they can do,
-    /// what range they provide etc.
-    fn ranges_to_actions(&self) -> HashMap<Selector, Action>;
+    /// they provide a map from [Selector] to [Action].
+    /// if the selector match, the entity will be able to choose the action
+    /// as an intent (but it needs to go through [EntityIntern::action_possible_to_intent] first)
+    fn selector_map(&self) -> HashMap<Selector, Action>;
     // At what distance(s) the entity can strike
     // currently broken but should depend on
     // - the weapon
@@ -74,6 +76,10 @@ pub trait EntityIntern: Debug {
     // - ? a plethora of other stuff, should the logic be handled by the external source?
     // TODO : make this a more complex Range struct that can deal with some different logic
     // fn get_attack_ranges(&self) -> &[i32];
+
+    /// This function is called on actions that can be chosen by the entity
+    /// It makes these action intent's and can use the context in which these actions
+    /// were selected to choose how (for instance the [Intent.priority])
     fn action_possible_to_intent(
         &self,
         action: Action,
