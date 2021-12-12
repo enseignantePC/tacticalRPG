@@ -105,7 +105,6 @@ impl GameManager {
         entity_id: &EntityId,
     ) -> Vec<Intent> {
         let mut result: Vec<Intent> = Vec::new();
-        // TODO EXTRACT THERE ---------------------
         let entity = self.entity_id_to_entity.get(entity_id).unwrap_or_else(|| {
             panic!(
                 "Tried to get intents for entity with id:{:?}\
@@ -113,8 +112,8 @@ impl GameManager {
                 entity_id
             )
         });
-        for (k, v) in entity.entity_intern.ranges_to_actions() {
-            if let Some(select_result) = k.select(&self.map) {
+        for (k, v) in entity.entity_intern.selector_map() {
+            if let Some(select_result) = k.select(&mut self.map) {
                 result.push(
                     entity
                         .entity_intern

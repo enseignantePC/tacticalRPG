@@ -112,14 +112,14 @@ impl EntityIntern for Intern {
         todo!()
     }
 
-    fn ranges_to_actions(&self) -> HashMap<Selector, Action> {
+    fn selector_map(&self) -> HashMap<Selector, Action> {
         todo!()
     }
 
     fn action_possible_to_intent(
         &self,
-        action: Action,
-        context: SelectorResult,
+        _action: Action,
+        _context: SelectorResult,
     ) -> Intent {
         todo!()
     }
