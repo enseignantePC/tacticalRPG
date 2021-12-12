@@ -18,7 +18,7 @@ pub struct Selector {
     /// useful for [TeamId::Loner] so they cannot target themselves...
     excluded_entity: Vec<EntityId>,
     /// A descriptor of which team to match
-    team_mask: TeamMask,
+    mask: Mask,
     /// Each of this range will be checked for the position
     /// and the matches returned, possibly with duplicates
     /// that means the target counts multiple times.
@@ -32,10 +32,10 @@ impl Selector {
     ) -> Option<SelectorResult> {
         let Selector {
             excluded_entity,
-            team_mask,
+            mask,
             pattern,
-        }: Selector = self;
-        let result = pattern.select(map);
+        } = self;
+        let result = pattern.select(map, &mask);
         todo!()
     }
 }
@@ -77,18 +77,20 @@ impl Mask {
     ) {
         todo!()
     }
+    /// returns wether an occupant should be kept with the mask
+    pub fn accept_occupant(
+        &self,
+        occupant: &Occupant,
+    ) -> bool {
+        todo!()
+    }
 }
 
 pub enum PatternKind {
     // yield the points that are between min_dist_from_point
     // and min_dist_from_point + len
     // on the [DijkstraMap]
-    Dijkstra(
-        f32,
-        f32,
-        TerrainMap,
-        Mask,
-    ),
+    Dijkstra(f32, f32, TerrainMap),
     /// the shape, described as a set of position
     /// everything in the shape, around the current point will be selected.
     Shape(Vec<Pos2D>),
@@ -111,9 +113,10 @@ impl PatternKind {
         &self,
         position: &Pos2D,
         map: &mut Map,
+        mask: &Mask,
     ) -> PatternResult {
         match self {
-            PatternKind::Dijkstra(min_dist, dist_len, terrain_map, mask) => {
+            PatternKind::Dijkstra(min_dist, dist_len, terrain_map) => {
                 let mut to_return = PatternResult {
                     position_matches: vec![],
                     entity_matches: vec![],
@@ -136,11 +139,13 @@ impl PatternKind {
                     );
                     to_return.position_matches.push(*pos_match);
                     let occupant = map.pos_to_occupant.get(pos_match);
-                    if let Some(Occupant::Entity(x)) = occupant {
-                        to_return.entity_matches.push((
-                            x.unique_id,
-                            *pos_match,
-                        ));
+                    if let Some(occupant) = occupant {
+                        if mask.accept_occupant(occupant) {
+                            to_return.entity_matches.push((
+                                (*occupant).clone(),
+                                *pos_match,
+                            ))
+                        }
                     }
                 }
                 to_return
@@ -152,11 +157,13 @@ impl PatternKind {
                 };
                 for each_pos in shape_positions {
                     let next_pos = each_pos + position;
-                    update_result_with_occupant_at_pos(
-                        map,
-                        &next_pos,
-                        &mut to_return,
-                    );
+                    let occupant = map.pos_to_occupant.get(&next_pos);
+                    if occupant.is_some() && mask.accept_occupant(occupant.unwrap()) {
+                        to_return.entity_matches.push((
+                            (*occupant.unwrap()).clone(),
+                            next_pos,
+                        ))
+                    }
                 }
                 to_return
             }
@@ -170,35 +177,20 @@ impl PatternKind {
     }
 }
 
-/// TODO this is where something more general should be made so
-/// TODO occupant will not be ignored if they are not entity.
-fn update_result_with_occupant_at_pos(
-    map: &mut Map,
-    pos_match: &Pos2D,
-    to_return: &mut PatternResult,
-) {
-    let occupant = map.pos_to_occupant.get(pos_match);
-    if let Some(Occupant::Entity(x)) = occupant {
-        to_return.entity_matches.push((
-            x.unique_id,
-            *pos_match,
-        ));
-    }
-}
-
 /// returns a vec of patterns result, the last result
 /// in the vector are the deepest one.
 impl Pattern {
     fn select(
         &self,
         map: &mut Map,
+        mask: &Mask,
     ) -> HashMap<i32, Vec<PatternResult>> {
         match &self.relative {
             Either::Pos(pos) => {
-                let result = HashMap::new();
+                let mut result = HashMap::new();
                 result.insert(
                     0,
-                    vec![self.kind.select(pos, map)],
+                    vec![self.kind.select(pos, map, mask)],
                 );
                 result
             }
@@ -206,7 +198,7 @@ impl Pattern {
             Either::Patterns(inner_patterns) => {
                 let stack: Vec<PatternResult>;
                 for k in inner_patterns {
-                    let res = k.select(map);
+                    let res = k.select(map, mask);
                 }
                 todo!()
             }
