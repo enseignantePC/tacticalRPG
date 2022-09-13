@@ -100,18 +100,13 @@ impl GameManager {
         );
         Ok(entity)
     }
+
     pub fn get_valid_intents_for_entity(
         &mut self,
         entity_id: &EntityId,
     ) -> Vec<Intent> {
         let mut result: Vec<Intent> = Vec::new();
-        let entity = self.entity_id_to_entity.get(entity_id).unwrap_or_else(|| {
-            panic!(
-                "Tried to get intents for entity with id:{:?}\
-            \nbut no such entity could be found",
-                entity_id
-            )
-        });
+        let entity = self.entity_id_to_entity.get(entity_id).unwrap();
         for (k, v) in entity.entity_intern.selector_map() {
             if let Some(select_result) = k.select(&mut self.map) {
                 result.push(
@@ -147,7 +142,7 @@ impl GameManager {
             match next_intent {
                 Ok(_) => {
                     let next_intent = next_intent.unwrap();
-                    let world_change = self.realise_intent(&next_intent);
+                    let world_change = self.realize_intent(&next_intent);
                     // stores the change for historic purposes
                     self.world_changes.extend(world_change.clone());
                     // watch the change
@@ -211,7 +206,7 @@ impl GameManager {
 
     /// this method transform an [Intent] into a [WorldChange]s
     /// and stores it in [GameManager.world_changes]
-    fn realise_intent(
+    fn realize_intent(
         &mut self,
         next_intent: &Intent,
     ) -> Vec<WorldChange> {
@@ -297,7 +292,7 @@ mod tests {
             &map::Pos2D::new(0, 0),
         );
         dbg!(gm);
-        if let Err(PositionOccupied) = result {
+        if let Err(map::AccessPositionError::PositionOccupied) = result {
             // everything is fine
         } else {
             panic!("Adding two entities at the same position should fail")

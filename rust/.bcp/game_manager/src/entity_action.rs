@@ -34,7 +34,7 @@ pub struct Attack {
     pub _type: AttackType,
     pub strength: f64,
     pub crit_chance: f32,
-    pub target: EntityId,
+    // pub target: EntityId,
 }
 
 /// This describes the type of attacks that exist in the game,
@@ -72,7 +72,7 @@ impl Action {
                 _type: AttackType::Base,
                 strength: 5f64,
                 crit_chance: 0f32,
-                target: EntityId(0),
+                // target: EntityId(0),
             }),
             ActionKind::Move => Action::Move(Move {
                 path: vec![Pos2D::new(0, 2), Pos2D::new(0, 1)],

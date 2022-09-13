@@ -2,6 +2,7 @@
 //! You should think of entities as the only "alive" thing on the map
 // TODO branch note: this should be the game_manager_wrapper_of a entity_intern that is a trait
 
+pub mod entity_implementations;
 use gdnative::core_types::ToVariant;
 
 use crate::{

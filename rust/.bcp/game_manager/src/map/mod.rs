@@ -346,7 +346,7 @@ impl Map {
     }
     /// ! if the dji map hasn't been precalculated, this returns empty array
     /// the paths returned doesn't include the point at which the entity is
-    fn end_points_ids_to_paths_to_end_points(
+    fn id_to_path_to_id(
         &self,
         end_points_available: &[PointId],
     ) -> Vec<Vec<Pos2D>> {

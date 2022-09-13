@@ -109,14 +109,14 @@ pub trait EventWatchers {
     fn watch(
         &self,
         own_entity: &Entity,
-        intent_analysed: &Intent,
+        intent_analyzed: &Intent,
     ) -> bool;
     /// When an intent triggers a reaction, the watcher must updates itself and its entity
     /// and issue an intent as a reaction
     fn react(
         &self,
         own_entity: &Entity,
-        intent_analysed: &Intent,
+        intent_analyzed: &Intent,
     ) -> Intent;
 }
 

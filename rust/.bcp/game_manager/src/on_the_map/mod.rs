@@ -55,7 +55,7 @@ impl OccupantMask {
             OccupantMask::AllExcept(v) => {
                 for occupant_mask in v.iter() {
                     if let OccupantMask::AllExcept(_occupant_masks) = occupant_mask {
-                        panic!("Nested OccupantMask::AllExcept dont have meaning")
+                        panic!("Nested OccupantMask::AllExcept don't make sense")
                     };
                 }
                 !v.iter().any(|x| x.select(occupant))
@@ -84,6 +84,7 @@ impl OccupantMask {
 
 /// Describes which Teams should or should not
 /// match while doing a query.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum TeamMask {
     AllExcept(Vec<TeamMask>),
     ThisTeam(TeamId),
@@ -91,18 +92,23 @@ pub enum TeamMask {
 }
 
 impl TeamMask {
-    /// returns true if an team should be
+    /// returns true if a team should be
     /// excluded by a search with mask TeamMask.
     pub fn filter(
         &self,
-        _team: TeamId,
+        _team: &TeamId,
     ) -> bool {
-        todo!()
+        match self {
+            // todo test this
+            TeamMask::AllExcept(x) => x.iter().any(|x| x.filter(_team)),
+            TeamMask::ThisTeam(x) => _team != x,
+            TeamMask::NotThisTeam(x) => _team == x,
+        }
     }
     /// disable points in the map that shouldn't be crossed while searching with current team mask
     pub fn mask(
         &self,
-        map: &mut Map,
+        _map: &mut Map,
     ) {
         todo!()
     }
@@ -111,17 +117,17 @@ impl TeamMask {
 impl TeamMask {
     pub fn select(
         &self,
-        id: TeamId,
+        id: &TeamId,
     ) -> bool {
         match self {
             TeamMask::AllExcept(v) => v.iter().any(|x| {
                 if let TeamMask::AllExcept(_team_masks) = x {
-                    panic!("Nested TeamMask::AllExcept dont have meaning")
+                    panic!("Nested TeamMask::AllExcept don't have meaning")
                 };
                 !v.iter().any(|x| -> bool { x.select(id) })
             }),
-            TeamMask::ThisTeam(other) => *other == id,
-            TeamMask::NotThisTeam(other) => *other != id,
+            TeamMask::ThisTeam(other) => other == id,
+            TeamMask::NotThisTeam(other) => other != id,
         }
     }
 }

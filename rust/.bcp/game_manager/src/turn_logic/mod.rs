@@ -2,6 +2,8 @@ use std::rc::Rc;
 
 use thiserror::Error;
 
+use crate::map::select::SelectorResult;
+
 use super::*;
 
 #[derive(Debug, Error)]
@@ -17,6 +19,7 @@ pub struct Intent {
     pub priority: i64,
     /// a reference to the entity that wants to do the action
     pub entity: Rc<Entity>,
+    pub targets: Option<SelectorResult>,
 }
 
 /// representation of what an entity wants to do
@@ -48,11 +51,13 @@ impl Intent {
                         action: Action::Move(Move { path: next_path }),
                         priority: self.priority,
                         entity: self.entity.clone(),
+                        targets: self.targets.clone(),
                     },
                     Intent {
                         action: Action::Move(Move { path: _move.path }),
                         priority: self.priority,
                         entity: self.entity.clone(),
+                        targets: self.targets.clone(),
                     },
                 );
                 let remainder_intent = if remainder_should_be_none {
@@ -84,6 +89,7 @@ impl Intent {
             entity: Rc::new(Entity::test_entity(
                 entity, entity_id,
             )),
+            targets: None,
         }
     }
 }

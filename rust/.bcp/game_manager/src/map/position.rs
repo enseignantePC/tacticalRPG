@@ -6,7 +6,7 @@ use gdnative::prelude::*;
 
 pub use dijkstra_map::grids::Vector2D;
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
+#[derive(Debug, PartialEq, Clone, Copy, Hash, Eq)]
 pub struct Pos2D(pub Vector2D<i32, i32>);
 impl Pos2D {
     pub fn new(
@@ -14,7 +14,7 @@ impl Pos2D {
         y: i32,
     ) -> Self {
         let x = Vector2D::<i32, i32>::new(x, y);
-        Pos2D { 0: x }
+        Pos2D(x)
     }
 }
 
