@@ -313,11 +313,11 @@ mod test {
 
     /// Creates a new `DijkstraMap` with 3 non connected points.
     fn setup_add012() -> DijkstraMap {
-        let mut djikstra = DijkstraMap::new();
-        djikstra.add_point(ID0, TERRAIN).unwrap();
-        djikstra.add_point(ID1, TERRAIN).unwrap();
-        djikstra.add_point(ID2, TERRAIN).unwrap();
-        djikstra
+        let mut dijkstra = DijkstraMap::new();
+        dijkstra.add_point(ID0, TERRAIN).unwrap();
+        dijkstra.add_point(ID1, TERRAIN).unwrap();
+        dijkstra.add_point(ID2, TERRAIN).unwrap();
+        dijkstra
     }
 
     #[test]

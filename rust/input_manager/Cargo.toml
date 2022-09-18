@@ -6,3 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+gdnative = "0.10"
+game_manager = { path = "../game_manager" }
+
+# dijkstra_map = { path = "../dijkstra_map" }
+# bidir-map = "1.0.0"
