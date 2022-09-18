@@ -1,19 +1,23 @@
-use dijkstra_map::DijkstraMap;
+use bidir_map::BidirMap;
+use dijkstra_map::{grids::Vector2D, DijkstraMap, PointId};
 
-use std::collections::HashMap;
+use std::hash::BuildHasherDefault;
+
+use dijkstra_map::FnvHashMap;
 
 use crate::common_types::{
-    Action, Intent, Selector, SelectorResult, Terrain, TerrainId, TerrainMode,
+    Action, EntityId, Intent, Position, Selector, SelectorResult, Terrain, TerrainId, TerrainMode,
 };
 
-pub struct TerrainSet {
-    id_gen: i32,
-    data: HashMap<Terrain, dijkstra_map::TerrainType>,
-}
+pub mod terrains;
+use terrains::TerrainSet;
 
 pub struct Map {
     intern_map: DijkstraMap,
     terrains: TerrainSet,
+    pos_to_point: FnvHashMap<Vector2D<i32, i32>, PointId>,
+    entities_positions: BidirMap<EntityId, Position>,
+    size: (usize, usize),
 }
 
 impl Map {
@@ -22,7 +26,7 @@ impl Map {
         size: (usize, usize),
     ) -> Self {
         let mut im = dijkstra_map::DijkstraMap::new();
-        let h = im.add_square_grid(
+        let pos_to_point = im.add_square_grid(
             size.0,
             size.1,
             None,
@@ -30,16 +34,54 @@ impl Map {
             None,
             None,
         );
-        todo!("h unused");
         Map {
             intern_map: im,
             terrains,
+            pos_to_point,
+            entities_positions: BidirMap::new(),
+            size,
         }
     }
     pub fn select(
         &self,
         selector: Selector,
     ) -> SelectorResult {
+        todo!()
+    }
+    ///
+    pub fn is_out_of_bounds(
+        &self,
+        pos: Position,
+    ) -> bool {
+        !self.pos_to_point.contains_key(&pos.0)
+    }
+
+    pub fn is_occupied(
+        &self,
+        pos: Position,
+    ) -> bool {
+        self.entities_positions.contains_second_key(&pos)
+    }
+
+    pub fn place(
+        &mut self,
+        entity: EntityId,
+        pos: Position,
+    ) {
+        self.entities_positions.insert(entity, pos);
+    }
+
+    pub fn move_entity(
+        id: EntityId,
+        new_pos: Position,
+    ) {
+        todo!()
+    }
+
+    pub fn unplace(
+        &mut self,
+        e: EntityId,
+    ) {
         todo!()
     }
 }
@@ -54,59 +96,5 @@ impl SelectorResult {
         action: Action,
     ) -> Intent {
         todo!()
-    }
-}
-
-impl Terrain {
-    pub fn new(
-        name: String,
-        id: TerrainId,
-        mode: TerrainMode,
-    ) -> Self {
-        Terrain { name, id, mode }
-    }
-}
-
-impl TerrainSet {
-    fn get_next_id(&mut self) -> TerrainId {
-        self.id_gen += 1;
-        TerrainId(self.id_gen)
-    }
-
-    pub fn to_dijkstra_terrain(
-        &self,
-        terrain: Terrain,
-    ) {
-        todo!()
-    }
-
-    pub fn add_terrain(
-        &mut self,
-        terrain_name: &str,
-        terrain_mode: TerrainMode,
-        dijkstra_terrain: dijkstra_map::TerrainType,
-    ) {
-        let terrain = Terrain {
-            name: terrain_name.into(),
-            id: self.get_next_id(),
-            mode: terrain_mode,
-        };
-        self.data.insert(
-            terrain,
-            dijkstra_terrain,
-        );
-    }
-
-    pub fn new() -> Self {
-        let mut set = TerrainSet {
-            data: HashMap::new(),
-            id_gen: 0,
-        };
-        set.add_terrain(
-            "Default",
-            TerrainMode::EntityCanCross,
-            dijkstra_map::TerrainType::DefaultTerrain,
-        );
-        set
     }
 }

@@ -1,13 +1,16 @@
-use std::{cell::RefCell, collections::HashMap, marker::PhantomData};
+use std::{cell::RefCell, collections::HashMap, marker::PhantomData, rc::Rc};
 
 use crate::{
-    common_types::{Entity, EntityId, Intent, Position, Selector, SelectorResult, WorldChange},
+    common_types::{
+        Action, Entity, EntityId, Intent, Position, Selector, SelectorResult, TeamId, WorldChange,
+    },
     map::Map,
 };
 
 pub struct EntityIntern<T: Entity> {
     pub entity: T,
     pub id: EntityId,
+    pub team_id: TeamId,
 }
 
 pub struct GameManagerInitialiser {}
@@ -18,12 +21,16 @@ impl GameManagerInitialiser {
         map: Map,
         // attack_resolver: T,
     ) -> GameManager<T> {
-        todo!()
+        GameManager {
+            map: RefCell::new(map),
+            entities: HashMap::new(),
+            gen_id: 0,
+        }
     }
 }
 pub struct GameManager<T: Entity> {
     map: RefCell<Map>,
-    entities: HashMap<EntityId, EntityIntern<T>>,
+    entities: HashMap<EntityId, Rc<EntityIntern<T>>>,
     gen_id: i32,
 }
 
@@ -33,29 +40,41 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
     pub fn register(
         &mut self,
         entity: EntityImpl,
+        team_id: TeamId,
     ) -> EntityId {
         let id = self.get_next_id();
         let e = EntityIntern {
             entity,
             id: id.clone(),
+            team_id,
         };
-        self.entities.insert(id.clone(), e);
+        self.entities.insert(
+            id.clone(),
+            Rc::new(e),
+        );
         id
     }
-
+    /// fails if position occupied or out of bounds
     pub fn try_place(
         &self,
         entity: EntityId,
         pos: Position,
     ) -> Result<(), ()> {
-        todo!()
+        if self.map.borrow().is_out_of_bounds(pos) {
+            return Err(());
+        }
+        if self.map.borrow().is_occupied(pos) {
+            return Err(());
+        }
+        self.map.borrow_mut().place(entity, pos);
+        Ok(())
     }
 
     pub fn unplace(
         &self,
         entity: EntityId,
     ) {
-        todo!()
+        self.map.borrow_mut().unplace(entity);
     }
 
     pub fn submit_intent(
@@ -81,6 +100,44 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
         res
     }
 
+    pub fn get_playable_entities(&self) -> Vec<EntityId> {
+        // sort by initiative
+        // sort by same team
+        let mut entity_queue: Vec<EntityId> = self.entities.keys().copied().collect();
+        entity_queue.sort_by(|x, y| {
+            let (x, y) = (
+                self.get_entity(*x),
+                self.get_entity(*y),
+            );
+            x.entity
+                .get_initiative()
+                .partial_cmp(&y.entity.get_initiative())
+                .unwrap()
+        });
+        let first_id = entity_queue.first();
+        if let Some(first_id) = first_id {
+            let team = self.get_entity(*first_id).team_id;
+            let mut res: Vec<EntityId> = vec![];
+            for id in entity_queue.iter() {
+                if self.get_entity(*id).team_id.is_ally(&team) {
+                    res.push(*id);
+                } else {
+                    break;
+                }
+            }
+            res
+        } else {
+            vec![]
+        }
+    }
+
+    pub fn get_play_options_for(
+        &self,
+        e: EntityId,
+    ) -> Vec<(Selector, Action)> {
+        self.get_entity(e).entity.get_play_options()
+    }
+
     pub fn map_select(
         &self,
         selector: Selector,
@@ -90,6 +147,21 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
 }
 
 impl<EntityImpl: Entity> GameManager<EntityImpl> {
+    fn get_entity(
+        &self,
+        id: EntityId,
+    ) -> Rc<EntityIntern<EntityImpl>> {
+        self.entities.get(&id).unwrap().clone()
+    }
+
+    fn move_entity(
+        &mut self,
+        entity: EntityId,
+        new_pos: Position,
+    ) {
+        todo!()
+    }
+
     fn get_next_id(&mut self) -> EntityId {
         self.gen_id += 1;
         EntityId(self.gen_id)
@@ -132,6 +204,13 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
         &mut self,
         changes: Vec<WorldChange<EntityImpl::EntityChange>>,
     ) {
-        todo!()
+        for change in changes.iter() {
+            match change {
+                WorldChange::EntityStateChanged(_) => {}
+                WorldChange::EntityMoved(entity, new_pos) => self.move_entity(*entity, *new_pos),
+                WorldChange::EntityUnplaced(entity) => self.unplace(*entity),
+                WorldChange::EntityPlaced(entity, pos) => self.try_place(*entity, *pos).unwrap(),
+            }
+        }
     }
 }

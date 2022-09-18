@@ -1,8 +1,29 @@
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+use dijkstra_map::grids::Vector2D;
+
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub struct TerrainId(pub i32);
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub struct EntityId(pub i32);
+
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
+pub enum TeamId {
+    Loner,
+    Team(i32),
+}
+impl TeamId {
+    pub fn is_ally(
+        &self,
+        oth: &TeamId,
+    ) -> bool {
+        if let TeamId::Team(x) = self {
+            if let TeamId::Team(y) = oth {
+                return *x == *y;
+            }
+        }
+        false
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Selector;
@@ -10,8 +31,8 @@ pub struct Selector;
 #[derive(Debug, Clone)]
 pub struct SelectorResult;
 
-#[derive(Debug, Clone)]
-pub struct Position;
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Position(pub Vector2D<i32, i32>);
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub struct Terrain {
@@ -46,10 +67,10 @@ pub enum Action {
 
 #[derive(Debug, Clone)]
 pub enum WorldChange<EntityStateChangeData> {
-    EntityMoved,
+    EntityMoved(EntityId, Position),
     EntityStateChanged(EntityStateChangeData),
-    EntityPlaced,
-    EntityUnplaced,
+    EntityPlaced(EntityId, Position),
+    EntityUnplaced(EntityId),
 }
 
 pub trait Entity {

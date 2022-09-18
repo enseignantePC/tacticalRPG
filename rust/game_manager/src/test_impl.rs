@@ -1,12 +1,15 @@
-use crate::common_types::Entity;
+use dijkstra_map::grids::Vector2D;
+
+use crate::common_types::{Entity, Position};
 use crate::input_manager::InputManager;
-use crate::map::{Map, TerrainSet};
+use crate::map::{terrains::TerrainSet, Map};
 
 use super::manager::{GameManager, GameManagerInitialiser};
 use super::*;
 
 pub struct MyEntity {
     name: String,
+    initiative: f32,
 }
 
 #[derive(Clone)]
@@ -34,7 +37,7 @@ impl Entity for MyEntity {
     }
 
     fn get_initiative(&self) -> f32 {
-        todo!()
+        self.initiative
     }
 
     fn turn_finished(&mut self) {
@@ -56,17 +59,29 @@ fn feature() {
     let mut gm = GameManagerInitialiser::initialise::<MyEntity>(my_map);
     let e1 = MyEntity {
         name: "Robert".into(),
+        initiative: 0.0,
     };
     let e2 = MyEntity {
         name: "Jean".into(),
+        initiative: 1.0,
     };
-    let id1 = gm.register(e1);
-    let id2 = gm.register(e2);
+    let id1 = gm.register(
+        e1,
+        common_types::TeamId::Loner,
+    );
+    let id2 = gm.register(
+        e2,
+        common_types::TeamId::Loner,
+    );
+    let pos1: Position = Position(Vector2D::new(0, 0));
+    let pos2: Position = Position(Vector2D::new(2, 2));
+    gm.try_place(id1, pos1).unwrap();
+    gm.try_place(id2, pos2).unwrap();
 
     let mut im = InputManager::new(gm);
 
     let pe = im.get_playable_entities();
     let opt = im.get_options_for_entity(0, pe);
     im.play(0, opt);
-    todo!();
+    // todo!();
 }

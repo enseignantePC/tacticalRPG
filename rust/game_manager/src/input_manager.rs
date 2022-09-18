@@ -1,10 +1,10 @@
 use crate::{
-    common_types::{Entity, Intent, WorldChange},
+    common_types::{Entity, EntityId, Intent, WorldChange},
     manager::{EntityIntern, GameManager},
     map::Map,
 };
 
-pub struct PlayableEntities;
+pub struct PlayableEntities(Vec<EntityId>);
 pub struct SelectableIntents;
 pub struct InputManager<T: Entity> {
     game_manager: GameManager<T>,
@@ -15,18 +15,19 @@ impl<T: Entity> InputManager<T> {
         InputManager { game_manager }
     }
     pub fn get_playable_entities(&self) -> PlayableEntities {
-        todo!()
+        let x: Vec<EntityId> = self.game_manager.get_playable_entities();
+        PlayableEntities::from(x)
     }
 
     pub fn get_options_for_entity(
         &self,
-        choice: i32,
+        choice: usize,
         entities: PlayableEntities,
     ) -> SelectableIntents {
-        let entity = entities.choice::<T>(choice).unwrap();
+        let entity = entities.choice(choice).unwrap();
         // let res = entity.entity.get_play_options();
         let mut res = vec![];
-        for (selector, action) in entity.entity.get_play_options() {
+        for (selector, action) in self.game_manager.get_play_options_for(entity) {
             let this = self.game_manager.map_select(selector);
             if this.is_not_empty() {
                 res.push(this.to_intent(action));
@@ -46,11 +47,16 @@ impl<T: Entity> InputManager<T> {
 }
 
 impl PlayableEntities {
-    fn choice<T: Entity>(
+    fn from(x: Vec<EntityId>) -> Self {
+        PlayableEntities(x)
+    }
+
+    fn choice(
         self,
-        choice: i32,
-    ) -> Result<EntityIntern<T>, ()> {
-        todo!();
+        index: usize,
+    ) -> Result<EntityId, ()> {
+        self.0.get(index).unwrap();
+        todo!()
     }
 }
 

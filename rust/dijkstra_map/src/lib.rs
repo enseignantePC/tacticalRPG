@@ -2,7 +2,7 @@
 //!
 //! This is intended for use in Godot, via the **dijkstra-map-gd** crate.
 
-use fnv::FnvHashMap;
+pub use fnv::FnvHashMap;
 use fnv::FnvHashSet;
 
 /// Contains the
