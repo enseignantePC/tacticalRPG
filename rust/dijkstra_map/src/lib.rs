@@ -3,7 +3,7 @@
 //! This is intended for use in Godot, via the **dijkstra-map-gd** crate.
 
 pub use fnv::FnvHashMap;
-use fnv::FnvHashSet;
+pub use fnv::FnvHashSet;
 
 /// Contains the
 /// [`get_direction_and_cost_map`](DijkstraMap::get_direction_and_cost_map) and

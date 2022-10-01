@@ -1,12 +1,13 @@
 use dijkstra_map::grids::Vector2D;
 
-use crate::common_types::{Entity, Position};
+use crate::common_types::{Action, Entity, Position, Selector};
 use crate::input_manager::InputManager;
 use crate::map::{terrains::TerrainSet, Map};
 
 use super::manager::{GameManager, GameManagerInitialiser};
 use super::*;
 
+#[derive(Debug, Clone)]
 pub struct MyEntity {
     name: String,
     initiative: f32,
@@ -29,11 +30,18 @@ impl Entity for MyEntity {
         common_types::Selector,
         common_types::Action,
     )> {
-        todo!()
+        vec![(
+            Selector {
+                mode: common_types::SelectorMode::Djikstra {
+                    move_force: 2.0,
+                },
+            },
+            Action::Move,
+        )]
     }
 
     fn can_still_play(&self) -> bool {
-        todo!()
+        true
     }
 
     fn get_initiative(&self) -> f32 {
@@ -47,7 +55,7 @@ impl Entity for MyEntity {
     fn get_message(
         &mut self,
         msg: Self::Message,
-    ) -> common_types::WorldChange<Self::EntityChange> {
+    ) -> common_types::WorldChange<Self> {
         todo!()
     }
 }
@@ -82,7 +90,7 @@ fn feature() {
 
     let pe = im.get_playable_entities();
     dbg!(&pe);
-    let opt = im.get_options_for_entity(0, pe);
+    let opt = im.get_options_for_entity(0, pe).unwrap();
     im.play(0, opt);
     // todo!();
 }

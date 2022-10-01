@@ -26,7 +26,14 @@ impl TeamId {
 }
 
 #[derive(Debug, Clone)]
-pub struct Selector;
+pub struct Selector {
+    pub mode: SelectorMode,
+}
+
+#[derive(Debug, Clone)]
+pub enum SelectorMode {
+    Djikstra {  move_force: f32 },
+}
 
 #[derive(Debug, Clone)]
 pub struct SelectorResult;
@@ -66,14 +73,26 @@ pub enum Action {
 }
 
 #[derive(Debug, Clone)]
-pub enum WorldChange<EntityStateChangeData> {
-    EntityMoved(EntityId, Position),
-    EntityStateChanged(EntityStateChangeData),
+pub enum WorldChange<T: Entity> {
+    EntityMoved {
+        id: EntityId,
+        from: Position,
+        to: Position,
+    },
+    EntitySentMessage {
+        from: EntityId,
+        to: EntityId,
+        msg: T::Message,
+    },
+    EntityStateChanged {
+        id: EntityId,
+        change: T::EntityChange,
+    },
     EntityPlaced(EntityId, Position),
     EntityUnplaced(EntityId),
 }
 
-pub trait Entity {
+pub trait Entity: Sized + Clone {
     // the entity can receive these kinda message and have to update their internal state when they do
     type Message: Clone;
     // returned by the entity to tell the world what kinda consequence it got
@@ -86,7 +105,7 @@ pub trait Entity {
     fn get_message(
         &mut self,
         msg: Self::Message,
-    ) -> WorldChange<Self::EntityChange>;
+    ) -> WorldChange<Self>;
 }
 
 pub trait Watcher {
