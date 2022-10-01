@@ -12,6 +12,8 @@ use crate::common_types::{
 pub mod terrains;
 use terrains::TerrainSet;
 
+
+#[derive(Debug)]
 pub struct Map {
     intern_map: DijkstraMap,
     terrains: TerrainSet,

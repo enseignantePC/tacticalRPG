@@ -81,6 +81,7 @@ fn feature() {
     let mut im = InputManager::new(gm);
 
     let pe = im.get_playable_entities();
+    dbg!(&pe);
     let opt = im.get_options_for_entity(0, pe);
     im.play(0, opt);
     // todo!();

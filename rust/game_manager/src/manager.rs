@@ -7,6 +7,7 @@ use crate::{
     map::Map,
 };
 
+#[derive(Debug)]
 pub struct EntityIntern<T: Entity> {
     pub entity: T,
     pub id: EntityId,
@@ -28,6 +29,7 @@ impl GameManagerInitialiser {
         }
     }
 }
+#[derive(Debug)]
 pub struct GameManager<T: Entity> {
     map: RefCell<Map>,
     entities: HashMap<EntityId, Rc<EntityIntern<T>>>,

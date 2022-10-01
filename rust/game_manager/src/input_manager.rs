@@ -4,8 +4,11 @@ use crate::{
     map::Map,
 };
 
+#[derive(Debug)]
 pub struct PlayableEntities(Vec<EntityId>);
+#[derive(Debug)]
 pub struct SelectableIntents;
+#[derive(Debug)]
 pub struct InputManager<T: Entity> {
     game_manager: GameManager<T>,
 }
