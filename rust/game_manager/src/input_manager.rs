@@ -4,6 +4,7 @@ use crate::{
     map::Map,
 };
 
+#[derive(Debug)]
 pub struct PlayableEntities(Vec<EntityId>);
 pub struct SelectableIntents;
 pub struct InputManager<T: Entity> {
@@ -15,8 +16,7 @@ impl<T: Entity> InputManager<T> {
         InputManager { game_manager }
     }
     pub fn get_playable_entities(&self) -> PlayableEntities {
-        let x: Vec<EntityId> = self.game_manager.get_playable_entities();
-        PlayableEntities::from(x)
+        PlayableEntities::from(self.game_manager.get_playable_entities())
     }
 
     pub fn get_options_for_entity(
@@ -55,8 +55,7 @@ impl PlayableEntities {
         self,
         index: usize,
     ) -> Result<EntityId, ()> {
-        self.0.get(index).unwrap();
-        todo!()
+        self.0.get(index).and_then(|x| Some(*x)).ok_or(())
     }
 }
 

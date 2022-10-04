@@ -25,11 +25,8 @@ impl TeamId {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Selector;
-
-#[derive(Debug, Clone)]
-pub struct SelectorResult;
+pub mod selector;
+pub use selector::{Selector, SelectorResult};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Position(pub Vector2D<i32, i32>);

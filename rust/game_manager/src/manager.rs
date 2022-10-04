@@ -103,21 +103,12 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
     pub fn get_playable_entities(&self) -> Vec<EntityId> {
         // sort by initiative
         // sort by same team
-        let mut entity_queue: Vec<EntityId> = self.entities.keys().copied().collect();
-        entity_queue.sort_by(|x, y| {
-            let (x, y) = (
-                self.get_entity(*x),
-                self.get_entity(*y),
-            );
-            x.entity
-                .get_initiative()
-                .partial_cmp(&y.entity.get_initiative())
-                .unwrap()
-        });
-        let first_id = entity_queue.first();
+        let entity_queue = self.get_playable_entity_sorted();
+
+        let first_id = dbg!(&entity_queue).first();
         if let Some(first_id) = first_id {
             let team = self.get_entity(*first_id).team_id;
-            let mut res: Vec<EntityId> = vec![];
+            let mut res: Vec<EntityId> = vec![*first_id];
             for id in entity_queue.iter() {
                 if self.get_entity(*id).team_id.is_ally(&team) {
                     res.push(*id);
@@ -129,6 +120,24 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
         } else {
             vec![]
         }
+    }
+
+    fn get_playable_entity_sorted(&self) -> Vec<EntityId> {
+        let mut entity_queue: Vec<EntityId> = self.entities.keys().copied().collect();
+        entity_queue.sort_by(|x, y| {
+            let (x, y) = (
+                self.get_entity(*x),
+                self.get_entity(*y),
+            );
+            y.entity
+                .get_initiative()
+                .partial_cmp(&x.entity.get_initiative())
+                .unwrap()
+        });
+        entity_queue
+            .into_iter()
+            .filter(|&x| self.get_entity(x).entity.can_still_play())
+            .collect()
     }
 
     pub fn get_play_options_for(

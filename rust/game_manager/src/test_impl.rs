@@ -1,6 +1,6 @@
 use dijkstra_map::grids::Vector2D;
 
-use crate::common_types::{Entity, Position};
+use crate::common_types::{Entity, Position, Selector};
 use crate::input_manager::InputManager;
 use crate::map::{terrains::TerrainSet, Map};
 
@@ -29,11 +29,15 @@ impl Entity for MyEntity {
         common_types::Selector,
         common_types::Action,
     )> {
+        Selector {
+            mode: common_types::selector::SelectorMode::Dijkstra,
+            filter: todo!(),
+        };
         todo!()
     }
 
     fn can_still_play(&self) -> bool {
-        todo!()
+        true
     }
 
     fn get_initiative(&self) -> f32 {
@@ -53,7 +57,7 @@ impl Entity for MyEntity {
 }
 
 #[test]
-fn feature() {
+fn basic() {
     let terrains = TerrainSet::new();
     let my_map = Map::new(terrains, (10, 10));
     let mut gm = GameManagerInitialiser::initialise::<MyEntity>(my_map);
@@ -78,10 +82,13 @@ fn feature() {
     gm.try_place(id1, pos1).unwrap();
     gm.try_place(id2, pos2).unwrap();
 
-    let mut im = InputManager::new(gm);
+    let im = InputManager::new(gm);
 
     let pe = im.get_playable_entities();
+    dbg!(&pe);
+    // assert not empty
     let opt = im.get_options_for_entity(0, pe);
-    im.play(0, opt);
+    // assert not empty
+    // im.play(0, opt);
     // todo!();
 }
