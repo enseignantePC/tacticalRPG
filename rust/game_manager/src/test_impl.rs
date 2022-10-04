@@ -1,12 +1,13 @@
 use dijkstra_map::grids::Vector2D;
 
-use crate::common_types::{Entity, Position, Selector};
+use crate::common_types::{Action, Entity, Position, Selector};
 use crate::input_manager::InputManager;
 use crate::map::{terrains::TerrainSet, Map};
 
 use super::manager::{GameManager, GameManagerInitialiser};
 use super::*;
 
+#[derive(Debug, Clone)]
 pub struct MyEntity {
     name: String,
     initiative: f32,
@@ -29,11 +30,12 @@ impl Entity for MyEntity {
         common_types::Selector,
         common_types::Action,
     )> {
-        Selector {
-            mode: common_types::selector::SelectorMode::Dijkstra,
-            filter: todo!(),
-        };
-        todo!()
+        vec![(
+            Selector {
+                mode: common_types::SelectorMode::Djikstra { move_force: 2.0 },
+            },
+            Action::Move,
+        )]
     }
 
     fn can_still_play(&self) -> bool {
@@ -51,7 +53,7 @@ impl Entity for MyEntity {
     fn get_message(
         &mut self,
         msg: Self::Message,
-    ) -> common_types::WorldChange<Self::EntityChange> {
+    ) -> common_types::WorldChange<Self> {
         todo!()
     }
 }
@@ -82,13 +84,11 @@ fn basic() {
     gm.try_place(id1, pos1).unwrap();
     gm.try_place(id2, pos2).unwrap();
 
-    let im = InputManager::new(gm);
+    let mut im = InputManager::new(gm);
 
     let pe = im.get_playable_entities();
     dbg!(&pe);
-    // assert not empty
-    let opt = im.get_options_for_entity(0, pe);
-    // assert not empty
-    // im.play(0, opt);
+    let opt = im.get_options_for_entity(0, pe).unwrap();
+    im.play(0, opt);
     // todo!();
 }

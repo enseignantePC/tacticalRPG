@@ -1,5 +1,5 @@
 use super::*;
-
+#[derive(Debug)]
 pub struct TerrainSet {
     id_gen: i32,
     data: FnvHashMap<Terrain, dijkstra_map::TerrainType>,

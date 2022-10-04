@@ -7,6 +7,7 @@ use crate::{
     map::Map,
 };
 
+#[derive(Debug)]
 pub struct EntityIntern<T: Entity> {
     pub entity: T,
     pub id: EntityId,
@@ -28,6 +29,7 @@ impl GameManagerInitialiser {
         }
     }
 }
+#[derive(Debug)]
 pub struct GameManager<T: Entity> {
     map: RefCell<Map>,
     entities: HashMap<EntityId, Rc<EntityIntern<T>>>,
@@ -80,7 +82,7 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
     pub fn submit_intent(
         &mut self,
         intent: Intent,
-    ) -> Vec<WorldChange<EntityImpl::EntityChange>> {
+    ) -> Vec<WorldChange<EntityImpl>> {
         self.insert_intent_in_queue(intent.clone());
         for i in self.watch_intent_submitted(intent).iter().cloned() {
             self.submit_intent(i);
@@ -90,8 +92,8 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
         res
     }
 
-    pub fn resolve_intents_submitted(&mut self) -> Vec<WorldChange<EntityImpl::EntityChange>> {
-        let mut res: Vec<WorldChange<EntityImpl::EntityChange>> = vec![];
+    pub fn resolve_intents_submitted(&mut self) -> Vec<WorldChange<EntityImpl>> {
+        let mut res: Vec<WorldChange<EntityImpl>> = vec![];
         while self.intent_queue_not_empty() {
             let i = self.pop_higher_priority_intent();
             res.append(&mut Self::apply_intent(i.clone()));
@@ -103,9 +105,27 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
     pub fn get_playable_entities(&self) -> Vec<EntityId> {
         // sort by initiative
         // sort by same team
-        let entity_queue = self.get_playable_entity_sorted();
-
-        let first_id = dbg!(&entity_queue).first();
+        // let entity_queue = self.get_playable_entity_sorted();
+        //
+        // let first_id = dbg!(&entity_queue).first();
+        // check up
+        let mut entity_queue: Vec<EntityId> = self
+            .entities
+            .keys()
+            .copied()
+            .filter(|x| self.get_entity(*x).entity.can_still_play())
+            .collect();
+        entity_queue.sort_by(|x, y| {
+            let (x, y) = (
+                self.get_entity(*x),
+                self.get_entity(*y),
+            );
+            x.entity
+                .get_initiative()
+                .partial_cmp(&y.entity.get_initiative())
+                .unwrap()
+        });
+        let first_id = entity_queue.first();
         if let Some(first_id) = first_id {
             let team = self.get_entity(*first_id).team_id;
             let mut res: Vec<EntityId> = vec![*first_id];
@@ -149,76 +169,94 @@ impl<EntityImpl: Entity> GameManager<EntityImpl> {
 
     pub fn map_select(
         &self,
+        id: EntityId,
         selector: Selector,
     ) -> SelectorResult {
-        self.map.borrow_mut().select(selector)
-    }
-}
+        match selector.mode {
+            crate::common_types::SelectorMode::Djikstra { move_force } => {
+                // bake map for entity
+                self.map.borrow_mut().recalculate_for_entity(
+                    &self.get_entity(id),
+                    move_force,
+                );
+                // perform the search (disabling the points that need to be disabled and reenabling them afterwards)
+                todo!()
 
-impl<EntityImpl: Entity> GameManager<EntityImpl> {
-    fn get_entity(
-        &self,
-        id: EntityId,
-    ) -> Rc<EntityIntern<EntityImpl>> {
-        self.entities.get(&id).unwrap().clone()
-    }
+                // self.map.borrow_mut().select(selector)
+            }
+        }
 
-    fn move_entity(
-        &mut self,
-        entity: EntityId,
-        new_pos: Position,
-    ) {
-        todo!()
-    }
+        impl<EntityImpl: Entity> GameManager<EntityImpl> {
+            fn get_entity(
+                &self,
+                id: EntityId,
+            ) -> Rc<EntityIntern<EntityImpl>> {
+                self.entities.get(&id).unwrap().clone()
+            }
 
-    fn get_next_id(&mut self) -> EntityId {
-        self.gen_id += 1;
-        EntityId(self.gen_id)
-    }
+            fn move_entity(
+                &mut self,
+                entity: EntityId,
+                new_pos: Position,
+            ) {
+                todo!()
+            }
 
-    fn watch_intent_submitted(
-        &self,
-        intent: Intent,
-    ) -> Vec<Intent> {
-        todo!()
-    }
+            fn get_next_id(&mut self) -> EntityId {
+                self.gen_id += 1;
+                EntityId(self.gen_id)
+            }
 
-    fn watch_intent_resolved(
-        &self,
-        intent: Intent,
-    ) -> Vec<Intent> {
-        todo!()
-    }
+            fn watch_intent_submitted(
+                &self,
+                intent: Intent,
+            ) -> Vec<Intent> {
+                todo!()
+            }
 
-    fn insert_intent_in_queue(
-        &mut self,
-        intent: Intent,
-    ) {
-        todo!()
-    }
+            fn watch_intent_resolved(
+                &self,
+                intent: Intent,
+            ) -> Vec<Intent> {
+                todo!()
+            }
 
-    fn intent_queue_not_empty(&self) -> bool {
-        todo!()
-    }
+            fn insert_intent_in_queue(
+                &mut self,
+                intent: Intent,
+            ) {
+                todo!()
+            }
 
-    fn pop_higher_priority_intent(&mut self) -> Intent {
-        todo!()
-    }
+            fn intent_queue_not_empty(&self) -> bool {
+                todo!()
+            }
 
-    fn apply_intent(intent: Intent) -> Vec<WorldChange<EntityImpl::EntityChange>> {
-        todo!()
-    }
+            fn pop_higher_priority_intent(&mut self) -> Intent {
+                todo!()
+            }
 
-    fn apply_changes_to_world(
-        &mut self,
-        changes: Vec<WorldChange<EntityImpl::EntityChange>>,
-    ) {
-        for change in changes.iter() {
-            match change {
-                WorldChange::EntityStateChanged(_) => {}
-                WorldChange::EntityMoved(entity, new_pos) => self.move_entity(*entity, *new_pos),
-                WorldChange::EntityUnplaced(entity) => self.unplace(*entity),
-                WorldChange::EntityPlaced(entity, pos) => self.try_place(*entity, *pos).unwrap(),
+            fn apply_intent(intent: Intent) -> Vec<WorldChange<EntityImpl>> {
+                todo!()
+            }
+
+            fn apply_changes_to_world(
+                &mut self,
+                changes: Vec<WorldChange<EntityImpl>>,
+            ) {
+                for change in changes.iter() {
+                    match change {
+                        WorldChange::EntityMoved { id, from, to } => self.move_entity(*id, *to),
+                        WorldChange::EntitySentMessage { from, to, msg } => todo!(),
+                        WorldChange::EntityStateChanged { id, change } => todo!(),
+                        WorldChange::EntityPlaced(_, _) => todo!(),
+                        WorldChange::EntityUnplaced(_) => todo!(),
+                        // WorldChange::EntityStateChanged(_) => {}
+                        // WorldChange::EntityMoved(entity, new_pos) => self.move_entity(*entity, *new_pos),
+                        // WorldChange::EntityUnplaced(entity) => self.unplace(*entity),
+                        // WorldChange::EntityPlaced(entity, pos) => self.try_place(*entity, *pos).unwrap(),
+                    }
+                }
             }
         }
     }

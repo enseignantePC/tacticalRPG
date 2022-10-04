@@ -1,17 +1,22 @@
 use bidir_map::BidirMap;
-use dijkstra_map::{grids::Vector2D, DijkstraMap, PointId};
+use dijkstra_map::{grids::Vector2D, DijkstraMap, PointId, FnvHashSet, Cost};
 
-use std::hash::BuildHasherDefault;
+use std::{hash::BuildHasherDefault, collections::HashSet};
 
 use dijkstra_map::FnvHashMap;
 
-use crate::common_types::{
-    Action, EntityId, Intent, Position, Selector, SelectorResult, Terrain, TerrainId, TerrainMode,
+use crate::{
+    common_types::{
+        Action, Entity, EntityId, Intent, Position, Selector, SelectorResult, Terrain, TerrainId,
+        TerrainMode,
+    },
+    manager::EntityIntern,
 };
 
 pub mod terrains;
 use terrains::TerrainSet;
 
+#[derive(Debug)]
 pub struct Map {
     intern_map: DijkstraMap,
     terrains: TerrainSet,
@@ -42,12 +47,7 @@ impl Map {
             size,
         }
     }
-    pub fn select(
-        &self,
-        selector: Selector,
-    ) -> SelectorResult {
-        todo!()
-    }
+
     ///
     pub fn is_out_of_bounds(
         &self,
@@ -83,6 +83,26 @@ impl Map {
         e: EntityId,
     ) {
         todo!()
+    }
+
+    pub fn recalculate_for_entity<T : Entity>(
+        &mut self,
+        entity: &EntityIntern<T>,
+        max_cost: f32,
+    ) {
+        let origin = self
+            .pos_to_point
+            .get(&self.entities_positions.get_by_first(&entity.id).unwrap().0)
+            .unwrap();
+
+        self.intern_map.recalculate(
+            vec![*origin].as_slice(),
+            Some(dijkstra_map::Read::InputIsOrigin),
+            Some(Cost( max_cost)),
+            vec![],
+            todo!(), //entity.entity.can_still_play() 
+            FnvHashSet::default(),
+        )
     }
 }
 
